@@ -18,7 +18,7 @@ next.
 
 | Project                                                         | What it is                                                        |
 | --------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [LabsQ](https://github.com/LuisZarate17/labqueue)               | Lab equipment reservation API with two measured database findings |
+| [LabQ](https://github.com/LuisZarate17/labqueue)               | Lab equipment reservation API with two measured database findings |
 | [Bifrost](https://github.com/LuisZarate17/bifrost)              | Local-first AI tools for Windows 11, all on one local model       |
 | [Cougar Connect](https://github.com/LuisZarate17/CougarConnect) | Alumni networking platform for WSU graduates                      |
 | [Mastery Pilot](https://github.com/LuisZarate17/MasteryPilot)   | Self-hosted Socratic AI tutor for school districts                |
