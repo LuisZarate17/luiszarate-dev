@@ -1,0 +1,22 @@
+---
+interface Props {
+  /** Scene number, e.g. "SC 01". Omitted in the hero. */
+  no?: string;
+  loc: string;
+}
+const { no, loc } = Astro.props;
+---
+
+<p class="slug font-mono text-slug text-muted uppercase">
+  {no && <span class="slug-no">{no}</span>}{" "}
+  <span class:list={["slug-loc", { "has-no": Boolean(no) }]}>{loc}</span>
+</p>
+
+<style>
+  .slug-loc {
+    color: var(--color-accent);
+  }
+  .slug-loc.has-no::before {
+    content: "· ";
+  }
+</style>

@@ -16,7 +16,7 @@ world:
 stack: [C#, .NET 10, PostgreSQL 17, Docker, k6, Grafana]
 repo: https://github.com/LuisZarate17/labqueue
 live: https://labqueue-api.onrender.com/docs
-role: Solo project.
+role: "Solo project. Designed and built the API, found both database bugs with my own concurrency and k6 load tests, fixed them, and published the before-and-after numbers."
 metrics:
   - { value: "50 → 1", label: "confirmed bookings when 50 race for one slot" }
   - { value: "2.13×", label: "availability throughput after indexing" }

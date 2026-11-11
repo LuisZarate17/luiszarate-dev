@@ -17,7 +17,7 @@ world:
   secondaryLight: "#5A45B8"
 stack: [Rust, Tauri, React, TypeScript, Ollama]
 repo: https://github.com/LuisZarate17/bifrost
-role: Solo project.
+role: "Solo project. Built the shared Rust engine and all three apps, the guards on model-written code, and the hidden-test benchmark that chose the coding model."
 metrics:
   - { value: "3", label: "apps on one local model: Vidar, Mimir and Hugin" }
   - { value: "1,100+", label: "Rust unit tests" }
