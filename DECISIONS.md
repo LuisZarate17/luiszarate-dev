@@ -75,3 +75,19 @@ in `order`.
 **Consequences.** Adding a project means adding one file (plus its simulation, when it has
 one). The schema rejects a project with a malformed color, missing links or more than four
 headline numbers at build time, so a bad entry fails CI instead of shipping.
+
+## ADR-005: Color worlds and credit live in the content files
+
+**Status:** accepted, 2026-11-11. Amends ADR-004.
+
+**Decision.** Each project file holds its full color world (fill, on-fill, text and tint for
+dark and light, optional secondary), a `credit` of `solo` or `team`, and its scene copy
+(`slug`, `headline`, `logline`, `pin`). `WorldStyles.astro` generates the CSS from the
+collection. The schema computes WCAG contrast and fails the build when a world's text pairs
+are under 4.5:1.
+
+**Considered.** Worlds in a CSS file keyed by project id: simpler today, but a new project
+would touch two files and lose the build-time contrast check.
+
+**Consequences.** A new project is still one file. A badly chosen color cannot ship. The
+light theme's tokens exist but no toggle ships yet; it is a later, additive change.
