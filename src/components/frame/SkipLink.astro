@@ -1,0 +1,31 @@
+---
+/** First element in <body> (spec 6.4). Hidden until focused, then styled as a Primary button. */
+---
+
+<a class="skip-link" href="#main">
+  Skip to content
+</a>
+
+<style>
+  .skip-link {
+    position: fixed;
+    top: calc(var(--bar-top) + 8px);
+    left: 16px;
+    z-index: var(--z-skip);
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    height: 48px;
+    padding-inline: 20px;
+    border-radius: var(--radius-md);
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-size: var(--text-control);
+    font-weight: 600;
+    text-decoration: none;
+    transform: translateY(-300%);
+  }
+  .skip-link:focus-visible {
+    transform: none;
+  }
+</style>

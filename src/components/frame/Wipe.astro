@@ -1,0 +1,22 @@
+---
+/** The single scene-cut wipe element (spec 4.2). Animated by src/lib/cut.ts. */
+---
+
+<div class="wipe" aria-hidden="true"></div>
+
+<style>
+  .wipe {
+    position: fixed;
+    inset: var(--bar-top) 0 var(--bar-bottom) 0;
+    z-index: var(--z-wipe);
+    background: var(--color-text);
+    pointer-events: none;
+    transform: translateX(-101%);
+  }
+</style>
+
+<script>
+  import { bindCutLinks } from "../../lib/cut";
+
+  bindCutLinks();
+</script>
