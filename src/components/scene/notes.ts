@@ -13,5 +13,5 @@ export const notes: Record<string, string> = {
 /** Label of the live link when "Live demo" would overstate what it opens. */
 export const liveLabels: Record<string, string> = {
   labq: "Live API docs",
-  "cougar-connect": "Live demo (login)",
+  "cougar-connect": "Live demo: sign-in",
 };

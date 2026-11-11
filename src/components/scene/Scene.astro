@@ -16,7 +16,8 @@ const note = notes[id];
 const number = `SC ${String(data.order).padStart(2, "0")}`;
 const teamProject = data.credit === "team";
 const liveLabel = liveLabels[id] ?? "Live demo";
-const drawerGroups = ["Stack", ...(note ? ["Notes"] : [])];
+// The drawer exists only when it holds more than the stack list, which the scene already shows.
+const drawerGroups = note ? ["Stack", "Notes"] : [];
 
 /** "50 → 1" is split so the arrow can be drawn (spec 5.7). */
 const statParts = (value: string) => value.split("→").map((part) => part.trim());
@@ -25,10 +26,12 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
 <section class="scene" id={id} data-world={id} aria-labelledby={`${id}-title`}>
   <div class="scene-grid">
     <div class="scene-head">
-      <Slug no={number} loc={data.slug} />
-      <p class:list={["credit-badge font-mono text-meta uppercase", { team: teamProject }]}>
-        {teamProject ? "Team project" : "Solo project"}
-      </p>
+      <div class="scene-slugrow">
+        <Slug no={number} loc={data.slug} />
+        <p class:list={["credit-badge font-mono text-meta uppercase", { team: teamProject }]}>
+          {teamProject ? "Team project" : "Solo project"}
+        </p>
+      </div>
       <h2 id={`${id}-title`}>
         <span class="scene-kicker font-display text-heading uppercase">{data.title}</span>
         <span class="sr-only">: </span>
@@ -53,7 +56,7 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
       <figure class="sim">
         <div class="sim-stage">
           {still && (
-            <div class="sim-still">
+            <div class:list={["sim-still", { light: still.tone === "light" }]}>
               <Picture
                 src={still.src}
                 alt={still.alt}
@@ -62,7 +65,6 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
                 widths={[480, 720, 960, 1256]}
                 sizes="(min-width: 64rem) 39.25rem, calc(100vw - 2rem)"
                 pictureAttributes={{ class: "sim-picture" }}
-                style={`object-position: ${still.position ?? "center"}`}
                 class="sim-image"
               />
             </div>
@@ -92,7 +94,6 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
                           d="M0 6h11M6.5 1.5 11 6l-4.5 4.5"
                           fill="none"
                           stroke="currentColor"
-                          stroke-width="2"
                           vector-effect="non-scaling-stroke"
                         />
                       </svg>
@@ -148,31 +149,61 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
         {data.role}
       </p>
 
-      <details class="drawer">
-        <summary class="text-control">
-          <span class="drawer-label">
-            Details
-            <span class="drawer-groups font-mono text-meta uppercase">
-              {drawerGroups.join(" · ")}
+      {drawerGroups.length > 0 && (
+        <details class="drawer">
+          <summary class="text-control">
+            <span class="drawer-label">
+              Details
+              <span class="drawer-groups font-mono text-meta uppercase">
+                {drawerGroups.join(" · ")}
+              </span>
             </span>
-          </span>
-        </summary>
-        <div class="drawer-panel">
-          <div class="drawer-group">
-            <h3>Stack</h3>
-            <p class="text-body">{data.stack.join(", ")}.</p>
-          </div>
-          {note && (
+          </summary>
+          <div class="drawer-panel">
             <div class="drawer-group">
-              <h3>Notes</h3>
-              <p class="text-body">{note}</p>
+              <h3>Stack</h3>
+              <p class="text-body">{data.stack.join(", ")}.</p>
             </div>
-          )}
-        </div>
-      </details>
+            {note && (
+              <div class="drawer-group">
+                <h3>Notes</h3>
+                <p class="text-body">{note}</p>
+              </div>
+            )}
+          </div>
+        </details>
+      )}
     </div>
   </div>
 </section>
+
+<script>
+  // Opening the drawer grows a vertically centred scene, which would move the bar under the
+  // pointer. Keep the summary where it was by scrolling by the difference.
+  const tops = new WeakMap<Element, number>();
+  document.addEventListener(
+    "click",
+    (event) => {
+      const summary = (event.target as Element | null)?.closest("details.drawer > summary");
+      if (summary?.parentElement) {
+        tops.set(summary.parentElement, summary.getBoundingClientRect().top);
+      }
+    },
+    true,
+  );
+  document.addEventListener(
+    "toggle",
+    (event) => {
+      const drawer = event.target as Element;
+      const before = tops.get(drawer);
+      const summary = drawer.querySelector(":scope > summary");
+      if (before === undefined || !summary) return;
+      tops.delete(drawer);
+      window.scrollBy(0, summary.getBoundingClientRect().top - before);
+    },
+    true,
+  );
+</script>
 
 <style>
   .scene {
@@ -198,16 +229,18 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
   }
 
   /* ---- head ---- */
-  .scene-head {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: start;
+  .scene-slugrow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
   }
-  .scene-head > :global(.slug) {
-    max-width: 100%;
+  /* Phone: the slug takes the row, so the badge sits on its own row below it. */
+  .scene-slugrow > :global(.slug) {
+    flex: 1 1 100%;
   }
   .credit-badge {
-    margin-top: calc(var(--spacing) * 2);
     padding: calc(var(--spacing) * 1) calc(var(--spacing) * 2);
     border: 1px solid var(--color-line-strong);
     border-radius: var(--radius-sm);
@@ -260,9 +293,17 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
+  }
+  /* A light screenshot on a dark scene: the surface frames it. Not inverted or tinted. */
+  .sim-still.light {
+    padding: calc(var(--spacing) * 3);
+  }
+  .sim-still.light :global(.sim-image) {
+    border-radius: var(--radius-sm);
   }
   figcaption {
-    margin-top: calc(var(--spacing) * 3);
+    margin-top: calc(var(--spacing) * 2);
     max-width: var(--container-measure-wide);
     color: var(--color-muted);
   }
@@ -292,6 +333,7 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     width: 0.5em;
     height: 0.5em;
     margin-inline: 0.15em;
+    stroke-width: 3px;
   }
 
   /* ---- meta ---- */
@@ -303,11 +345,15 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
   .stack {
     display: flex;
     flex-wrap: wrap;
+    gap: calc(var(--spacing) * 1) calc(var(--spacing) * 2);
     color: var(--color-muted);
   }
-  .stack li + li::before {
+  .stack li {
+    white-space: nowrap;
+  }
+  .stack li:not(:last-child)::after {
     content: "·";
-    margin-inline: calc(var(--spacing) * 2);
+    margin-inline-start: calc(var(--spacing) * 2);
   }
   .scene-links {
     display: flex;
@@ -344,14 +390,16 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     color: var(--color-text);
     border-color: var(--color-text);
   }
-  .btn-primary:hover {
-    background: var(--color-text);
-    color: var(--color-bg);
-    border-color: var(--color-text);
-  }
-  .btn-ghost:hover {
-    background: var(--color-text);
-    color: var(--color-bg);
+  @media (hover: hover) {
+    .btn-primary:hover {
+      background: var(--color-text);
+      color: var(--color-bg);
+      border-color: var(--color-text);
+    }
+    .btn-ghost:hover {
+      background: var(--color-text);
+      color: var(--color-bg);
+    }
   }
   .btn:active {
     background: var(--color-accent);
@@ -394,14 +442,13 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
   .drawer[open] > summary {
     border-bottom-color: transparent;
   }
-  .drawer summary:hover {
-    background: var(--color-surface);
+  @media (hover: hover) {
+    .drawer summary:hover {
+      background: var(--color-surface);
+    }
   }
   .drawer summary:active {
     background: var(--color-line);
-  }
-  .drawer summary:focus-visible {
-    outline-offset: -4px;
   }
   .drawer-groups {
     display: none;
@@ -455,6 +502,14 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     .drawer-groups {
       display: inline;
     }
+    .credit {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: calc(var(--spacing) * 3);
+    }
+    .credit-label {
+      margin-right: 0;
+    }
   }
 
   /* ---- 1024 and up ---- */
@@ -501,6 +556,16 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     }
     .sim-stage {
       aspect-ratio: 3 / 2;
+    }
+    .sim-still.light {
+      padding: calc(var(--spacing) * 6);
+    }
+    .stat-arrow {
+      stroke-width: 4px;
+    }
+    .scene-slugrow > :global(.slug) {
+      flex: 0 1 auto;
+      white-space: nowrap;
     }
     .stats {
       margin-top: calc(var(--spacing) * 6);

@@ -78,18 +78,27 @@ for (const project of projects) {
       await expect(s.locator("dl.stats .stat")).toHaveCount(project.stats);
     });
 
-    test("opens the drawer with the keyboard", async ({ page }) => {
-      await page.goto("/");
-      const summary = scene(page).locator(".drawer > summary");
-      await summary.scrollIntoViewIfNeeded();
-      await summary.focus();
-      await expect(scene(page).locator(".drawer")).not.toHaveAttribute("open", "");
-      await page.keyboard.press("Enter");
-      await expect(scene(page).locator(".drawer")).toHaveAttribute("open", "");
-      await expect(scene(page).locator(".drawer-panel h3", { hasText: "Stack" })).toBeVisible();
-      await page.keyboard.press("Space");
-      await expect(scene(page).locator(".drawer")).not.toHaveAttribute("open", "");
-    });
+    test(
+      project.id === "bifrost" ? "opens the drawer with the keyboard" : "has no drawer",
+      async ({ page }) => {
+        await page.goto("/");
+        const drawer = scene(page).locator(".drawer");
+        if (project.id !== "bifrost") {
+          await expect(drawer).toHaveCount(0);
+          return;
+        }
+        const summary = drawer.locator("> summary");
+        await summary.scrollIntoViewIfNeeded();
+        await summary.focus();
+        await expect(drawer).not.toHaveAttribute("open", "");
+        await page.keyboard.press("Enter");
+        await expect(drawer).toHaveAttribute("open", "");
+        await expect(drawer.locator(".drawer-panel h3", { hasText: "Stack" })).toBeVisible();
+        await expect(drawer.locator(".drawer-panel h3", { hasText: "Notes" })).toBeVisible();
+        await page.keyboard.press("Space");
+        await expect(drawer).not.toHaveAttribute("open", "");
+      },
+    );
   });
 }
 
@@ -113,19 +122,19 @@ test("only Bifrost has a Notes group", async ({ page }) => {
   await expect(page.locator("#bifrost .drawer-panel")).toContainText(
     "The model comparison run was stopped early; the repo's write-up says what that leaves unproven.",
   );
-  await expect(page.locator("#labq .drawer-panel h3", { hasText: "Notes" })).toHaveCount(0);
+  await expect(page.locator(".drawer")).toHaveCount(1);
 });
 
 test("reduced motion: the open drawer shows its panel without animation", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce" });
   const page = await context.newPage();
   await page.goto("/");
-  await page.locator("#labq .drawer > summary").click();
+  await page.locator("#bifrost .drawer > summary").click();
   const animations = await page
-    .locator("#labq .drawer-panel")
+    .locator("#bifrost .drawer-panel")
     .evaluate((el) => el.getAnimations().length);
   expect(animations).toBe(0);
-  await expect(page.locator("#labq .drawer-panel")).toBeVisible();
+  await expect(page.locator("#bifrost .drawer-panel")).toBeVisible();
   await context.close();
 });
 
@@ -138,4 +147,17 @@ test("no horizontal scroll at 320 px", async ({ browser }) => {
   );
   expect(overflow).toBeLessThanOrEqual(0);
   await context.close();
+});
+
+test("opening the drawer does not move its bar", async ({ page }) => {
+  test.skip(page.viewportSize()?.width !== 1440, "measured at 1440 x 900");
+  await page.goto("/");
+  const summary = page.locator("#bifrost .drawer > summary");
+  await summary.scrollIntoViewIfNeeded();
+  const before = (await summary.boundingBox())?.y ?? 0;
+  await summary.click();
+  await expect(page.locator("#bifrost .drawer")).toHaveAttribute("open", "");
+  await page.waitForTimeout(100);
+  const after = (await summary.boundingBox())?.y ?? 0;
+  expect(Math.abs(after - before)).toBeLessThanOrEqual(1);
 });
