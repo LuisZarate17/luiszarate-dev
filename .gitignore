@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+.DS_Store
+.lighthouseci/
+playwright-report/
+test-results/
+.claude/settings.local.json
+.vercel

@@ -1,0 +1,54 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+
+const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="Luis Zarate · Full-stack engineer"
+  description="Portfolio of Luis Zarate, full-stack engineer. Work in progress."
+>
+  <div class="flex min-h-dvh flex-col">
+    <div class="flex justify-between gap-4 bg-black px-6 py-3 font-mono text-xs tracking-[0.12em] text-muted uppercase">
+      <span>Luis Zarate · Reel 2026</span>
+      <span>In production</span>
+    </div>
+
+    <main class="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center gap-10 px-6 py-16">
+      <p class="font-mono text-xs tracking-[0.1em] text-muted uppercase">
+        Int. portfolio, full-stack engineer
+      </p>
+      <h1 class="text-6xl leading-none font-black tracking-tight uppercase sm:text-8xl">
+        Luis Zarate
+      </h1>
+      <p class="max-w-prose text-lg text-muted">
+        The full site is being built in the open. Until then, here are the projects it will cover.
+      </p>
+
+      <ul class="grid gap-3 sm:grid-cols-2" aria-label="Projects">
+        {projects.map(({ data }) => (
+          <li>
+            <a
+              href={data.repo}
+              class="flex h-full flex-col gap-1 rounded border border-line p-4 transition-colors hover:bg-surface"
+            >
+              <span class="font-mono text-xs text-muted">SC 0{data.order}</span>
+              <span class="text-xl font-bold" style={`color: ${data.color}`}>
+                {data.title}
+              </span>
+              <span class="text-sm text-muted">{data.tagline}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </main>
+
+    <div class="flex justify-between gap-4 bg-black px-6 py-3 font-mono text-xs tracking-[0.12em] text-muted uppercase">
+      <a href="https://github.com/LuisZarate17" class="hover:text-paper">
+        GitHub
+      </a>
+      <span>2.39 : 1</span>
+    </div>
+  </div>
+</Base>

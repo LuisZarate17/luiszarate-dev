@@ -1,0 +1,587 @@
+<title>Portfolio Art Direction</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Hanken+Grotesk:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;600&family=Geist+Mono:wght@400&family=Fraunces:ital,wght@0,300;1,300&family=Albert+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+/* Layout: a quiet neutral review sheet; each concept is a full-width "screen" with its own fixed palette inside. */
+:root{
+  --pg:#F1F2F4; --pf:#14161A; --pm:#565C67; --pl:#D3D7DE; --pc:#FFFFFF;
+  --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --pg:#0E0F12; --pf:#ECEEF2; --pm:#9399A5; --pl:#2A2D35; --pc:#16181D; color-scheme:dark } }
+:root[data-theme="dark"]{ --pg:#0E0F12; --pf:#ECEEF2; --pm:#9399A5; --pl:#2A2D35; --pc:#16181D; color-scheme:dark }
+
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--pg);color:var(--pf);font:400 16px/1.55 var(--sans)}
+h1,h2,h3,h4,p,dl,dd,ul{margin:0}
+ul{padding:0;list-style:none}
+h1,h2,h3,h4{text-wrap:balance}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+canvas{display:block;width:100%}
+
+.wrap{max-width:1160px;margin:0 auto;padding-block:40px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:64px}
+.top{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font:400 12px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pm)}
+.top h1{font:600 clamp(30px,5vw,46px)/1.05 var(--sans);letter-spacing:-.02em}
+.top p{max-width:62ch;color:var(--pm)}
+.jump{display:flex;flex-wrap:wrap;gap:8px}
+.jump a{font:400 13px/1 var(--mono);color:var(--pf);text-decoration:none;border:1px solid var(--pl);background:var(--pc);padding:10px 12px;border-radius:999px}
+.concept{display:flex;flex-direction:column;gap:18px;scroll-margin-top:16px}
+.chead{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.chead>div{min-width:0;flex:1 1 320px;display:flex;flex-direction:column;gap:6px}
+.chead h2{font:600 28px/1.1 var(--sans);letter-spacing:-.01em}
+.chead .idea{color:var(--pm);max-width:68ch}
+.tog{font:400 13px/1 var(--mono);color:var(--pf);background:var(--pc);border:1px solid var(--pl);border-radius:999px;padding:11px 14px}
+.verdict{background:var(--pc);border:1px solid var(--pl);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.verdict h2{font:600 22px/1.2 var(--sans)}
+.verdict p{max-width:70ch}
+.cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.cmp div{min-width:0;border-top:1px solid var(--pl);padding-top:12px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--pm)}
+.cmp b{color:var(--pf);font-weight:600;font-size:15px}
+@media (max-width:720px){.cmp{grid-template-columns:1fr}}
+
+/* ---------- shared mock plumbing: project color worlds ---------- */
+.mock{border-radius:14px;overflow:hidden;background:var(--b);color:var(--t);border:1px solid var(--l)}
+[data-w=labsq]{--a:#F59E1B;--on:#1A1206}
+[data-w=bifrost]{--a:#7FD6EE;--on:#071419}
+[data-w=cougar]{--a:#C8102E;--on:#FFFFFF}
+[data-w=mastery]{--a:#6C5CE7;--on:#FFFFFF}
+[data-mode=dark][data-w=labsq],[data-mode=dark] [data-w=labsq]{--at:#FFB648;--tint:#1A1206}
+[data-mode=dark][data-w=bifrost],[data-mode=dark] [data-w=bifrost]{--at:#A5E6F7;--tint:#071419}
+[data-mode=dark][data-w=cougar],[data-mode=dark] [data-w=cougar]{--at:#FF6B81;--tint:#1A070B}
+[data-mode=dark][data-w=mastery],[data-mode=dark] [data-w=mastery]{--at:#A99CFF;--tint:#0E0B1F}
+[data-mode=light][data-w=labsq],[data-mode=light] [data-w=labsq]{--at:#8F5400;--tint:#FFF3DC}
+[data-mode=light][data-w=bifrost],[data-mode=light] [data-w=bifrost]{--at:#0B6B86;--tint:#E4F5FA}
+[data-mode=light][data-w=cougar],[data-mode=light] [data-w=cougar]{--at:#A60F2D;--tint:#FBE8EB}
+[data-mode=light][data-w=mastery],[data-mode=light] [data-w=mastery]{--at:#4B3BC4;--tint:#EDEAFF}
+
+.spec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding:24px;border-top:1px solid var(--l);background:var(--b)}
+.spec>div{min-width:0;display:flex;flex-direction:column;gap:8px}
+.spec .lab,.sw .lab{font:400 11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--m)}
+.spec .body{font-size:15px;line-height:1.55;color:var(--t)}
+.spec .mn{font-size:13px;line-height:1.6;color:var(--t);overflow-wrap:anywhere}
+.sw{padding:0 24px 24px;background:var(--b);display:flex;flex-direction:column;gap:10px}
+.sw ul{display:flex;flex-wrap:wrap;gap:8px 16px}
+.sw li{display:flex;align-items:center;gap:8px;font:400 12px/1 var(--mono);color:var(--t)}
+.sw i{width:26px;height:26px;border-radius:6px;border:1px solid var(--l);flex:none}
+@media (max-width:720px){.spec{grid-template-columns:1fr;padding:20px 16px}.sw{padding:0 16px 20px}}
+
+/* ---------- A. Final Cut ---------- */
+.m1{--d:"Big Shoulders Display","Arial Narrow","Helvetica Neue",Impact,sans-serif;--bd:"Hanken Grotesk",system-ui,"Segoe UI",sans-serif;--mo:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-family:var(--bd)}
+.m1[data-mode=dark]{--b:#0B0B0D;--s:#151518;--t:#F2EFE9;--m:#A19D96;--l:#2B2B30;--bar:#000000;--bart:#A19D96}
+.m1[data-mode=light]{--b:#F4F4F2;--s:#FFFFFF;--t:#111113;--m:#5C5C61;--l:#D6D6D2;--bar:#111113;--bart:#C9C6BF}
+.m1 .bar{background:var(--bar);color:var(--bart);font:400 11px/1 var(--mo);letter-spacing:.12em;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px;padding:14px 24px}
+.m1 .bar span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.m1-stage{position:relative;overflow:hidden;background:var(--tint);padding:36px 24px 28px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px 40px;align-items:end;transition:background-color .5s}
+.m1 .slug{font:400 12px/1.5 var(--mo);letter-spacing:.1em;text-transform:uppercase;color:var(--at);grid-column:1/-1}
+.m1-title{font:900 clamp(84px,19vw,208px)/.8 var(--d);letter-spacing:-.01em;text-transform:uppercase;color:var(--t)}
+.m1-card{min-width:0;display:flex;flex-direction:column;gap:8px;padding-bottom:6px}
+.m1-big{font:700 clamp(44px,8vw,84px)/.9 var(--d);color:var(--at);text-transform:uppercase}
+.m1-cap{color:var(--t);max-width:38ch;font-size:15px}
+.m1-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sc{min-width:0;text-align:left;background:transparent;color:var(--t);border:1px solid var(--l);border-radius:4px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.sc small{font:400 11px/1 var(--mo);letter-spacing:.1em;color:var(--m)}
+.sc b{font:700 20px/1 var(--d);letter-spacing:.02em;text-transform:uppercase}
+.sc[aria-pressed=true]{background:var(--a);color:var(--on);border-color:var(--a)}
+.sc[aria-pressed=true] small{color:var(--on)}
+.wipe{position:absolute;inset:0;background:var(--t);transform:translateX(-101%);pointer-events:none;z-index:2}
+.cut .wipe{animation:wipe .7s cubic-bezier(.77,0,.18,1)}
+@keyframes wipe{0%{transform:translateX(-101%)}45%,55%{transform:translateX(0)}100%{transform:translateX(101%)}}
+.m1-chap{background:var(--b);padding:36px 24px 28px;display:flex;flex-direction:column;gap:16px;border-top:1px solid var(--l)}
+.m1-h{font:900 clamp(44px,8vw,92px)/.86 var(--d);text-transform:uppercase;color:var(--t)}
+.m1-p{max-width:60ch;color:var(--t);font-size:15px}
+#race{height:230px;background:var(--s);border:1px solid var(--l);border-radius:4px}
+.lanes{display:grid;grid-template-columns:28% 40% 32%;font:400 11px/1.3 var(--mo);letter-spacing:.08em;text-transform:uppercase;color:var(--m)}
+.lanes span:last-child{text-align:right}
+.m1-ctl{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center}
+.run{background:transparent;color:var(--t);border:1px solid var(--t);border-radius:4px;padding:11px 14px;font:600 14px/1 var(--bd)}
+.run[aria-pressed=true]{background:var(--a);border-color:var(--a);color:var(--on)}
+.cnt{display:flex;flex-wrap:wrap;gap:6px 20px;font:400 13px/1.3 var(--mo);color:var(--m);font-variant-numeric:tabular-nums}
+.cnt b{color:var(--at);font-weight:600;font-size:15px}
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;border-top:1px solid var(--l);padding-top:16px}
+.nums div{min-width:0}
+.nums dt{font:700 clamp(26px,4.4vw,44px)/1 var(--d);color:var(--t);font-variant-numeric:tabular-nums}
+.nums dd{font-size:13px;color:var(--m)}
+@media (max-width:720px){
+  .m1 .bar{padding:12px 16px}
+  .m1-stage{grid-template-columns:1fr;padding:28px 16px 20px}
+  .m1-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .m1-chap{padding:28px 16px 20px}
+  #race{height:200px}
+}
+
+/* ---------- B. Meridian ---------- */
+.m2{--d:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;--bd:"Figtree",system-ui,"Segoe UI",sans-serif;--mo:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;font-family:var(--bd)}
+.m2[data-mode=light]{--b:#FBFCFE;--s:#FFFFFF;--t:#0A1A2F;--m:#506178;--l:#DFE6EF;--sh:0 18px 40px -18px rgba(10,26,47,.35);--del:#FDE8EA;--delt:#9B1C2C;--add:#E2F6EA;--addt:#14663A}
+.m2[data-mode=dark]{--b:#0A1220;--s:#111C2E;--t:#EAF1FA;--m:#93A4BA;--l:#24344E;--sh:0 18px 40px -18px rgba(0,0,0,.8);--del:#3A1A22;--delt:#FF9AA8;--add:#12331F;--addt:#8FE0AE}
+.rib{position:relative;height:150px;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 55%,0 100%);background:var(--b)}
+.rib .g{position:absolute;inset:-40% -10%;filter:blur(34px);transform:translate(calc(var(--mx,0)*40px),calc(var(--my,0)*24px));transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.rib i{position:absolute;width:46%;height:120%;border-radius:50%;top:-10%;animation:drift 14s ease-in-out infinite alternate}
+.rib i:nth-child(1){left:-8%;background:#F59E1B}
+.rib i:nth-child(2){left:20%;background:#C8102E;animation-duration:17s;animation-direction:alternate-reverse}
+.rib i:nth-child(3){left:46%;background:#6C5CE7;animation-duration:12s}
+.rib i:nth-child(4){left:70%;background:#7FD6EE;animation-duration:19s;animation-direction:alternate-reverse}
+.rib.frost i:nth-child(1){background:#7FD6EE}
+.rib.frost i:nth-child(2){background:#CFF3FB}
+.rib.frost i:nth-child(3){background:#5AA9E6}
+.rib.frost i:nth-child(4){background:#B9A9FF}
+@keyframes drift{from{transform:translate(-12%,-8%) scale(1)}to{transform:translate(14%,10%) scale(1.25)}}
+.m2-in{padding:8px 32px 40px;display:flex;flex-direction:column;gap:16px}
+.m2-eye{font:400 12px/1.4 var(--mo);letter-spacing:.06em;text-transform:uppercase;color:var(--m)}
+.m2-h1{font:700 clamp(34px,6vw,68px)/1 var(--d);letter-spacing:-.03em;color:var(--t);max-width:16ch}
+.m2-sub{max-width:52ch;color:var(--m);font-size:17px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips li{display:flex;align-items:center;gap:8px;border:1px solid var(--l);background:var(--s);color:var(--t);border-radius:999px;padding:8px 12px;font-size:14px}
+.chips i{width:9px;height:9px;border-radius:50%;background:var(--a)}
+.chips span{color:var(--m);font:400 12px/1 var(--mo)}
+.m2-chap{border-top:1px solid var(--l);background:var(--b)}
+.m2-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:32px;padding:0 32px 36px;margin-top:-56px;position:relative;align-items:start}
+.m2-txt{min-width:0;display:flex;flex-direction:column;gap:14px;padding-top:72px}
+.m2-h2{font:700 clamp(26px,3.6vw,40px)/1.05 var(--d);letter-spacing:-.02em;color:var(--t)}
+.m2-txt p{color:var(--m)}
+.m2-txt .m2-eye{color:var(--at)}
+.m2-st{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.m2-st div{min-width:0}
+.m2-st dt{font:700 24px/1.1 var(--d);color:var(--t)}
+.m2-st dd{font-size:13px;color:var(--m)}
+.card{min-width:0;background:var(--s);border:1px solid var(--l);border-radius:14px;box-shadow:var(--sh);overflow:hidden}
+.card header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:14px 16px;border-bottom:1px solid var(--l);color:var(--t);font-weight:600;font-size:14px}
+.card header code{font:400 12px/1 var(--mo);color:var(--m)}
+.card .pm{margin-left:auto;font:400 12px/1 var(--mo);color:var(--m)}
+.pill{font:400 12px/1 var(--mo);padding:6px 9px;border-radius:999px;background:var(--tint);color:var(--at)}
+.diff{overflow-x:auto;font:400 12.5px/1.75 var(--mo);color:var(--t);padding:8px 0}
+.diff div{display:flex;white-space:pre;padding:0 16px;min-width:max-content}
+.diff div>span{flex:none;width:28px;color:var(--m)}
+.diff .x{background:var(--del);color:var(--delt)}
+.diff .p{background:var(--add);color:var(--addt);transition:background-color .5s,color .5s}
+[data-state=applied] .diff .x,[data-state=denied] .diff{display:none}
+[data-state=applied] .diff .p{background:transparent;color:var(--t)}
+.card footer{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px;border-top:1px solid var(--l)}
+.card footer p{flex:1 1 200px;min-width:0;font-size:13px;color:var(--m)}
+.acts{display:flex;gap:8px}
+.btn{border-radius:999px;padding:10px 14px;font:600 13px/1 var(--bd);border:1px solid var(--t);background:var(--t);color:var(--b)}
+.btn.gh{background:transparent;color:var(--t);border-color:var(--l)}
+@media (max-width:720px){
+  .rib{height:110px}
+  .m2-in{padding:4px 16px 28px}
+  .m2-grid{grid-template-columns:1fr;padding:0 16px 24px;margin-top:-36px;gap:20px}
+  .m2-txt{padding-top:48px}
+}
+
+/* ---------- C. Constellation ---------- */
+.m3{--d:"Fraunces","Iowan Old Style",Georgia,serif;--bd:"Albert Sans",system-ui,"Segoe UI",sans-serif;--mo:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-family:var(--bd)}
+.m3[data-mode=dark]{--b:#05060A;--s:#0D1017;--t:#E9ECF2;--m:#8F96A6;--l:#1E232F}
+.m3[data-mode=light]{--b:#EEF0F3;--s:#F8F9FB;--t:#0C0E13;--m:#575E6D;--l:#D0D5DD}
+.m3-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-areas:"hero can" "info can";gap:28px 32px;padding:36px 32px;background:radial-gradient(120% 90% at 78% 40%,var(--tint),var(--b) 70%)}
+.m3-hero{grid-area:hero;min-width:0;display:flex;flex-direction:column;gap:14px}
+.m3-eye{font:400 12px/1.4 var(--mo);letter-spacing:.08em;text-transform:uppercase;color:var(--m)}
+.m3-h1{font:300 clamp(36px,5.4vw,66px)/1.02 var(--d);letter-spacing:-.02em;color:var(--t)}
+.m3-h1 em{font-style:italic;color:var(--at)}
+.m3-can{grid-area:can;min-width:0;position:relative;min-height:320px}
+#pcan{position:absolute;inset:0;height:100%;touch-action:pan-y}
+.hint{position:absolute;left:0;bottom:0;font:400 11px/1.4 var(--mo);letter-spacing:.06em;text-transform:uppercase;color:var(--m);pointer-events:none}
+.m3-info{grid-area:info;min-width:0;display:flex;flex-direction:column;gap:16px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tb{background:transparent;color:var(--t);border:1px solid var(--l);border-radius:999px;padding:10px 14px;font:400 14px/1 var(--bd)}
+.tb[aria-pressed=true]{background:var(--a);border-color:var(--a);color:var(--on)}
+.m3-name{font:300 34px/1.05 var(--d);color:var(--t)}
+.m3-info p{color:var(--t);max-width:46ch;font-size:15px}
+.m3-info .what{font:400 12px/1.5 var(--mo);color:var(--at)}
+.m3-st{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid var(--l);padding-top:14px}
+.m3-st div{min-width:0}
+.m3-st dt{font:300 26px/1.1 var(--d);color:var(--t);font-variant-numeric:tabular-nums}
+.m3-st dd{font-size:13px;color:var(--m)}
+@media (max-width:720px){
+  .m3-grid{grid-template-columns:1fr;grid-template-areas:"hero" "can" "info";padding:28px 16px 24px;gap:18px}
+  .m3-can{min-height:280px}
+}
+@media (prefers-reduced-motion: reduce){
+  .rib i{animation:none}.rib .g{transition:none}.cut .wipe{animation:none}
+  .m1-stage,.diff .p{transition:none}
+}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <p class="eyebrow">Luis Zarate · portfolio site · art direction</p>
+    <h1>Three directions, one to build</h1>
+    <p>Each block below is a live sketch of one direction: its hero, one project chapter, its type and its palette. The controls work by tap. Use the switch beside each name to see the same direction on a light base. Content comes from the four repos.</p>
+    <nav class="jump" aria-label="Concepts">
+      <a href="#final-cut">A · Final Cut</a><a href="#meridian">B · Meridian</a><a href="#constellation">C · Constellation</a><a href="#pick">Recommendation</a>
+    </nav>
+  </div>
+
+  <!-- ================= A ================= -->
+  <section class="concept" id="final-cut">
+    <div class="chead">
+      <div>
+        <p class="eyebrow">Concept A · film grammar, 2D simulations</p>
+        <h2>Final Cut</h2>
+        <p class="idea">The site is a short film in a widescreen frame: letterbox bars, slug lines, hard cuts between project color worlds. Inside each scene sits one small working simulation of what the project does, which you can run.</p>
+      </div>
+      <button class="tog" type="button" data-toggle="m1">Show light base</button>
+    </div>
+    <div class="mock m1" id="m1" data-mode="dark" data-w="labsq">
+      <div class="bar"><span>Luis Zarate · Reel 2026</span><span id="tc">00:00:05:12</span></div>
+      <div class="m1-stage" id="m1stage">
+        <div class="wipe" aria-hidden="true"></div>
+        <p class="slug">Int. portfolio — full-stack engineer</p>
+        <h3 class="m1-title">Luis<br>Zarate</h3>
+        <div class="m1-card" aria-live="polite">
+          <p class="m1-big" id="m1big">50 → 1</p>
+          <p class="m1-cap" id="m1cap">Fifty simultaneous bookings for one lab slot all confirmed. After a GiST exclusion constraint, one does.</p>
+        </div>
+        <div class="m1-strip" role="group" aria-label="Cut to a scene">
+          <button class="sc" type="button" data-sc="labsq" aria-pressed="true"><small>SC 01</small><b>LabsQ</b></button>
+          <button class="sc" type="button" data-sc="bifrost" aria-pressed="false"><small>SC 02</small><b>Bifrost</b></button>
+          <button class="sc" type="button" data-sc="cougar" aria-pressed="false"><small>SC 03</small><b>Cougar Connect</b></button>
+          <button class="sc" type="button" data-sc="mastery" aria-pressed="false"><small>SC 04</small><b>Mastery Pilot</b></button>
+        </div>
+      </div>
+      <div class="bar"><span>2.39 : 1</span><span>4 scenes · 60 s read</span></div>
+
+      <div class="m1-chap" id="m1chap" data-w="labsq">
+        <p class="slug">Scene 01 · Int. Postgres 17 — read committed</p>
+        <h3 class="m1-h">Fifty bookings.<br>One slot.</h3>
+        <p class="m1-p">LabsQ is a lab equipment reservation API in C#/.NET 10. The booking path checked for an overlap, then inserted, with nothing holding the gap. Run it both ways.</p>
+        <canvas id="race" role="img" aria-label="Fifty booking requests travel toward one time slot. Without the constraint all fifty are confirmed. With it, one is confirmed and forty-nine are refused."></canvas>
+        <div class="lanes" aria-hidden="true"><span>50 requests</span><span>refused · 409</span><span>one slot</span></div>
+        <div class="m1-ctl">
+          <button class="run" type="button" data-run="before" aria-pressed="false">Run without the constraint</button>
+          <button class="run" type="button" data-run="after" aria-pressed="true">Run with the constraint</button>
+          <div class="cnt" aria-live="polite"><span>confirmed <b id="rok">1</b></span><span>refused <b id="rno">49</b></span><span>overlapping pairs <b id="rpr">0</b></span></div>
+        </div>
+        <dl class="nums">
+          <div><dt>2.13×</dt><dd>availability throughput, 3,423 → 7,282 req/s</dd></div>
+          <div><dt>21.78 → 9.91</dt><dd>p95 latency, ms</dd></div>
+          <div><dt>26.9×</dt><dd>query execution, 0.861 → 0.032 ms</dd></div>
+        </dl>
+      </div>
+
+      <div class="spec">
+        <div><p class="lab">Display · Big Shoulders Display 900</p><p style="font:900 54px/.9 var(--d);text-transform:uppercase;color:var(--t)">99 deadlocks</p></div>
+        <div><p class="lab">Body · Hanken Grotesk 400 / 600</p><p class="body">Every request won. Not occasionally two: all fifty read the same empty result and all fifty inserted.</p></div>
+        <div><p class="lab">Mono · JetBrains Mono</p><p class="mn" style="font-family:var(--mo)">bookings_created: 1<br>bookings_conflicted: 49<br>23P01 → 409</p></div>
+      </div>
+      <div class="sw">
+        <p class="lab">Base dark / light, then the four worlds</p>
+        <ul>
+          <li><i style="background:#0B0B0D"></i>#0B0B0D</li><li><i style="background:#151518"></i>#151518</li><li><i style="background:#F2EFE9"></i>#F2EFE9</li>
+          <li><i style="background:#F4F4F2"></i>#F4F4F2</li><li><i style="background:#111113"></i>#111113</li>
+          <li><i style="background:#F59E1B"></i>LabsQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= B ================= -->
+  <section class="concept" id="meridian">
+    <div class="chead">
+      <div>
+        <p class="eyebrow">Concept B · Stripe lineage, light first</p>
+        <h2>Meridian</h2>
+        <p class="idea">A bright, precise product page where one living gradient ribbon carries the color: all four hues in the hero, one hue per chapter. The wow moments are working pieces of each product's interface that you can operate.</p>
+      </div>
+      <button class="tog" type="button" data-toggle="m2">Show dark base</button>
+    </div>
+    <div class="mock m2" id="m2" data-mode="light" data-w="bifrost">
+      <div class="m2-hero" id="m2hero">
+        <div class="rib" aria-hidden="true"><div class="g"><i></i><i></i><i></i><i></i></div></div>
+        <div class="m2-in">
+          <p class="m2-eye">Luis Zarate · full-stack engineer</p>
+          <h3 class="m2-h1">I build the system, and the proof that it works.</h3>
+          <p class="m2-sub">Four projects across C#/.NET, Rust, Python and Postgres. Each one ships with its numbers, its decisions and a live link.</p>
+          <ul class="chips">
+            <li data-w="labsq"><i></i>LabsQ <span>2.13× throughput</span></li>
+            <li data-w="bifrost"><i></i>Bifrost <span>1 local model</span></li>
+            <li data-w="cougar"><i></i>Cougar Connect <span>live demo</span></li>
+            <li data-w="mastery"><i></i>Mastery Pilot <span>508 tests</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="m2-chap">
+        <div class="rib frost" aria-hidden="true"><div class="g"><i></i><i></i><i></i><i></i></div></div>
+        <div class="m2-grid">
+          <div class="m2-txt">
+            <p class="m2-eye">Bifrost · Rust, Tauri, React, Ollama</p>
+            <h4 class="m2-h2">The model proposes. You see the exact bytes first.</h4>
+            <p>Vidar, Mimir and Hugin run on one local model. Mimir renders an edit to its final bytes and shows the diff before anything is written. Try it on the card.</p>
+            <dl class="m2-st">
+              <div><dt>8 GB</dt><dd>memory cap per process</dd></div>
+              <div><dt>24 GB</dt><dd>cap per run</dd></div>
+              <div><dt>0</dt><dd>calls leave the machine by default</dd></div>
+            </dl>
+          </div>
+          <div class="card" id="diff" data-state="review">
+            <header><span>Edit file</span><code>src/main.rs</code><span class="pm">+2 −2</span><span class="pill" id="dpill">Review</span></header>
+            <div class="diff" tabindex="0" role="group" aria-label="Proposed diff for src/main.rs">
+              <div><span>1</span>  mod config;</div>
+              <div><span>2</span> </div>
+              <div class="x"><span>3</span>- fn greet(name: &amp;str) -&gt; String {</div>
+              <div class="p"><span>3</span>+ fn welcome(name: &amp;str) -&gt; String {</div>
+              <div><span>4</span>      format!("Hello, {name}!")</div>
+              <div><span>5</span>  }</div>
+              <div><span>7</span>  fn main() {</div>
+              <div class="x"><span>8</span>-     println!("{}", greet("world"));</div>
+              <div class="p"><span>8</span>+     println!("{}", welcome("world"));</div>
+              <div><span>10</span>  }</div>
+            </div>
+            <footer>
+              <p id="dmsg" aria-live="polite">Nothing has been changed yet. Applying writes exactly this and keeps a backup, so it can be undone.</p>
+              <div class="acts"><button class="btn" type="button" id="dA">Apply edit</button><button class="btn gh" type="button" id="dB">Deny</button></div>
+            </footer>
+          </div>
+        </div>
+      </div>
+      <div class="spec">
+        <div><p class="lab">Display · Bricolage Grotesque 700</p><p style="font:700 40px/1 var(--d);letter-spacing:-.03em;color:var(--t)">Undo, byte for byte</p></div>
+        <div><p class="lab">Body · Figtree 400 / 600</p><p class="body">A check that could not give a verdict is never reported as a pass.</p></div>
+        <div><p class="lab">Mono · Geist Mono</p><p class="mn" style="font-family:var(--mo)">hugin -p "task" --check "cargo test"<br>qwen3.6:35b-a3b</p></div>
+      </div>
+      <div class="sw">
+        <p class="lab">Base light / dark, then the four worlds</p>
+        <ul>
+          <li><i style="background:#FBFCFE"></i>#FBFCFE</li><li><i style="background:#0A1A2F"></i>#0A1A2F</li><li><i style="background:#DFE6EF"></i>#DFE6EF</li>
+          <li><i style="background:#0A1220"></i>#0A1220</li><li><i style="background:#111C2E"></i>#111C2E</li>
+          <li><i style="background:#F59E1B"></i>LabsQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= C ================= -->
+  <section class="concept" id="constellation">
+    <div class="chead">
+      <div>
+        <p class="eyebrow">Concept C · Lusion lineage, one persistent object</p>
+        <h2>Constellation</h2>
+        <p class="idea">One field of points lives behind the whole site and re-forms into each project's shape as you scroll: a graph, a collapse to one, a bridge, a staircase. The type stays quiet and literary so the field is the only loud thing on screen.</p>
+      </div>
+      <button class="tog" type="button" data-toggle="m3">Show light base</button>
+    </div>
+    <div class="mock m3" id="m3" data-mode="dark" data-w="cougar">
+      <div class="m3-grid">
+        <div class="m3-hero">
+          <p class="m3-eye">Luis Zarate · full-stack engineer</p>
+          <h3 class="m3-h1">Systems you can <em>watch</em> working.</h3>
+        </div>
+        <div class="m3-can">
+          <canvas id="pcan" role="img" aria-label="A field of 140 points arranged into the shape of the selected project"></canvas>
+          <p class="hint">Drag across the points · tap to scatter</p>
+        </div>
+        <div class="m3-info">
+          <div class="tabs" role="group" aria-label="Re-form the field">
+            <button class="tb" type="button" data-sh="cougar" aria-pressed="true">Cougar Connect</button>
+            <button class="tb" type="button" data-sh="labsq" aria-pressed="false">LabsQ</button>
+            <button class="tb" type="button" data-sh="bifrost" aria-pressed="false">Bifrost</button>
+            <button class="tb" type="button" data-sh="mastery" aria-pressed="false">Mastery Pilot</button>
+          </div>
+          <div aria-live="polite" style="display:flex;flex-direction:column;gap:10px;min-width:0">
+            <p class="what" id="p3w">The field is the alumni graph: hubs are people, strands are connections.</p>
+            <h4 class="m3-name" id="p3n">Cougar Connect</h4>
+            <p id="p3t">A WSU alumni network on Blazor Server. A 2024 team project; in 2026 Luis, solo, removed hardcoded secrets, moved it to Postgres, added tests and CI, and deployed it.</p>
+          </div>
+          <dl class="m3-st" id="p3s">
+            <div><dt>1 box</dt><dd>searches name, year, city, major, company</dd></div>
+            <div><dt>2024</dt><dd>team of three</dd></div>
+            <div><dt>2026</dt><dd>solo rebuild, live on Render</dd></div>
+          </dl>
+        </div>
+      </div>
+      <div class="spec">
+        <div><p class="lab">Display · Fraunces 300 + italic</p><p style="font:300 42px/1 var(--d);color:var(--t)">Asks, <em style="color:var(--at)">rather</em> than answers</p></div>
+        <div><p class="lab">Body · Albert Sans 400 / 600</p><p class="body">The tutor gives one step per reply and waits, and names the curriculum file it used.</p></div>
+        <div><p class="lab">Mono · IBM Plex Mono</p><p class="mn" style="font-family:var(--mo)">MIN_SCORE = 0.45<br>algebra_linear_equations.md</p></div>
+      </div>
+      <div class="sw">
+        <p class="lab">Base dark / light, then the four worlds</p>
+        <ul>
+          <li><i style="background:#05060A"></i>#05060A</li><li><i style="background:#0D1017"></i>#0D1017</li><li><i style="background:#E9ECF2"></i>#E9ECF2</li>
+          <li><i style="background:#EEF0F3"></i>#EEF0F3</li><li><i style="background:#0C0E13"></i>#0C0E13</li>
+          <li><i style="background:#F59E1B"></i>LabsQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="verdict" id="pick">
+    <p class="eyebrow">Recommendation</p>
+    <h2>Build Final Cut, and borrow one thing from each of the others</h2>
+    <p>Final Cut matches the brief most directly: the frame is cinematic and quiet, and each wow moment is a small simulation of the project's real behaviour, which is the strongest proof of design engineering. It needs no WebGL to work, so it is safe on phones. Take Constellation's point field for the hero only, loaded after first paint, and Meridian's operable interface cards for the deeper technical layer.</p>
+    <div class="cmp">
+      <div><b>A · Final Cut</b><span>Wow from: runnable 2D simulations.</span><span>Build: CSS, canvas 2D, no three.js.</span><span>Main risk: scroll-pinned scenes on iOS Safari.</span></div>
+      <div><b>B · Meridian</b><span>Wow from: gradient and operable UI cards.</span><span>Build: one small shader, mostly DOM.</span><span>Main risk: reads as a Stripe imitation.</span></div>
+      <div><b>C · Constellation</b><span>Wow from: one morphing 3D field.</span><span>Build: three.js, shaders, tuning time.</span><span>Main risk: phone GPUs, and shapes that do not read.</span></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(()=>{
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const cv=(el,v)=>getComputedStyle(el).getPropertyValue(v).trim();
+const fit=c=>{const d=Math.min(window.devicePixelRatio||1,2),r=c.getBoundingClientRect();c.width=Math.max(1,Math.round(r.width*d));c.height=Math.max(1,Math.round(r.height*d));return d};
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const press=(list,on)=>list.forEach(b=>b.setAttribute('aria-pressed',b===on?'true':'false'));
+
+/* base switch per mock */
+$$('[data-toggle]').forEach(b=>b.addEventListener('click',()=>{
+  const m=$('#'+b.dataset.toggle),dark=m.dataset.mode==='dark';
+  m.dataset.mode=dark?'light':'dark';
+  b.textContent=dark?'Show dark base':'Show light base';
+  drawRace();pDraw();
+}));
+
+/* ---------- A: scene cuts ---------- */
+const SC={
+ labsq:['50 → 1','Fifty simultaneous bookings for one lab slot all confirmed. After a GiST exclusion constraint, one does.'],
+ bifrost:['1 model','Vidar, Mimir and Hugin: a screen assistant, a code-aware chat and a terminal agent, all on one local model through Ollama.'],
+ cougar:['2024 → 2026','A WSU alumni network that began as a team project. Luis, solo, took out the hardcoded secrets, moved it to Postgres, tested it and deployed it.'],
+ mastery:['508 tests','A Socratic tutor for school districts that asks rather than answers. Student conversations never leave the district’s hardware.']
+};
+const m1=$('#m1'),stage=$('#m1stage'),scs=$$('.sc');
+scs.forEach(b=>b.addEventListener('click',()=>{
+  const k=b.dataset.sc;if(m1.dataset.w===k)return;
+  press(scs,b);
+  const swap=()=>{m1.dataset.w=k;$('#m1big').textContent=SC[k][0];$('#m1cap').textContent=SC[k][1]};
+  if(RM){swap();return}
+  stage.classList.remove('cut');void stage.offsetWidth;stage.classList.add('cut');
+  setTimeout(swap,330);
+}));
+if(!RM){let f=132;setInterval(()=>{f++;const p=n=>String(n).padStart(2,'0');$('#tc').textContent='00:00:'+p(Math.floor(f/24)%60)+':'+p(f%24)},1000/24*3)}
+
+/* ---------- A: the 50 → 1 race ---------- */
+const rc=$('#race'),rx=rc.getContext('2d'),chap=$('#m1chap'),runs=$$('.run');
+const dots=[...Array(50)].map((_,i)=>({i,d:(i===17?0:.06+Math.random()*.3)}));
+let rMode='after',rT=1,rAnim=0;
+function drawRace(){
+  const d=fit(rc),W=rc.width,H=rc.height;
+  const A=cv(chap,'--at'),T=cv(chap,'--t'),M=cv(chap,'--m'),L=cv(chap,'--l');
+  rx.clearRect(0,0,W,H);
+  const s=H/12.5,r=Math.max(2.2*d,s*.2);
+  const sx0=W*.04+r,slX=W*.74,slW=W*.22,slY=H*.12,slH=H*.76,rf0=W*.34;
+  rx.strokeStyle=rMode==='before'?A:L;rx.lineWidth=1.5*d;rx.strokeRect(slX,slY,slW,slH);
+  rx.strokeStyle=L;rx.setLineDash([4*d,5*d]);rx.beginPath();rx.moveTo(slX-s,slY);rx.lineTo(slX-s,slY+slH);rx.stroke();rx.setLineDash([]);
+  let ok=0,no=0;
+  for(const p of dots){
+    const i=p.i,lt=Math.min(1,Math.max(0,rT*1.36-p.d));
+    const sx=sx0+(i%5)*s,sy=H/2+(Math.floor(i/5)-4.5)*s;
+    rx.beginPath();rx.arc(sx,sy,r*.45,0,6.283);rx.fillStyle=L;rx.fill();
+    let x,y,st='go';
+    if(rMode==='before'){
+      const tx=slX+slW*((i%5)+1)/6,ty=slY+slH*(Math.floor(i/5)+1)/11,e=ease(lt);
+      x=lerp(sx,tx,e);y=lerp(sy,ty,e);if(lt>=1){st='ok';ok++}
+    }else if(i===17){
+      const e=ease(lt);x=lerp(sx,slX+slW/2,e);y=lerp(sy,slY+slH/2,e);if(lt>=1){st='ok';ok++}
+    }else{
+      const j=i>17?i-1:i,bx=slX-s-r*1.5,by=lerp(sy,H/2,.35);
+      const tx=rf0+(j%7)*s*.95,ty=H/2+(Math.floor(j/7)-3)*s;
+      if(lt<.55){const e=ease(lt/.55);x=lerp(sx,bx,e);y=lerp(sy,by,e)}
+      else{const e=ease((lt-.55)/.45);x=lerp(bx,tx,e);y=lerp(by,ty,e);st=lt>=1?'no':'back';if(lt>=1)no++}
+    }
+    rx.beginPath();rx.arc(x,y,st==='ok'&&rMode==='after'?r*1.9:r,0,6.283);
+    if(st==='ok'){rx.fillStyle=A;rx.fill()}
+    else if(st==='no'||st==='back'){rx.strokeStyle=M;rx.lineWidth=1.2*d;rx.stroke()}
+    else{rx.fillStyle=T;rx.fill()}
+  }
+  $('#rok').textContent=ok;$('#rno').textContent=no;$('#rpr').textContent=(ok*(ok-1)/2).toLocaleString('en-US');
+}
+function runRace(mode){
+  rMode=mode;cancelAnimationFrame(rAnim);
+  if(RM){rT=1;drawRace();return}
+  const t0=performance.now();
+  const step=now=>{rT=Math.min(1,(now-t0)/2400);drawRace();if(rT<1)rAnim=requestAnimationFrame(step)};
+  rAnim=requestAnimationFrame(step);
+}
+runs.forEach(b=>b.addEventListener('click',()=>{press(runs,b);runRace(b.dataset.run)}));
+
+/* ---------- B: gradient follows the pointer, diff card works ---------- */
+$$('.m2-hero,.m2-chap').forEach(h=>h.addEventListener('pointermove',e=>{
+  if(RM)return;const r=h.getBoundingClientRect(),g=$('.g',h);
+  g.style.setProperty('--mx',((e.clientX-r.left)/r.width-.5).toFixed(3));
+  g.style.setProperty('--my',((e.clientY-r.top)/r.height-.5).toFixed(3));
+}));
+const diff=$('#diff'),dA=$('#dA'),dB=$('#dB');
+const DS={
+ review:['Review','Nothing has been changed yet. Applying writes exactly this and keeps a backup, so it can be undone.','Apply edit','Deny'],
+ applied:['Applied','Written to src/main.rs: greet is now welcome, in both places. Undo restores the file byte for byte.','Undo',''],
+ denied:['Denied','Nothing was written. The model was told the edit was refused.','Review again','']
+};
+function setDiff(s){diff.dataset.state=s;const v=DS[s];$('#dpill').textContent=v[0];$('#dmsg').textContent=v[1];dA.textContent=v[2];dB.hidden=!v[3]}
+dA.addEventListener('click',()=>setDiff(diff.dataset.state==='review'?'applied':'review'));
+dB.addEventListener('click',()=>{setDiff('denied');dA.focus()});
+
+/* ---------- C: one field, four shapes ---------- */
+const pc=$('#pcan'),px=pc.getContext('2d'),m3=$('#m3'),N=140,tbs=$$('.tb');
+const hubs=[[-.82,-.3],[-.36,.44],[-.2,-.62],[.14,0],[.55,-.52],[.78,.28],[.3,.7],[-.76,.62]];
+const edges=[[0,1],[0,2],[1,3],[2,3],[3,4],[3,5],[3,6],[4,5],[1,7],[5,6]];
+const rnd=(i,k)=>{const x=Math.sin(i*127.1+k*311.7)*43758.5453;return x-Math.floor(x)};
+function tgt(s,i){
+  if(s==='cougar'){
+    if(i<56){const h=hubs[i%8],a=rnd(i,1)*6.283,q=rnd(i,2)*.07;return[h[0]+Math.cos(a)*q,h[1]+Math.sin(a)*q]}
+    const e=edges[i%10],t=.12+.76*rnd(i,3);return[lerp(hubs[e[0]][0],hubs[e[1]][0],t),lerp(hubs[e[0]][1],hubs[e[1]][1],t)]
+  }
+  if(s==='labsq'){
+    if(i<98){const a=(i%49)/49*6.283,q=i<49?.8:.72;return[Math.cos(a)*q,Math.sin(a)*q]}
+    const a=rnd(i,4)*6.283,q=rnd(i,5)*.07;return[Math.cos(a)*q,Math.sin(a)*q]
+  }
+  if(s==='bifrost'){
+    const k=i%4,t=Math.floor(i/4)/(N/4-1),a=Math.PI*(1-t),q=.62+k*.1;return[Math.cos(a)*q*1.05,.55-Math.sin(a)*q*1.15]
+  }
+  const st=7,t=i/(N-1)*st*2,seg=Math.min(st*2-1,Math.floor(t)),f=t-seg,n=Math.floor(seg/2),w=1.8/st,h=1.4/st;
+  return seg%2===0?[-.9+(n+f)*w,.7-n*h]:[-.9+(n+1)*w,.7-(n+f)*h];
+}
+let shape='cougar',pd=1,ptr=null,pOn=false,pRaf=0;
+const P=[...Array(N)].map((_,i)=>({x:0,y:0,vx:0,vy:0,tx:0,ty:0,ph:rnd(i,9)*6.283}));
+function pLayout(snap){
+  pd=fit(pc);const W=pc.width,H=pc.height,sc=Math.min(W*.46,H*.52);
+  P.forEach((p,i)=>{const t=tgt(shape,i);p.tx=W/2+t[0]*sc;p.ty=H/2+t[1]*sc;if(snap){p.x=p.tx;p.y=p.ty;p.vx=p.vy=0}});
+}
+function pDraw(){
+  const W=pc.width,H=pc.height,A=cv(m3,'--at');
+  px.clearRect(0,0,W,H);px.strokeStyle=A;px.fillStyle=A;px.lineWidth=pd*.7;
+  const R=24*pd,R2=R*R;px.globalAlpha=.22;px.beginPath();
+  for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y;if(dx*dx+dy*dy<R2){px.moveTo(P[i].x,P[i].y);px.lineTo(P[j].x,P[j].y)}}
+  px.stroke();px.globalAlpha=1;
+  for(const p of P){px.beginPath();px.arc(p.x,p.y,1.7*pd,0,6.283);px.fill()}
+}
+function pTick(now){
+  const R=80*pd,R2=R*R;
+  for(const p of P){
+    let ax=(p.tx+Math.sin(now/1100+p.ph)*2.4*pd-p.x)*.045,ay=(p.ty+Math.cos(now/1300+p.ph)*2.4*pd-p.y)*.045;
+    if(ptr){const dx=p.x-ptr.x,dy=p.y-ptr.y,q=dx*dx+dy*dy;if(q<R2){const l=Math.sqrt(q)||1,f=(1-q/R2)*2.6*pd;ax+=dx/l*f;ay+=dy/l*f}}
+    p.vx=(p.vx+ax)*.84;p.vy=(p.vy+ay)*.84;p.x+=p.vx;p.y+=p.vy;
+  }
+  pDraw();if(pOn)pRaf=requestAnimationFrame(pTick);
+}
+const pos=e=>{const r=pc.getBoundingClientRect();return{x:(e.clientX-r.left)*pd,y:(e.clientY-r.top)*pd}};
+pc.addEventListener('pointermove',e=>{ptr=pos(e)});
+pc.addEventListener('pointerleave',()=>{ptr=null});
+pc.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')ptr=null});
+pc.addEventListener('pointerdown',e=>{if(RM)return;const c=pos(e);for(const p of P){const dx=p.x-c.x,dy=p.y-c.y,l=Math.sqrt(dx*dx+dy*dy)||1,f=Math.min(26,2600/l)*pd;p.vx+=dx/l*f;p.vy+=dy/l*f}});
+const INFO={
+ cougar:['The field is the alumni graph: hubs are people, strands are connections.','Cougar Connect','A WSU alumni network on Blazor Server. A 2024 team project; in 2026 Luis, solo, removed hardcoded secrets, moved it to Postgres, added tests and CI, and deployed it.',[['1 box','searches name, year, city, major, company'],['2024','team of three'],['2026','solo rebuild, live on Render']]],
+ labsq:['Forty-nine requests are held on the ring. One reaches the slot.','LabsQ','A lab equipment reservation API in C#/.NET 10 on PostgreSQL 17. Fifty concurrent bookings for one slot all confirmed, until a GiST exclusion constraint made it one.',[['50 → 1','confirmed bookings per slot'],['2.13×','throughput after the index'],['9.91 ms','p95, down from 21.78']]],
+ bifrost:['The field becomes the bridge the project is named for.','Bifrost','Local-first AI tools for Windows 11 in Rust and Tauri. Vidar, Mimir and Hugin share one local model, show exact diffs before writing, and can undo.',[['3 tools','Vidar, Mimir, Hugin'],['1 model','served locally by Ollama'],['24 GB','cap per run of model-written code']]],
+ mastery:['The field becomes a staircase: one step per reply.','Mastery Pilot','A self-hosted Socratic tutor in Django for school districts. For 2x + 6 = 14 it asks for the first step, waits, and cites the curriculum file it drew on.',[['508','tests, run in under a second'],['0.45','relevance floor for retrieval'],['0','conversations leave the district']]]
+};
+tbs.forEach(b=>b.addEventListener('click',()=>{
+  const k=b.dataset.sh;press(tbs,b);shape=k;m3.dataset.w=k;
+  const v=INFO[k];$('#p3w').textContent=v[0];$('#p3n').textContent=v[1];$('#p3t').textContent=v[2];
+  $('#p3s').innerHTML=v[3].map(s=>'<div><dt>'+s[0]+'</dt><dd>'+s[1]+'</dd></div>').join('');
+  pLayout(RM);if(RM||!pOn)pDraw();
+}));
+
+/* boot: draw final states immediately, animate only while on screen */
+function boot(){drawRace();pLayout(true);pDraw()}
+boot();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(boot);
+let rz=0;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(rT>=1)drawRace();pLayout(true);pDraw()},120)});
+if(!RM&&'IntersectionObserver' in window){
+  new IntersectionObserver(es=>{const v=es[0].isIntersecting;if(v&&!pOn){pOn=true;pRaf=requestAnimationFrame(pTick)}else if(!v){pOn=false;cancelAnimationFrame(pRaf)}}).observe(pc);
+}
+})();
+</script>
