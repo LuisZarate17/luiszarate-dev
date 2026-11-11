@@ -47,7 +47,7 @@
 
   /* Type scale: size, then the role's line height, tracking and weight. */
   --text-hero: clamp(5rem, min(30.77vw, 5.4571rem + 8.381vw), 13rem);
-  --text-hero--line-height: 0.8;
+  --text-hero--line-height: 0.84;
   --text-hero--letter-spacing: -0.01em;
   --text-hero--font-weight: 900;
 
