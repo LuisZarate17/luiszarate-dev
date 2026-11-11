@@ -5,7 +5,7 @@ built, which model did the work, and why. Written as the work happens, not recon
 
 ## 2026-11-11: Planning
 
-- Scope: a live portfolio, linked from the resume, for the four resume projects: LabsQ,
+- Scope: a live portfolio, linked from the resume, for the four resume projects: LabQ,
   Bifrost, Cougar Connect and Mastery Pilot. Rule: every resume project goes on the site, and
   this site goes on the resume.
 - Positioning: full-stack engineer. The site itself is the front-end proof.
@@ -24,7 +24,7 @@ built, which model did the work, and why. Written as the work happens, not recon
   B _Meridian_, C _Constellation_ (~157k tokens, ~8 minutes). See `docs/art-direction/`.
 - Decision: A as the base, B's operable cards, C's point field in the hero upgraded to 3D
   (ADR-002).
-- Colors: LabsQ amber `#F59E1B`, Bifrost frost `#7FD6EE`, Cougar Connect crimson `#C8102E`,
+- Colors: LabQ amber `#F59E1B`, Bifrost frost `#7FD6EE`, Cougar Connect crimson `#C8102E`,
   Mastery Pilot indigo-violet `#6C5CE7`.
 
 ## 2026-11-11: Foundation PR (Opus, orchestrator)

@@ -32,7 +32,7 @@ deeper: stack, decisions, numbers, repo links).
 - **Color**: not hard-committed to dark (he prefers dark but is open). Each project is a
   chapter with its **own color world**, all meshing on a shared base:
   Cougar Connect → crimson/red; Bifrost → frosty (Norse names: Vidar, Mimir, Hugin);
-  LabsQ and Mastery Pilot → yours to propose.
+  LabQ and Mastery Pilot → yours to propose.
 - A small photo of Luis near the bottom (about/contact), not a centerpiece.
 - A **"How it was built"** section documenting the engineering workflow behind the site
   itself: git worktrees for parallel work, an orchestrator model delegating to subagents
@@ -53,7 +53,7 @@ deeper: stack, decisions, numbers, repo links).
 
 Read their READMEs and look at the screenshots — they are the raw material.
 
-1. **LabsQ** (`labqueue`) — Lab equipment reservation API, C#/.NET 10, PostgreSQL 17,
+1. **LabQ** (`labqueue`) — Lab equipment reservation API, C#/.NET 10, PostgreSQL 17,
    Docker, k6, Grafana. Story: measured database findings. A booking race where 50 of 50
    concurrent bookings for one slot all confirmed → fixed to 1 with a GiST exclusion
    constraint (then a deadlock edge case found and fixed). Unindexed range predicate:

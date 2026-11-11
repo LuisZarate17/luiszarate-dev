@@ -43,15 +43,15 @@ canvas{display:block;width:100%}
 
 /* ---------- shared mock plumbing: project color worlds ---------- */
 .mock{border-radius:14px;overflow:hidden;background:var(--b);color:var(--t);border:1px solid var(--l)}
-[data-w=labsq]{--a:#F59E1B;--on:#1A1206}
+[data-w=labq]{--a:#F59E1B;--on:#1A1206}
 [data-w=bifrost]{--a:#7FD6EE;--on:#071419}
 [data-w=cougar]{--a:#C8102E;--on:#FFFFFF}
 [data-w=mastery]{--a:#6C5CE7;--on:#FFFFFF}
-[data-mode=dark][data-w=labsq],[data-mode=dark] [data-w=labsq]{--at:#FFB648;--tint:#1A1206}
+[data-mode=dark][data-w=labq],[data-mode=dark] [data-w=labq]{--at:#FFB648;--tint:#1A1206}
 [data-mode=dark][data-w=bifrost],[data-mode=dark] [data-w=bifrost]{--at:#A5E6F7;--tint:#071419}
 [data-mode=dark][data-w=cougar],[data-mode=dark] [data-w=cougar]{--at:#FF6B81;--tint:#1A070B}
 [data-mode=dark][data-w=mastery],[data-mode=dark] [data-w=mastery]{--at:#A99CFF;--tint:#0E0B1F}
-[data-mode=light][data-w=labsq],[data-mode=light] [data-w=labsq]{--at:#8F5400;--tint:#FFF3DC}
+[data-mode=light][data-w=labq],[data-mode=light] [data-w=labq]{--at:#8F5400;--tint:#FFF3DC}
 [data-mode=light][data-w=bifrost],[data-mode=light] [data-w=bifrost]{--at:#0B6B86;--tint:#E4F5FA}
 [data-mode=light][data-w=cougar],[data-mode=light] [data-w=cougar]{--at:#A60F2D;--tint:#FBE8EB}
 [data-mode=light][data-w=mastery],[data-mode=light] [data-w=mastery]{--at:#4B3BC4;--tint:#EDEAFF}
@@ -222,7 +222,7 @@ canvas{display:block;width:100%}
       </div>
       <button class="tog" type="button" data-toggle="m1">Show light base</button>
     </div>
-    <div class="mock m1" id="m1" data-mode="dark" data-w="labsq">
+    <div class="mock m1" id="m1" data-mode="dark" data-w="labq">
       <div class="bar"><span>Luis Zarate · Reel 2026</span><span id="tc">00:00:05:12</span></div>
       <div class="m1-stage" id="m1stage">
         <div class="wipe" aria-hidden="true"></div>
@@ -233,7 +233,7 @@ canvas{display:block;width:100%}
           <p class="m1-cap" id="m1cap">Fifty simultaneous bookings for one lab slot all confirmed. After a GiST exclusion constraint, one does.</p>
         </div>
         <div class="m1-strip" role="group" aria-label="Cut to a scene">
-          <button class="sc" type="button" data-sc="labsq" aria-pressed="true"><small>SC 01</small><b>LabsQ</b></button>
+          <button class="sc" type="button" data-sc="labq" aria-pressed="true"><small>SC 01</small><b>LabQ</b></button>
           <button class="sc" type="button" data-sc="bifrost" aria-pressed="false"><small>SC 02</small><b>Bifrost</b></button>
           <button class="sc" type="button" data-sc="cougar" aria-pressed="false"><small>SC 03</small><b>Cougar Connect</b></button>
           <button class="sc" type="button" data-sc="mastery" aria-pressed="false"><small>SC 04</small><b>Mastery Pilot</b></button>
@@ -241,10 +241,10 @@ canvas{display:block;width:100%}
       </div>
       <div class="bar"><span>2.39 : 1</span><span>4 scenes · 60 s read</span></div>
 
-      <div class="m1-chap" id="m1chap" data-w="labsq">
+      <div class="m1-chap" id="m1chap" data-w="labq">
         <p class="slug">Scene 01 · Int. Postgres 17 — read committed</p>
         <h3 class="m1-h">Fifty bookings.<br>One slot.</h3>
-        <p class="m1-p">LabsQ is a lab equipment reservation API in C#/.NET 10. The booking path checked for an overlap, then inserted, with nothing holding the gap. Run it both ways.</p>
+        <p class="m1-p">LabQ is a lab equipment reservation API in C#/.NET 10. The booking path checked for an overlap, then inserted, with nothing holding the gap. Run it both ways.</p>
         <canvas id="race" role="img" aria-label="Fifty booking requests travel toward one time slot. Without the constraint all fifty are confirmed. With it, one is confirmed and forty-nine are refused."></canvas>
         <div class="lanes" aria-hidden="true"><span>50 requests</span><span>refused · 409</span><span>one slot</span></div>
         <div class="m1-ctl">
@@ -269,7 +269,7 @@ canvas{display:block;width:100%}
         <ul>
           <li><i style="background:#0B0B0D"></i>#0B0B0D</li><li><i style="background:#151518"></i>#151518</li><li><i style="background:#F2EFE9"></i>#F2EFE9</li>
           <li><i style="background:#F4F4F2"></i>#F4F4F2</li><li><i style="background:#111113"></i>#111113</li>
-          <li><i style="background:#F59E1B"></i>LabsQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
+          <li><i style="background:#F59E1B"></i>LabQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
         </ul>
       </div>
     </div>
@@ -293,7 +293,7 @@ canvas{display:block;width:100%}
           <h3 class="m2-h1">I build the system, and the proof that it works.</h3>
           <p class="m2-sub">Four projects across C#/.NET, Rust, Python and Postgres. Each one ships with its numbers, its decisions and a live link.</p>
           <ul class="chips">
-            <li data-w="labsq"><i></i>LabsQ <span>2.13× throughput</span></li>
+            <li data-w="labq"><i></i>LabQ <span>2.13× throughput</span></li>
             <li data-w="bifrost"><i></i>Bifrost <span>1 local model</span></li>
             <li data-w="cougar"><i></i>Cougar Connect <span>live demo</span></li>
             <li data-w="mastery"><i></i>Mastery Pilot <span>508 tests</span></li>
@@ -344,7 +344,7 @@ canvas{display:block;width:100%}
         <ul>
           <li><i style="background:#FBFCFE"></i>#FBFCFE</li><li><i style="background:#0A1A2F"></i>#0A1A2F</li><li><i style="background:#DFE6EF"></i>#DFE6EF</li>
           <li><i style="background:#0A1220"></i>#0A1220</li><li><i style="background:#111C2E"></i>#111C2E</li>
-          <li><i style="background:#F59E1B"></i>LabsQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
+          <li><i style="background:#F59E1B"></i>LabQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
         </ul>
       </div>
     </div>
@@ -373,7 +373,7 @@ canvas{display:block;width:100%}
         <div class="m3-info">
           <div class="tabs" role="group" aria-label="Re-form the field">
             <button class="tb" type="button" data-sh="cougar" aria-pressed="true">Cougar Connect</button>
-            <button class="tb" type="button" data-sh="labsq" aria-pressed="false">LabsQ</button>
+            <button class="tb" type="button" data-sh="labq" aria-pressed="false">LabQ</button>
             <button class="tb" type="button" data-sh="bifrost" aria-pressed="false">Bifrost</button>
             <button class="tb" type="button" data-sh="mastery" aria-pressed="false">Mastery Pilot</button>
           </div>
@@ -399,7 +399,7 @@ canvas{display:block;width:100%}
         <ul>
           <li><i style="background:#05060A"></i>#05060A</li><li><i style="background:#0D1017"></i>#0D1017</li><li><i style="background:#E9ECF2"></i>#E9ECF2</li>
           <li><i style="background:#EEF0F3"></i>#EEF0F3</li><li><i style="background:#0C0E13"></i>#0C0E13</li>
-          <li><i style="background:#F59E1B"></i>LabsQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
+          <li><i style="background:#F59E1B"></i>LabQ #F59E1B</li><li><i style="background:#7FD6EE"></i>Bifrost #7FD6EE</li><li><i style="background:#C8102E"></i>Cougar #C8102E</li><li><i style="background:#6C5CE7"></i>Mastery #6C5CE7</li>
         </ul>
       </div>
     </div>
@@ -437,7 +437,7 @@ $$('[data-toggle]').forEach(b=>b.addEventListener('click',()=>{
 
 /* ---------- A: scene cuts ---------- */
 const SC={
- labsq:['50 → 1','Fifty simultaneous bookings for one lab slot all confirmed. After a GiST exclusion constraint, one does.'],
+ labq:['50 → 1','Fifty simultaneous bookings for one lab slot all confirmed. After a GiST exclusion constraint, one does.'],
  bifrost:['1 model','Vidar, Mimir and Hugin: a screen assistant, a code-aware chat and a terminal agent, all on one local model through Ollama.'],
  cougar:['2024 → 2026','A WSU alumni network that began as a team project. Luis, solo, took out the hardcoded secrets, moved it to Postgres, tested it and deployed it.'],
  mastery:['508 tests','A Socratic tutor for school districts that asks rather than answers. Student conversations never leave the district’s hardware.']
@@ -524,7 +524,7 @@ function tgt(s,i){
     if(i<56){const h=hubs[i%8],a=rnd(i,1)*6.283,q=rnd(i,2)*.07;return[h[0]+Math.cos(a)*q,h[1]+Math.sin(a)*q]}
     const e=edges[i%10],t=.12+.76*rnd(i,3);return[lerp(hubs[e[0]][0],hubs[e[1]][0],t),lerp(hubs[e[0]][1],hubs[e[1]][1],t)]
   }
-  if(s==='labsq'){
+  if(s==='labq'){
     if(i<98){const a=(i%49)/49*6.283,q=i<49?.8:.72;return[Math.cos(a)*q,Math.sin(a)*q]}
     const a=rnd(i,4)*6.283,q=rnd(i,5)*.07;return[Math.cos(a)*q,Math.sin(a)*q]
   }
@@ -564,7 +564,7 @@ pc.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')ptr=null});
 pc.addEventListener('pointerdown',e=>{if(RM)return;const c=pos(e);for(const p of P){const dx=p.x-c.x,dy=p.y-c.y,l=Math.sqrt(dx*dx+dy*dy)||1,f=Math.min(26,2600/l)*pd;p.vx+=dx/l*f;p.vy+=dy/l*f}});
 const INFO={
  cougar:['The field is the alumni graph: hubs are people, strands are connections.','Cougar Connect','A WSU alumni network on Blazor Server. A 2024 team project; in 2026 Luis, solo, removed hardcoded secrets, moved it to Postgres, added tests and CI, and deployed it.',[['1 box','searches name, year, city, major, company'],['2024','team of three'],['2026','solo rebuild, live on Render']]],
- labsq:['Forty-nine requests are held on the ring. One reaches the slot.','LabsQ','A lab equipment reservation API in C#/.NET 10 on PostgreSQL 17. Fifty concurrent bookings for one slot all confirmed, until a GiST exclusion constraint made it one.',[['50 → 1','confirmed bookings per slot'],['2.13×','throughput after the index'],['9.91 ms','p95, down from 21.78']]],
+ labq:['Forty-nine requests are held on the ring. One reaches the slot.','LabQ','A lab equipment reservation API in C#/.NET 10 on PostgreSQL 17. Fifty concurrent bookings for one slot all confirmed, until a GiST exclusion constraint made it one.',[['50 → 1','confirmed bookings per slot'],['2.13×','throughput after the index'],['9.91 ms','p95, down from 21.78']]],
  bifrost:['The field becomes the bridge the project is named for.','Bifrost','Local-first AI tools for Windows 11 in Rust and Tauri. Vidar, Mimir and Hugin share one local model, show exact diffs before writing, and can undo.',[['3 tools','Vidar, Mimir, Hugin'],['1 model','served locally by Ollama'],['24 GB','cap per run of model-written code']]],
  mastery:['The field becomes a staircase: one step per reply.','Mastery Pilot','A self-hosted Socratic tutor in Django for school districts. For 2x + 6 = 14 it asks for the first step, waits, and cites the curriculum file it drew on.',[['508','tests, run in under a second'],['0.45','relevance floor for retrieval'],['0','conversations leave the district']]]
 };
