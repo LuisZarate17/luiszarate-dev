@@ -1,11 +1,15 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("home page", () => {
-  test("renders the name and every project", async ({ page }) => {
+  test("has one h1 and four scenes, each with an h2", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Luis Zarate/i);
-    const projects = page.getByRole("list", { name: "Projects" }).getByRole("listitem");
-    await expect(projects).toHaveCount(4);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Luis\s+Zarate/i);
+    const scenes = page.locator("section.scene");
+    await expect(scenes).toHaveCount(4);
+    for (const scene of await scenes.all()) {
+      await expect(scene.getByRole("heading", { level: 2 })).toHaveCount(1);
+    }
   });
 
   test("has no horizontal scroll", async ({ page }) => {
