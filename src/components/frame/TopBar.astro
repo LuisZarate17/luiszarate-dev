@@ -1,0 +1,126 @@
+---
+/** Top letterbox bar (spec 5.1): home link and the scroll-driven timecode. */
+---
+
+<header class="frame-bar frame-bar--top">
+  <a class="home" href="/" data-cut-home>
+    <span class="home-long">Luis Zarate · Reel 2026</span>
+    <span class="home-short">Luis Zarate</span>
+  </a>
+  <span class="timecode" id="timecode" aria-hidden="true">
+    00:00:00:00
+  </span>
+</header>
+
+<style>
+  .frame-bar {
+    position: fixed;
+    inset-inline: 0;
+    z-index: var(--z-bars);
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    background: var(--color-bar);
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    line-height: var(--text-meta--line-height);
+    letter-spacing: var(--text-meta--letter-spacing);
+    text-transform: uppercase;
+  }
+  .frame-bar--top {
+    top: 0;
+    height: var(--bar-top);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-inline: max(1rem, env(safe-area-inset-left, 0px))
+      max(1rem, env(safe-area-inset-right, 0px));
+  }
+  .home {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+  .home:hover,
+  .home:focus-visible {
+    color: var(--color-text);
+  }
+  .home-long {
+    display: none;
+  }
+  .timecode {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 11ch;
+    letter-spacing: 0;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (min-width: 64rem) {
+    .frame-bar--top {
+      padding-inline: max(1.5rem, env(safe-area-inset-left, 0px))
+        max(1.5rem, env(safe-area-inset-right, 0px));
+    }
+    .home-long {
+      display: inline;
+    }
+    .home-short {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { onReducedMotionChange, prefersReducedMotion } from "../../lib/motion";
+  import { formatTimecode, secondsAt, sectionStartSeconds } from "../../lib/timecode";
+
+  const out = document.getElementById("timecode");
+  const sections = [...document.querySelectorAll<HTMLElement>("main > section")];
+
+  if (out && sections.length > 0) {
+    let tops: number[] = [];
+    let end = 0;
+    let reduced = prefersReducedMotion();
+    let frame = 0;
+
+    const measure = () => {
+      tops = sections.map((s) => s.getBoundingClientRect().top + window.scrollY);
+      const last = sections.at(-1)?.getBoundingClientRect();
+      end = (last?.bottom ?? 0) + window.scrollY;
+    };
+
+    const update = () => {
+      frame = 0;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      // Spread the probe so the bottom of the page reads as the end of the last section.
+      const share = maxScroll > 0 ? Math.min(1, window.scrollY / maxScroll) : 0;
+      const probe = window.scrollY + window.innerHeight * share;
+      const seconds = reduced ? sectionStartSeconds(tops, probe) : secondsAt(tops, end, probe);
+      const text = formatTimecode(seconds);
+      if (out.textContent !== text) out.textContent = text;
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    measure();
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", () => {
+      measure();
+      schedule();
+    });
+    window.addEventListener("load", () => {
+      measure();
+      schedule();
+    });
+    onReducedMotionChange((value) => {
+      reduced = value;
+      schedule();
+    });
+  }
+</script>

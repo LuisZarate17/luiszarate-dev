@@ -1,6 +1,10 @@
 ---
 import "../styles/global.css";
 import WorldStyles from "../components/WorldStyles.astro";
+import SkipLink from "../components/frame/SkipLink.astro";
+import TopBar from "../components/frame/TopBar.astro";
+import SceneStrip from "../components/frame/SceneStrip.astro";
+import Wipe from "../components/frame/Wipe.astro";
 import displayBlack from "@fontsource/big-shoulders-display/files/big-shoulders-display-latin-900-normal.woff2?url";
 import sansRegular from "@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2?url";
 
@@ -26,6 +30,19 @@ const { title, description } = Astro.props;
     <title>{title}</title>
   </head>
   <body class="bg-bg font-sans text-text antialiased">
-    <slot />
+    <SkipLink />
+    <TopBar />
+    <SceneStrip />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Wipe />
   </body>
 </html>
+
+<style>
+  /* <main> only takes programmatic focus (skip link); a ring around the whole page helps no one. */
+  main:focus {
+    outline: none;
+  }
+</style>
