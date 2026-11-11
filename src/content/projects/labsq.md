@@ -1,14 +1,24 @@
 ---
 title: LabsQ
 order: 1
-tagline: Lab equipment reservation API, used to find, fix and measure two database bugs.
-color: "#F59E1B"
+credit: solo
+slug: "INT. POSTGRES 17 — READ COMMITTED"
+headline: ["50 bookings.", "One slot."]
+logline: "Fifty simultaneous bookings for one lab slot all succeeded. I measured the race, closed it with an exclusion constraint, then measured again."
+pin: false
+world:
+  fill: "#F59E1B"
+  onFill: "#1A1206"
+  textDark: "#FFB648"
+  textLight: "#8F5400"
+  tintDark: "#1A1206"
+  tintLight: "#FFF3DC"
 stack: [C#, .NET 10, PostgreSQL 17, Docker, k6, Grafana]
 repo: https://github.com/LuisZarate17/labqueue
 live: https://labqueue-api.onrender.com/docs
 role: Solo project.
 metrics:
-  - { value: "50 → 1", label: "confirmed bookings for one slot under a 50-request race" }
+  - { value: "50 → 1", label: "confirmed bookings when 50 race for one slot" }
   - { value: "2.13×", label: "availability throughput after indexing" }
-  - { value: "26.9×", label: "faster query execution" }
+  - { value: "26.9×", label: "faster availability query" }
 ---

@@ -1,5 +1,8 @@
 ---
 import "../styles/global.css";
+import WorldStyles from "../components/WorldStyles.astro";
+import displayBlack from "@fontsource/big-shoulders-display/files/big-shoulders-display-latin-900-normal.woff2?url";
+import sansRegular from "@fontsource/hanken-grotesk/files/hanken-grotesk-latin-400-normal.woff2?url";
 
 interface Props {
   title: string;
@@ -17,9 +20,12 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#0b0b0d" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href={displayBlack} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={sansRegular} crossorigin />
+    <WorldStyles />
     <title>{title}</title>
   </head>
-  <body class="min-h-dvh bg-ink font-sans text-paper antialiased">
+  <body class="bg-bg font-sans text-text antialiased">
     <slot />
   </body>
 </html>

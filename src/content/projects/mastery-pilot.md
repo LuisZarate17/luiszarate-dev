@@ -1,8 +1,18 @@
 ---
 title: Mastery Pilot
 order: 4
-tagline: Self-hosted Socratic AI tutor for school districts.
-color: "#6C5CE7"
+credit: team
+slug: "INT. DISTRICT SERVER — DATA STAYS IN"
+headline: ["It asks.", "It waits."]
+logline: "A self-hosted tutor that gives one step at a time and cites the curriculum it used. Student conversations never leave the district's hardware."
+pin: false
+world:
+  fill: "#6C5CE7"
+  onFill: "#FFFFFF"
+  textDark: "#A99CFF"
+  textLight: "#4B3BC4"
+  tintDark: "#0E0B1F"
+  tintLight: "#EDEAFF"
 stack: [Python 3.13, Django 5.2]
 repo: https://github.com/LuisZarate17/MasteryPilot
 role: >-
@@ -12,5 +22,5 @@ role: >-
   pipeline rebuilt and scored, and CI added.
 metrics:
   - { value: "508", label: "tests" }
-  - { value: "0", label: "student conversations leave the district" }
+  - { value: "0", label: "student conversations that leave the district" }
 ---

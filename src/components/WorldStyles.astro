@@ -1,0 +1,13 @@
+---
+import { getCollection } from "astro:content";
+import { worldCss } from "../lib/world-css";
+
+/**
+ * Emits the per-world CSS (spec Appendix A.4) from the projects collection, so a
+ * new project needs no stylesheet edit. Rendered once, in the <head> of Base.astro.
+ */
+const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+const css = worldCss(projects.map((p) => ({ id: p.id, world: p.data.world })));
+---
+
+<style is:inline set:html={css}></style>

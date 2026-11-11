@@ -10,45 +10,41 @@ const projects = (await getCollection("projects")).sort((a, b) => a.data.order -
   description="Portfolio of Luis Zarate, full-stack engineer. Work in progress."
 >
   <div class="flex min-h-dvh flex-col">
-    <div class="flex justify-between gap-4 bg-black px-6 py-3 font-mono text-xs tracking-[0.12em] text-muted uppercase">
+    <div class="flex justify-between gap-4 bg-bar px-6 py-3 font-mono text-meta text-bar-text uppercase">
       <span>Luis Zarate · Reel 2026</span>
       <span>In production</span>
     </div>
 
     <main class="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center gap-10 px-6 py-16">
-      <p class="font-mono text-xs tracking-[0.1em] text-muted uppercase">
-        Int. portfolio, full-stack engineer
-      </p>
-      <h1 class="text-6xl leading-none font-black tracking-tight uppercase sm:text-8xl">
-        Luis Zarate
-      </h1>
-      <p class="max-w-prose text-lg text-muted">
+      <p class="font-mono text-slug text-muted uppercase">Int. portfolio, full-stack engineer</p>
+      <h1 class="font-display text-hero uppercase">Luis Zarate</h1>
+      <p class="max-w-measure text-lead text-muted">
         The full site is being built in the open. Until then, here are the projects it will cover.
       </p>
 
       <ul class="grid gap-3 sm:grid-cols-2" aria-label="Projects">
-        {projects.map(({ data }) => (
+        {projects.map(({ id, data }) => (
           <li>
             <a
               href={data.repo}
-              class="flex h-full flex-col gap-1 rounded border border-line p-4 transition-colors hover:bg-surface"
+              class="flex h-full flex-col gap-1 rounded-md border border-line p-4 transition-colors hover:bg-surface"
             >
-              <span class="font-mono text-xs text-muted">SC 0{data.order}</span>
-              <span class="text-xl font-bold" style={`color: ${data.color}`}>
+              <span class="font-mono text-meta text-muted">SC 0{data.order}</span>
+              <span data-world={id} class="text-lead font-semibold text-accent">
                 {data.title}
               </span>
-              <span class="text-sm text-muted">{data.tagline}</span>
+              <span class="text-small text-muted">{data.logline}</span>
             </a>
           </li>
         ))}
       </ul>
     </main>
 
-    <div class="flex justify-between gap-4 bg-black px-6 py-3 font-mono text-xs tracking-[0.12em] text-muted uppercase">
-      <a href="https://github.com/LuisZarate17" class="hover:text-paper">
+    <div class="flex justify-between gap-4 bg-bar px-6 py-3 font-mono text-meta text-bar-text uppercase">
+      <a href="https://github.com/LuisZarate17" class="hover:text-bar-strong">
         GitHub
       </a>
-      <span>2.39 : 1</span>
+      <span>In production</span>
     </div>
   </div>
 </Base>
