@@ -724,6 +724,9 @@ primary per scene: the live demo if the project has one, otherwise the repositor
 
 ### 5.8 Details drawer
 
+- **Rendered only when it holds something beyond the Stack group** (decided in design review,
+  2026-11-11): a drawer that repeats the stack list printed above it reads as a template. Today
+  only Bifrost has one (Stack and Notes). The summary hint lists only the groups present.
 - Native disclosure: `<details class="drawer">` with `<summary>`. No JavaScript is needed to
   open it, find-in-page opens it, and it is announced as expanded or collapsed.
 - It is the last item of `scene-meta`, full width of that column (628 at 1440, 358 at 390).
