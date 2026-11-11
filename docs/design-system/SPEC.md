@@ -190,7 +190,7 @@ A world is 6 required hex values plus an optional secondary pair. Source values:
 
 | World id         | Fill      | On-fill   | Text on dark | Text on light | Tint dark | Tint light | Secondary dark / light |
 | ---------------- | --------- | --------- | ------------ | ------------- | --------- | ---------- | ---------------------- |
-| `labsq`          | `#F59E1B` | `#1A1206` | `#FFB648`    | `#8F5400`     | `#1A1206` | `#FFF3DC`  | none                   |
+| `labq`           | `#F59E1B` | `#1A1206` | `#FFB648`    | `#8F5400`     | `#1A1206` | `#FFF3DC`  | none                   |
 | `bifrost`        | `#7FD6EE` | `#071419` | `#A5E6F7`    | `#0B6B86`     | `#071419` | `#E4F5FA`  | `#B9A9FF` / `#5A45B8`  |
 | `cougar-connect` | `#C8102E` | `#FFFFFF` | `#FF6B81`    | `#A60F2D`     | `#1A070B` | `#FBE8EB`  | none                   |
 | `mastery-pilot`  | `#6C5CE7` | `#FFFFFF` | `#A99CFF`    | `#4B3BC4`     | `#0E0B1F` | `#EDEAFF`  | none                   |
@@ -217,7 +217,7 @@ Resolved values, for reference and for tests:
 
 | World            | Surface dark | Surface light | Line dark | Line light | Line-strong dark | Line-strong light |
 | ---------------- | ------------ | ------------- | --------- | ---------- | ---------------- | ----------------- |
-| `labsq`          | `#271F14`    | `#FFFAEF`     | `#3D352A` | `#D9CFBC`  | `#868078`        | `#888278`         |
+| `labq`           | `#271F14`    | `#FFFAEF`     | `#3D352A` | `#D9CFBC`  | `#868078`        | `#888278`         |
 | `bifrost`        | `#152125`    | `#F3FAFD`     | `#2D373A` | `#C2D1D5`  | `#7C8281`        | `#7A8386`         |
 | `cougar-connect` | `#271518`    | `#FDF5F6`     | `#3D2C2F` | `#D6C6C8`  | `#867B7A`        | `#867C7F`         |
 | `mastery-pilot`  | `#1C192B`    | `#F7F6FF`     | `#322F3F` | `#CAC7D9`  | `#807D84`        | `#7F7E89`         |
@@ -226,7 +226,7 @@ Resolved values, for reference and for tests:
 
 Dark theme:
 
-| Pair                                     | labsq       | bifrost     | cougar-connect | mastery-pilot | Need |
+| Pair                                     | labq        | bifrost     | cougar-connect | mastery-pilot | Need |
 | ---------------------------------------- | ----------- | ----------- | -------------- | ------------- | ---- |
 | text on tint                             | 16.15       | 16.29       | 16.96          | 16.84         | 4.5  |
 | text on scene surface                    | 14.16       | 14.34       | 15.16          | 14.96         | 4.5  |
@@ -244,7 +244,7 @@ Dark theme:
 
 Light theme:
 
-| Pair                                     | labsq       | bifrost     | cougar-connect | mastery-pilot | Need |
+| Pair                                     | labq        | bifrost     | cougar-connect | mastery-pilot | Need |
 | ---------------------------------------- | ----------- | ----------- | -------------- | ------------- | ---- |
 | text on tint                             | 17.16       | 16.83       | 16.03          | 16.00         | 4.5  |
 | text on scene surface                    | 18.12       | 17.88       | 17.57          | 17.59         | 4.5  |
@@ -657,7 +657,7 @@ reflects this); pinned (4.4); drawer open (pin released, scene grows).
 | Layout          | Row, items sized to content, each 56 tall, padding-inline 16 | Grid. The current item is `1fr`; every other item is 44 wide. All 56 tall                                    |
 | Number          | `text-meta`, bar-text                                        | `text-meta` at 14 px, bar-text, centered                                                                     |
 | Name            | `text-strip` (18 px), bar-text, 8 right of the number        | Shown for the current item only, Display 700 at 15 px, tracking 0.02em. Others keep the name visually hidden |
-| Accessible name | "Scene 1: LabsQ" (`aria-label`)                              | Same                                                                                                         |
+| Accessible name | "Scene 1: LabQ" (`aria-label`)                               | Same                                                                                                         |
 
 States:
 
@@ -819,11 +819,11 @@ DOM order, which is also tab order:
 
 Headings:
 
-| Level | Content                                                                                  |
-| ----- | ---------------------------------------------------------------------------------------- |
-| `h1`  | "Luis Zarate" (hero). Exactly one                                                        |
-| `h2`  | One per scene: "LabsQ: Fifty bookings. One slot." pattern; "How it was built"; "Contact" |
-| `h3`  | Drawer groups (Stack, Decisions, Notes); sub-sections of How it was built                |
+| Level | Content                                                                                 |
+| ----- | --------------------------------------------------------------------------------------- |
+| `h1`  | "Luis Zarate" (hero). Exactly one                                                       |
+| `h2`  | One per scene: "LabQ: Fifty bookings. One slot." pattern; "How it was built"; "Contact" |
+| `h3`  | Drawer groups (Stack, Decisions, Notes); sub-sections of How it was built               |
 
 No level is skipped. Slug lines, kickers outside the `h2`, badges and stat values are not
 headings. Each `section` is labelled by its heading (`aria-labelledby`).
@@ -1331,12 +1331,12 @@ re-pointed by the `[data-world]` rule above it, so the scene picks up its own st
 
 ```css
 :root {
-  --w-labsq-fill: #f59e1b;
-  --w-labsq-on-fill: #1a1206;
-  --w-labsq-text-dark: #ffb648;
-  --w-labsq-text-light: #8f5400;
-  --w-labsq-tint-dark: #1a1206;
-  --w-labsq-tint-light: #fff3dc;
+  --w-labq-fill: #f59e1b;
+  --w-labq-on-fill: #1a1206;
+  --w-labq-text-dark: #ffb648;
+  --w-labq-text-light: #8f5400;
+  --w-labq-tint-dark: #1a1206;
+  --w-labq-tint-light: #fff3dc;
 
   --w-bifrost-fill: #7fd6ee;
   --w-bifrost-on-fill: #071419;
@@ -1362,13 +1362,13 @@ re-pointed by the `[data-world]` rule above it, so the scene picks up its own st
   --w-mastery-pilot-tint-light: #edeaff;
 }
 
-[data-world="labsq"] {
-  --wd-fill: var(--w-labsq-fill);
-  --wd-on-fill: var(--w-labsq-on-fill);
-  --wd-text-dark: var(--w-labsq-text-dark);
-  --wd-text-light: var(--w-labsq-text-light);
-  --wd-tint-dark: var(--w-labsq-tint-dark);
-  --wd-tint-light: var(--w-labsq-tint-light);
+[data-world="labq"] {
+  --wd-fill: var(--w-labq-fill);
+  --wd-on-fill: var(--w-labq-on-fill);
+  --wd-text-dark: var(--w-labq-text-dark);
+  --wd-text-light: var(--w-labq-text-light);
+  --wd-tint-dark: var(--w-labq-tint-dark);
+  --wd-tint-light: var(--w-labq-tint-light);
 }
 
 [data-world="bifrost"] {
@@ -1401,7 +1401,7 @@ re-pointed by the `[data-world]` rule above it, so the scene picks up its own st
 }
 ```
 
-The matching content-file front matter, replacing today's `color:` line (LabsQ shown; the
+The matching content-file front matter, replacing today's `color:` line (LabQ shown; the
 other three use the values in 2.3):
 
 ```yaml

@@ -1,5 +1,5 @@
 ---
-title: LabsQ
+title: LabQ
 order: 1
 credit: solo
 slug: "INT. POSTGRES 17 — READ COMMITTED"

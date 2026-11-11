@@ -27,13 +27,13 @@ describe("contrast math", () => {
 
   // Spec 2.4: accent (text) on tint, dark theme then light theme.
   const accentOnTint: Record<string, [number, number]> = {
-    labsq: [10.62, 5.56],
+    labq: [10.62, 5.56],
     bifrost: [13.59, 5.41],
     "cougar-connect": [7.11, 6.54],
     "mastery-pilot": [8.18, 6.54],
   };
   const onFill: Record<string, number> = {
-    labsq: 8.64,
+    labq: 8.64,
     bifrost: 11.36,
     "cougar-connect": 5.88,
     "mastery-pilot": 4.86,
@@ -71,12 +71,7 @@ describe("world schema refine", () => {
 
   it("accepts the four real worlds", () => {
     const worlds = loadWorlds();
-    expect(worlds.map((w) => w.id)).toEqual([
-      "labsq",
-      "bifrost",
-      "cougar-connect",
-      "mastery-pilot",
-    ]);
+    expect(worlds.map((w) => w.id)).toEqual(["labq", "bifrost", "cougar-connect", "mastery-pilot"]);
     for (const { id, world } of worlds) {
       const result = worldSchema.safeParse(world);
       expect(result.success, id).toBe(true);

@@ -29,7 +29,7 @@ describe("world styles", () => {
 
   it("keys each block by the entry id", () => {
     const css = worldCss(loadWorlds());
-    for (const id of ["labsq", "bifrost", "cougar-connect", "mastery-pilot"]) {
+    for (const id of ["labq", "bifrost", "cougar-connect", "mastery-pilot"]) {
       expect(css).toContain(`[data-world="${id}"]`);
     }
   });

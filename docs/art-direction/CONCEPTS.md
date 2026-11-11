@@ -8,7 +8,7 @@ Live preview of all three: `concepts.html` in this folder. Read time: about 10 m
 
 | Project        | World         | Fill      | Text on dark | Text on light | Dark tint | Light tint | Why                                                                               |
 | -------------- | ------------- | --------- | ------------ | ------------- | --------- | ---------- | --------------------------------------------------------------------------------- |
-| LabsQ          | Sodium amber  | `#F59E1B` | `#FFB648`    | `#8F5400`     | `#1A1206` | `#FFF3DC`  | The orange line of its own Grafana dashboard; lab warning-light colour            |
+| LabQ           | Sodium amber  | `#F59E1B` | `#FFB648`    | `#8F5400`     | `#1A1206` | `#FFF3DC`  | The orange line of its own Grafana dashboard; lab warning-light colour            |
 | Bifrost        | Frost         | `#7FD6EE` | `#A5E6F7`    | `#0B6B86`     | `#071419` | `#E4F5FA`  | Ice, with a faint aurora violet (`#B9A9FF`) as the only secondary, for the bridge |
 | Cougar Connect | Crimson       | `#C8102E` | `#FF6B81`    | `#A60F2D`     | `#1A070B` | `#FBE8EB`  | WSU crimson, as in the app's own header                                           |
 | Mastery Pilot  | Indigo-violet | `#6C5CE7` | `#A99CFF`    | `#4B3BC4`     | `#0E0B1F` | `#EDEAFF`  | The app's own indigo, pushed toward violet so it separates from Bifrost           |
@@ -36,7 +36,7 @@ The site is a short film in a widescreen frame: letterbox bars, screenplay slug 
 
 **Wow moment per project.**
 
-- **LabsQ: "Fifty bookings. One slot."** A canvas with 50 request dots, a dashed constraint line and one slot. Two buttons: run without the constraint (all 50 land, counter reads confirmed 50, overlapping pairs 1,225) and with it (1 lands, 49 bounce off as hollow 409s, pairs 0). A third "deadlock" replay shows the 99-deadlock run as dots locked in a ring, then the row-lock fix as a queue. Built in the preview.
+- **LabQ: "Fifty bookings. One slot."** A canvas with 50 request dots, a dashed constraint line and one slot. Two buttons: run without the constraint (all 50 land, counter reads confirmed 50, overlapping pairs 1,225) and with it (1 lands, 49 bounce off as hollow 409s, pairs 0). A third "deadlock" replay shows the 99-deadlock run as dots locked in a ring, then the row-lock fix as a queue. Built in the preview.
 - **Bifrost: "Nothing is written until you say so."** A cut-in of Mimir's edit card: the real `greet` → `welcome` diff types in line by line; Apply writes it, Undo plays the same frames backwards (byte for byte). Beside it a three-way split-screen shows Vidar, Mimir, Hugin all drawing from one pulsing "local model" bar, with a GPU memory meter (8.7 / 16.0 GB).
 - **Cougar Connect: "Before / after."** A split-screen wipe the visitor drags (or taps either side of): 2024 team build on the left, 2026 solo rebuild on the right, with a ledger of the changes ticking over as the divider moves (hardcoded secrets → env, SQL Server → Postgres, 0 tests → xUnit + CI, localhost → Render). The credit line is on screen the whole time.
 - **Mastery Pilot: "It asks."** The real transcript (2x + 6 = 14) plays as subtitles at the bottom of the frame, one step per tap; the visitor can tap the wrong answer ("20") and get the tutor's actual next question, not the answer. Each tutor line ends with its citation chip (`algebra_linear_equations.md`).
@@ -50,7 +50,7 @@ The site is a short film in a widescreen frame: letterbox bars, screenplay slug 
 **Mobile, touch, reduced motion, performance.**
 
 - Pinning: scenes pin only at ≥900px. On phones each scene is a normal block and the simulation plays on a button tap; no scroll-jacking.
-- LabsQ race: canvas 2D, 50 dots, trivial on any GPU. Reduced motion: both end states shown side by side as static frames with counters.
+- LabQ race: canvas 2D, 50 dots, trivial on any GPU. Reduced motion: both end states shown side by side as static frames with counters.
 - Bifrost diff: DOM. Reduced motion: the diff appears complete; Apply/Undo switch instantly.
 - Cougar split: drag works with pointer events; arrow keys and two buttons do the same. Reduced motion: two stacked stills labelled 2024 and 2026.
 - Mastery transcript: tap to advance; reduced motion shows the full transcript.
@@ -75,7 +75,7 @@ A bright, precise product page in the Stripe tradition where one living gradient
 
 **Wow moment per project.**
 
-- **LabsQ:** a live "status page" card. A load dial the visitor drags from 1 to 50 concurrent bookings; a bar chart of confirmed vs refused updates as they drag, with a toggle for "constraint on/off", and a p95 sparkline that drops from 21.78 to 9.91 ms when they switch the index on. Links to the real public Grafana dashboard.
+- **LabQ:** a live "status page" card. A load dial the visitor drags from 1 to 50 concurrent bookings; a bar chart of confirmed vs refused updates as they drag, with a toggle for "constraint on/off", and a p95 sparkline that drops from 21.78 to 9.91 ms when they switch the index on. Links to the real public Grafana dashboard.
 - **Bifrost:** Mimir's edit card, working: the real diff, Apply edit, Deny, Undo. Built in the preview. A second card is Hugin's terminal with a typed `hugin -p` run ending in "check passed (exit 0, 19.6 s)".
 - **Cougar Connect:** the real search box, working on the 9 mock profiles from the screenshots: type "Seattle" or "2020" and results filter across name, year, city, major and company; "Connect" flips to "Pending". A "live demo" button with the ~50s cold-start note.
 - **Mastery Pilot:** a working mini chat with scripted branches from the real transcript plus the teacher-dashboard row that lights an intervention flag when the visitor fails the three-question quiz on purpose.
@@ -111,7 +111,7 @@ One field of points lives behind the whole site and re-forms into each project's
 
 **Wow moment per project.**
 
-- **LabsQ:** the field arranges as 50 bright points rushing one slot. Scroll forward and all 50 pile in (the slot overloads and flares amber); keep scrolling and the constraint appears as a ring, 49 points are held on it and one sits at the centre.
+- **LabQ:** the field arranges as 50 bright points rushing one slot. Scroll forward and all 50 pile in (the slot overloads and flares amber); keep scrolling and the constraint appears as a ring, 49 points are held on it and one sits at the centre.
 - **Bifrost:** the field freezes into an arched bridge of ice-coloured points with a faint aurora shimmer; three brighter clusters on the span are Vidar, Mimir and Hugin, all fed by one stream from a single source point (the one local model). Tapping a cluster opens that tool's screenshot.
 - **Cougar Connect:** the field becomes the alumni graph in crimson: hubs and strands. Tap a hub to "send a connection request"; a strand draws to it and the unread badge appears.
 - **Mastery Pilot:** the field forms a staircase; each tap lights the next step and the matching transcript line appears (first step? → subtract 6 → 2x = 8 → x = 4). The field never jumps to the top, which is the Socratic point.
