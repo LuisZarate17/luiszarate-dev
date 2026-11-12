@@ -137,3 +137,11 @@ site carries a pinned dependency on three (exact version, re-measured on upgrade
 is part of the design and is checked against the live rest pose by `npm run hero:still`.
 Timecode and scene tracking treat `main > .hero-pin` as section 0, because a sticky section's
 own position moves while it is pinned.
+
+**Amendments (design review, approved by Luis).** The fan is one lattice column per plate (rest
+fan 16 px desktop, 12 px phone; at most about 29 px and 22 px with the pointer), so
+`--hero-step` is 3 px / 4 px. The front plate is drawn solid (dot = pitch), amending the
+"dotted at rest" open question: only the four colored plates stay dotted. On phones the hero is
+at most 37.5rem tall, so a tall screen does not leave empty ground above the name. Visibility is
+read from the hero's rect every frame rather than from an IntersectionObserver, whose batched
+callbacks could leave the field stranded after a quick scroll out and back.

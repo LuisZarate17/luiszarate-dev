@@ -1189,7 +1189,7 @@ Metric overrides measured against Arial (Liberation Sans metrics) from the shipp
      src/lib/hero/constants.ts holds the same numbers for the canvas. */
   --hero-pitch: 3px;
   --hero-dot: 2px;
-  --hero-step: 6px;
+  --hero-step: 3px;
 
   /* World mixing: what a scene's surface and lines are mixed toward */
   --mix-surface-keep: 94%;
@@ -1203,7 +1203,7 @@ Metric overrides measured against Arial (Liberation Sans metrics) from the shipp
     --bar-bottom: 3.5rem;
     --hero-pitch: 4px;
     --hero-dot: 3px;
-    --hero-step: 8px;
+    --hero-step: 4px;
   }
 }
 

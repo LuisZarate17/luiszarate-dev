@@ -52,7 +52,7 @@ export const LATTICE = {
 } as const;
 export const DESKTOP_MIN_WIDTH = 1024;
 /** Plates step this many lattice columns at the rest pose (2.3). */
-export const FAN_COLUMNS = 2;
+export const FAN_COLUMNS = 1;
 /** A cell is ink when its coverage is at least this (0..255) (7.2). */
 export const ALPHA_THRESHOLD = 128;
 /** Plates the shader has room for: the name plus up to seven projects. */

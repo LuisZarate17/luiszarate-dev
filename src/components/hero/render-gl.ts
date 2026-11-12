@@ -34,6 +34,7 @@ attribute vec2 aux;
 varying vec3 vCol;
 void main() {
   float k = position.z;
+  bool front = k < 0.5;
   float d = uD * k * uGap / (1.0 - k * uGap);
   float w = uD + d;
   float T = 0.0;
@@ -43,14 +44,15 @@ void main() {
     w -= uD * (1.0 - exp(-${num(BREAK.zoomK)} * T)) * (uD + d) / uD;
   }
   vec2 e = uC + uEye;
-  vec2 s = e + (uC + (position.xy - uC) * (uD + d) / uD - e) * uD / w;
-  float size = min(uMaxDot, uDot * (uD + d) / w);
+  vec2 s = e + (uC + (position.xy + (front ? vec2((uPitch - uDot) * 0.5) : vec2(0.0)) - uC) * (uD + d) / uD - e) * uD / w;
+  // The front plate is solid ink: dot = pitch, centred on the same cell.
+  float size = min(uMaxDot, (front ? uPitch : uDot) * (uD + d) / w);
   if (back) {
     float t = smoothstep(${num(BREAK.lineFrom)}, ${num(BREAK.lineTo)}, uP);
     s = mix(s, vec2(aux.y * uRes.x, uRes.y - uDot * 0.5), t);
   }
   vCol = uBack > 0.5 ? uBg : uCol[int(k + 0.5)];
-  if (uBack > 0.5) { size *= (uPitch + 0.5) / uDot; w += 1.0; }
+  if (uBack > 0.5) { if (!front) size *= (uPitch + 0.5) / uDot; w += 1.0; }
   gl_Position = T >= 1.0
     ? vec4(2.0, 2.0, 2.0, 1.0)
     : vec4(s.x / uRes.x * 2.0 - 1.0, 1.0 - s.y / uRes.y * 2.0, clamp(w / (uD * 4.0), 0.0, 1.0) * 2.0 - 1.0, 1.0);

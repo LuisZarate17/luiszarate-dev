@@ -82,11 +82,15 @@ export function projectPoint(
     T = clamp01((p - delay) / BREAK.span);
     w -= D * (1 - Math.exp(-BREAK.zoomK * T)) * scale;
   }
-  const hx = a[o] ?? 0;
-  const hy = a[o + 1] ?? 0;
+  // The front plate is solid ink: its dot is the pitch, centred on the same cell.
+  const front = k === 0;
+  const dot = front ? f.g : f.dot;
+  const nudge = front ? (f.g - f.dot) / 2 : 0;
+  const hx = (a[o] ?? 0) + nudge;
+  const hy = (a[o + 1] ?? 0) + nudge;
   let x = ex + (f.C[0] + (hx - f.C[0]) * scale - ex) * (D / w);
   let y = ey + (f.C[1] + (hy - f.C[1]) * scale - ey) * (D / w);
-  const size = Math.min(f.maxDot, (f.dot * (D + d)) / w);
+  const size = Math.min(f.maxDot, (dot * (D + d)) / w);
   if (back) {
     const t = smoothstep(BREAK.lineFrom, BREAK.lineTo, p);
     x += ((a[o + 4] ?? 0) * f.W - x) * t;
@@ -95,7 +99,7 @@ export function projectPoint(
   out[0] = x;
   out[1] = y;
   out[2] = T >= 1 ? 0 : size;
-  out[3] = (size * (f.g + 0.5)) / f.dot;
+  out[3] = front ? size : (size * (f.g + 0.5)) / f.dot;
   return out;
 }
 

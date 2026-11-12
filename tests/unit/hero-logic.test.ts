@@ -1,7 +1,14 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { parseColor } from "../../src/lib/hero/color";
-import { HOLD_MS, INTRO_MS, LATTICE, REST, WATCHDOG } from "../../src/lib/hero/constants";
+import {
+  FAN_COLUMNS,
+  HOLD_MS,
+  INTRO_MS,
+  LATTICE,
+  REST,
+  WATCHDOG,
+} from "../../src/lib/hero/constants";
 import { buildPoints, cellsFromAlpha, rankGlyphs } from "../../src/lib/hero/lattice";
 import {
   eyeDistance,
@@ -151,21 +158,27 @@ describe("projection", () => {
     const d = [1, 2, 3, 4].map((k) => plateDepth(f.D, k, f.c));
     expect(d).toEqual([...d].sort((a, b) => a - b));
   });
-  it("at e = 0 every plate sits on its home position at the dot size", () => {
+  // The front plate is solid ink: its dot is the pitch, centred on the same cell.
+  const nudge = (k: number) => (k === 0 ? (f.g - f.dot) / 2 : 0);
+  it("at e = 0 every plate sits on its home position; colored dots are dot-sized, the front is pitch-sized", () => {
     for (let k = 0; k < f.plates; k++) {
       const i = point(f, 1, k);
       projectPoint(f, i, [0, 0], 0, out);
-      expect(out[0]).toBeCloseTo(f.pts[i * STRIDE]!, 4);
-      expect(out[1]).toBeCloseTo(f.pts[i * STRIDE + 1]!, 4);
-      expect(out[2]).toBeCloseTo(f.dot, 6);
+      expect(out[0]).toBeCloseTo(f.pts[i * STRIDE]! + nudge(k), 4);
+      expect(out[1]).toBeCloseTo(f.pts[i * STRIDE + 1]! + nudge(k), 4);
+      expect(out[2]).toBeCloseTo(k === 0 ? f.g : f.dot, 6);
     }
   });
-  it("at the rest yaw plate k is shifted exactly 2 g k", () => {
+  it("the front plate's cell is whole pixels: centre minus half the pitch is the cell corner", () => {
+    projectPoint(f, point(f, 1, 0), [0, 0], 0, out);
+    expect(((out[0] ?? 0) - f.g / 2) % 1).toBeCloseTo(0, 6);
+  });
+  it("at the rest yaw plate k is shifted exactly FAN_COLUMNS g k", () => {
     const eye = eyeOffset(f.D, REST.yaw, 0);
     for (let k = 0; k < f.plates; k++) {
       const i = point(f, 1, k);
       projectPoint(f, i, eye, 0, out);
-      expect((out[0] ?? 0) - f.pts[i * STRIDE]!).toBeCloseTo(2 * f.g * k, 4);
+      expect((out[0] ?? 0) - f.pts[i * STRIDE]!).toBeCloseTo(FAN_COLUMNS * f.g * k + nudge(k), 4);
     }
   });
   it("plate 0 never moves, whatever the eye", () => {
@@ -176,8 +189,8 @@ describe("projection", () => {
       [130, -30],
     ] as const) {
       projectPoint(f, i, e, 0, out);
-      expect(out[0]).toBeCloseTo(f.pts[i * STRIDE]!, 6);
-      expect(out[1]).toBeCloseTo(f.pts[i * STRIDE + 1]!, 6);
+      expect(out[0]).toBeCloseTo(f.pts[i * STRIDE]! + nudge(0), 6);
+      expect(out[1]).toBeCloseTo(f.pts[i * STRIDE + 1]! + nudge(0), 6);
     }
   });
   it("flies through the camera and is culled at T >= 1", () => {
@@ -291,7 +304,10 @@ describe("tokens agree with the constants", () => {
   it("hero pitch, dot and step: phone first, then desktop", () => {
     expect(token("hero-pitch")).toEqual([LATTICE.full.phone.pitch, LATTICE.full.desktop.pitch]);
     expect(token("hero-dot")).toEqual([LATTICE.full.phone.dot, LATTICE.full.desktop.dot]);
-    expect(token("hero-step")).toEqual([6, 8]);
+    expect(token("hero-step")).toEqual([
+      FAN_COLUMNS * LATTICE.full.phone.pitch,
+      FAN_COLUMNS * LATTICE.full.desktop.pitch,
+    ]);
   });
 });
 

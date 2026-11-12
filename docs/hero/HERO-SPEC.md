@@ -103,23 +103,24 @@ At `a = 0` this reduces to `screen = h + k·c·e`: every plate is a pure transla
 name, in equal steps. This is an off-axis ("window") projection: the screen plane never moves,
 which is what keeps plate 0 registered to the `h1` at every eye position.
 
-`c` is chosen so that at the rest pose (yaw 5°) each plate steps exactly **two lattice
-columns** (8 px desktop, 6 px phone). At rest the lattices of all plates therefore coincide.
+`c` is chosen so that at the rest pose (yaw 5°) each plate steps exactly **one lattice
+column** (4 px desktop, 3 px phone), so the four colors fan 16 px / 12 px at rest (design review: two
+columns read as a smear). At rest the lattices of all plates therefore coincide.
 
 ### 2.4 Framing and safe zones
 
 Layout is the current `HeroStatic` layout (content bottom-left, `align-items: flex-end`), plus
 a controls row under the sub-line.
 
-| Element         | 1440 × 788 frame                                  | 390 × 600 frame                          |
-| --------------- | ------------------------------------------------- | ---------------------------------------- |
-| Slug            | x 80, y 209 to 234                                | x 16, y 168 to 190                       |
-| Name (`h1` box) | x 80 to 610, y 248 to 597; 208 px type            | x 16 to 322, y 204 to 406; 120 px type   |
-| Sub-line        | x 80, y 612                                       | x 16, y 419 (two lines)                  |
-| Pause           | x 80, y 662, 44 px tall (bottom-left of the hero) | x 16, y 490                              |
-| Field at rest   | name box + 32 px right, 6 px up                   | name box + 24 px right, 5 px up          |
-| Field, max fan  | name box ± 58 px horizontally, ± 14 px vertically | ± 44 px horizontally, ± 11 px vertically |
-| Free            | everything right of x 700 and above y 200         | everything above y 160                   |
+| Element         | 1440 × 788 frame                                  | 390 × 600 frame                         |
+| --------------- | ------------------------------------------------- | --------------------------------------- |
+| Slug            | x 80, y 209 to 234                                | x 16, y 168 to 190                      |
+| Name (`h1` box) | x 80 to 610, y 248 to 597; 208 px type            | x 16 to 322, y 204 to 406; 120 px type  |
+| Sub-line        | x 80, y 612                                       | x 16, y 419 (two lines)                 |
+| Pause           | x 80, y 662, 44 px tall (bottom-left of the hero) | x 16, y 490                             |
+| Field at rest   | name box + 16 px right, 3 px up                   | name box + 12 px right, 2 px up         |
+| Field, max fan  | name box ± 29 px horizontally, ± 7 px vertically  | ± 22 px horizontally, ± 6 px vertically |
+| Free            | everything right of x 700 and above y 200         | everything above y 160                  |
 
 Positions are _measured_ in the prototype, whose controls block has one extra 38 px row (a
 prototype-only readout); in production the block sits about 38 px lower. The fan sizes are
@@ -354,7 +355,7 @@ through `::before { content: attr(data-t) }` with a dot pattern clipped to the g
 }
 ```
 
-- `--hero-pitch / --hero-dot / --hero-step`: `3px / 2px / 6px` below 64rem, `4px / 3px / 8px`
+- `--hero-pitch / --hero-dot / --hero-step`: `3px / 2px / 3px` below 64rem, `4px / 3px / 4px`
   from 64rem. `--k` is 1..4 and `--c` the world color, nearest plate last in DOM order.
   Add these three tokens to `tokens.css`.
 - Markup: `<span class="hero-plates" aria-hidden="true">` with one
@@ -443,18 +444,18 @@ Both renderers implement `{ setField(field, dpr), draw(field, eye, p), dispose()
 
 ### 7.3 Unit tests (Vitest, no browser)
 
-| Function                     | Assert                                                                                                                                                         |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pickTier`                   | Each row of the table in section 5, including undefined `deviceMemory` and reduced motion winning                                                              |
-| `pickDpr`                    | 1 → 1, 1.5 → 1, 2 → 2, 2.625 → 2, 3 → 2                                                                                                                        |
-| `cubicBezier`                | 0 → 0, 1 → 1, monotonic, value at 0.5 within 0.001 of the CSS curve                                                                                            |
-| `poseAt`                     | 0° at 0 and 240 ms; 5° / 1° at 1840 ms; continuous at 1840 ms; pointer adds 4° / 1.2° at the extremes                                                          |
-| `plateDepth`, `projectPoint` | `e = 0` maps every plate onto its home position; at yaw 5° plate `k` is shifted exactly `2·g·k`; plate 0 never moves for any `e`; size equals `dot` at `p = 0` |
-| `projectPoint`               | Culled at `T ≥ 1`; back plate at `p = 1` is at `(frac·W, H − dot/2)`                                                                                           |
-| `cellsFromAlpha`             | Threshold; single ownership; seam column dropped between touching glyphs                                                                                       |
-| `rankGlyphs`                 | Farthest centroid gets rank 0; ties stable                                                                                                                     |
-| `progressFromScroll`         | Clamped 0..1 for pinned and unpinned distances; 0 when distance is 0                                                                                           |
-| `createWatchdog`             | Fires each step once, in order, only after two consecutive slow windows                                                                                        |
+| Function                     | Assert                                                                                                                                                                                             |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pickTier`                   | Each row of the table in section 5, including undefined `deviceMemory` and reduced motion winning                                                                                                  |
+| `pickDpr`                    | 1 → 1, 1.5 → 1, 2 → 2, 2.625 → 2, 3 → 2                                                                                                                                                            |
+| `cubicBezier`                | 0 → 0, 1 → 1, monotonic, value at 0.5 within 0.001 of the CSS curve                                                                                                                                |
+| `poseAt`                     | 0° at 0 and 240 ms; 5° / 1° at 1840 ms; continuous at 1840 ms; pointer adds 4° / 1.2° at the extremes                                                                                              |
+| `plateDepth`, `projectPoint` | `e = 0` maps every plate onto its home position; at yaw 5° plate `k` is shifted exactly `FAN_COLUMNS·g·k`; plate 0 never moves for any `e`; size equals `dot` at `p = 0` (`g` for the front plate) |
+| `projectPoint`               | Culled at `T ≥ 1`; back plate at `p = 1` is at `(frac·W, H − dot/2)`                                                                                                                               |
+| `cellsFromAlpha`             | Threshold; single ownership; seam column dropped between touching glyphs                                                                                                                           |
+| `rankGlyphs`                 | Farthest centroid gets rank 0; ties stable                                                                                                                                                         |
+| `progressFromScroll`         | Clamped 0..1 for pinned and unpinned distances; 0 when distance is 0                                                                                                                               |
+| `createWatchdog`             | Fires each step once, in order, only after two consecutive slow windows                                                                                                                            |
 
 ### 7.4 End-to-end tests (Playwright, both projects)
 
@@ -585,3 +586,5 @@ always the still.
 4. **The name is dotted at rest**, so it is a little less bright than the solid `h1`. That is
    the look. If it should be heavier, raise the dot from `g − 1` toward `g`; do not add a
    solid layer.
+   _Amended after design review, approved by Luis: the front plate (k = 0) is drawn solid
+   (dot = pitch, centred on its cell); only the four colored plates stay dotted._

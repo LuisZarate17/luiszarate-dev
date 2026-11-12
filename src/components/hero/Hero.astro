@@ -84,6 +84,12 @@ const name = "LUIS\nZARATE";
     /* A horizontal drag moves the fan; vertical drags scroll the page. */
     touch-action: pan-y pinch-zoom;
   }
+  /* A tall phone would leave a screenful of empty ground above the name. */
+  @media (max-width: 1023px) {
+    .hero {
+      min-height: min(var(--frame-h), 37.5rem);
+    }
+  }
   .hero-field {
     position: absolute;
     inset: 0;

@@ -52,6 +52,31 @@ const tokenRgb = (page: Page, name: string) =>
     return [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16));
   }, name);
 
+/** Fraction of the bottom pixel row of `.hero` (as the visitor sees it) that is `fill`. */
+async function bottomRowShare(page: Page, fill: number[]): Promise<number> {
+  const box = (await hero(page).boundingBox())!;
+  const row = await rowsMatching(
+    page,
+    await page.screenshot({
+      clip: { x: box.x, y: box.y + box.height - 1, width: box.width, height: 1 },
+    }),
+    fill,
+  );
+  return row[0] ?? 0;
+}
+
+/** Tab to the Pause button and press it, so no pointer event is involved. */
+async function pauseWithKeyboard(page: Page) {
+  const pause = page.getByRole("button", { name: "Pause" });
+  for (let i = 0; i < 20 && !(await pause.evaluate((el) => el === document.activeElement)); i++) {
+    await page.keyboard.press("Tab");
+  }
+  await expect(pause).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: "Play" })).toBeVisible();
+  await page.waitForTimeout(300);
+}
+
 test.describe("hero", () => {
   test("goes live: canvas visible, the h1 off but still the heading", async ({ page }) => {
     await live(page);
@@ -105,14 +130,7 @@ test.describe("hero", () => {
 
   test("pause works from the keyboard and freezes the field", async ({ page }) => {
     await live(page);
-    const pause = page.getByRole("button", { name: "Pause" });
-    for (let i = 0; i < 20 && !(await pause.evaluate((el) => el === document.activeElement)); i++) {
-      await page.keyboard.press("Tab");
-    }
-    await expect(pause).toBeFocused();
-    await page.keyboard.press("Enter");
-    await expect(page.getByRole("button", { name: "Play" })).toBeVisible();
-    await page.waitForTimeout(300);
+    await pauseWithKeyboard(page);
     const a = await hero(page).screenshot();
     await page.waitForTimeout(600);
     const b = await hero(page).screenshot();
@@ -143,21 +161,14 @@ test.describe("hero", () => {
     await page.evaluate((y) => scrollTo(0, y), pin.frame);
     const fill = await tokenRgb(page, "--w-labq-fill");
     await expect
-      .poll(
-        async () => {
-          const box = (await hero(page).boundingBox())!;
-          const row = await rowsMatching(
-            page,
-            await page.screenshot({
-              clip: { x: box.x, y: box.y + box.height - 1, width: box.width, height: 1 },
-            }),
-            fill,
-          );
-          return row[0] ?? 0;
-        },
-        { timeout: 8000 },
-      )
+      .poll(() => bottomRowShare(page, fill), { timeout: 8000 })
       .toBeGreaterThanOrEqual(0.95);
+    // The line stays put while the hero scrolls away with scene 1 (40 px past the end of the pin).
+    await page.evaluate((y) => scrollTo(0, y + 40), pin.frame);
+    await expect
+      .poll(() => bottomRowShare(page, fill), { timeout: 8000 })
+      .toBeGreaterThanOrEqual(0.95);
+    await page.evaluate((y) => scrollTo(0, y), pin.frame);
     const edges = await page.evaluate(() => ({
       heroBottom: document.querySelector(".hero")!.getBoundingClientRect().bottom,
       sceneTop: document.querySelector("#labq")!.getBoundingClientRect().top,
@@ -213,7 +224,154 @@ test.describe("hero", () => {
         }),
       )
       .toBe(0);
+    // ...and the first project's line is on the hero's bottom edge: the last canvas row is amber.
+    // (Read back from the 2D canvas; a WebGL canvas cannot be read without preserveDrawingBuffer.)
+    const fill = await tokenRgb(page, "--w-labq-fill");
+    await expect
+      .poll(() =>
+        page.evaluate((fill) => {
+          const c = document.querySelector<HTMLCanvasElement>(".hero-field canvas")!;
+          const { data } = c.getContext("2d")!.getImageData(0, c.height - 1, c.width, 1);
+          let n = 0;
+          for (let x = 0; x < c.width; x++)
+            if (
+              Math.abs((data[x * 4] ?? 0) - (fill[0] ?? 0)) <= 6 &&
+              Math.abs((data[x * 4 + 1] ?? 0) - (fill[1] ?? 0)) <= 6 &&
+              Math.abs((data[x * 4 + 2] ?? 0) - (fill[2] ?? 0)) <= 6
+            )
+              n++;
+          return n / c.width;
+        }, fill),
+      )
+      .toBeGreaterThanOrEqual(0.95);
   });
+
+  test("phone: the WebGL line is on the hero's bottom edge at p = 1", async ({ page }) => {
+    test.skip(isDesktop(page), "phone behaviour");
+    await live(page);
+    await page.evaluate(() =>
+      scrollTo(0, document.querySelector<HTMLElement>(".hero")!.offsetHeight * 0.85),
+    );
+    const fill = await tokenRgb(page, "--w-labq-fill");
+    await expect
+      .poll(() => bottomRowShare(page, fill), { timeout: 8000 })
+      .toBeGreaterThanOrEqual(0.95);
+  });
+
+  test("scrolling to the end of the hero and back to the top re-forms the name", async ({
+    page,
+  }) => {
+    await live(page);
+    await page.waitForTimeout(2200); // past the intro, so a paused frame is a settled pose
+    await pauseWithKeyboard(page);
+    const before = await hero(page).screenshot();
+    const frame = await page.evaluate(
+      () => document.querySelector<HTMLElement>(".hero")!.offsetHeight,
+    );
+    const steps = [frame * 0.5, frame, frame * 3, frame, frame * 0.4, 0];
+    for (const y of steps) {
+      await page.evaluate((y) => scrollTo(0, y), y);
+      await page.waitForTimeout(150);
+    }
+    await expect
+      .poll(async () => (await hero(page).screenshot()).equals(before), { timeout: 5000 })
+      .toBe(true);
+  });
+
+  test("a quick scroll out and back does not strand the field", async ({ page }) => {
+    // Regression: an IntersectionObserver that kept only the oldest entry of a batch left the
+    // hero "out of view" after a fast round trip, with the loop stopped for good.
+    await live(page);
+    await page.waitForTimeout(1200);
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: 8 });
+    await page.evaluate(async () => {
+      const h = document.querySelector<HTMLElement>(".hero")!.offsetHeight;
+      for (let i = 0; i < 6; i++) {
+        scrollTo(0, h * 3);
+        await new Promise((r) => requestAnimationFrame(r));
+        scrollTo(0, 0);
+        await new Promise((r) => requestAnimationFrame(r));
+      }
+    });
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+    await page.waitForTimeout(600);
+    const a = await hero(page).screenshot();
+    await expect
+      .poll(async () => !(await hero(page).screenshot()).equals(a), { timeout: 4000 })
+      .toBe(true);
+  });
+});
+
+/**
+ * The line, read from the WebGL drawing buffer itself. Screenshots of a WebGL canvas that is
+ * mostly scrolled out of view are unreliable under SwiftShader at some pixel ratios (at 1x and
+ * 3x the compositor shows the canvas empty although the buffer holds the line: readPixels
+ * sees it, `elementFromPoint` and the canvas rect are right), so the screenshot tests above run
+ * at the Pixel 7 ratio, and this test asserts the same thing on the buffer for every ratio. The
+ * buffer is made readable by forcing `preserveDrawingBuffer` on the hero's context only.
+ */
+test.describe("the line in the WebGL drawing buffer", () => {
+  const phone = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true };
+  const cases = [
+    {
+      name: "desktop 1x, 40 px past the pin",
+      opts: { viewport: { width: 1440, height: 900 } },
+      desktop: true,
+    },
+    { name: "phone 1x", opts: { ...phone, deviceScaleFactor: 1 }, desktop: false },
+    { name: "phone 3x", opts: { ...phone, deviceScaleFactor: 3 }, desktop: false },
+  ];
+  for (const { name, opts, desktop } of cases) {
+    test(name, async ({ browser }) => {
+      const context = await browser.newContext(opts);
+      const page = await context.newPage();
+      await page.addInitScript(() => {
+        const original = HTMLCanvasElement.prototype.getContext as (
+          this: HTMLCanvasElement,
+          type: string,
+          attrs?: object,
+        ) => unknown;
+        (HTMLCanvasElement.prototype as unknown as { getContext: unknown }).getContext = function (
+          this: HTMLCanvasElement,
+          type: string,
+          attrs?: object,
+        ) {
+          const next =
+            type === "webgl2" && attrs ? { ...attrs, preserveDrawingBuffer: true } : attrs;
+          return original.call(this, type, next);
+        };
+      });
+      await live(page);
+      const frame = await page.evaluate(
+        () => document.querySelector<HTMLElement>(".hero")!.offsetHeight,
+      );
+      await page.evaluate((y) => scrollTo(0, y), desktop ? frame + 40 : frame * 0.85);
+      const fill = await tokenRgb(page, "--w-labq-fill");
+      await expect
+        .poll(
+          () =>
+            page.evaluate((fill) => {
+              const c = document.querySelector<HTMLCanvasElement>(".hero-field canvas")!;
+              const gl = c.getContext("webgl2") as WebGL2RenderingContext;
+              const row = new Uint8Array(c.width * 4); // the bottom row: GL's origin is bottom-left
+              gl.readPixels(0, 0, c.width, 1, gl.RGBA, gl.UNSIGNED_BYTE, row);
+              let n = 0;
+              for (let x = 0; x < c.width; x++)
+                if (
+                  Math.abs((row[x * 4] ?? 0) - (fill[0] ?? 0)) <= 6 &&
+                  Math.abs((row[x * 4 + 1] ?? 0) - (fill[1] ?? 0)) <= 6 &&
+                  Math.abs((row[x * 4 + 2] ?? 0) - (fill[2] ?? 0)) <= 6
+                )
+                  n++;
+              return n / c.width;
+            }, fill),
+          { timeout: 8000 },
+        )
+        .toBeGreaterThanOrEqual(0.95);
+      await context.close();
+    });
+  }
 });
 
 test.describe("hero with reduced motion", () => {

@@ -124,7 +124,6 @@ export function startHero(hero: HTMLElement): void {
   let live = false;
   let paused = false;
   let visible = true;
-  let anyInView = true;
   let raf = 0;
   let last = 0;
   let lastDraw = 0;
@@ -232,10 +231,21 @@ export function startHero(hero: HTMLElement): void {
     progress = override === "rest" ? 0 : progressFromScroll(window.scrollY, distance);
   }
 
-  function runnable(): boolean {
-    return !paused && visible && inViewEnough && override !== "rest";
+  /**
+   * Share of the hero inside the viewport, read from its rect on every frame. An
+   * IntersectionObserver was used first and could strand the field: its callback is batched
+   * and only the first (oldest) entry was read, so a quick scroll out and back could leave the
+   * hero "not in view" for good, with the loop stopped and scroll events ignored.
+   */
+  function viewShare(): number {
+    const r = hero.getBoundingClientRect();
+    const visibleHeight = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+    return r.height > 0 ? Math.max(0, visibleHeight) / r.height : 0;
   }
-  let inViewEnough = true;
+
+  function runnable(share: number): boolean {
+    return !paused && visible && share >= IN_VIEW_RATIO && override !== "rest";
+  }
 
   function draw(dt: number) {
     if (!renderer || !field) return;
@@ -250,7 +260,13 @@ export function startHero(hero: HTMLElement): void {
   function frame(now: number) {
     raf = 0;
     if (!renderer || !field) return;
-    const running = runnable();
+    const share = viewShare();
+    // Off screen: nothing to draw. The next scroll event (or resize) asks for a frame again.
+    if (live && share <= 0) {
+      last = 0;
+      return;
+    }
+    const running = runnable(share);
     let dt = 0;
     if (running) {
       dt = Math.min(MAX_DT_MS, now - (last || now));
@@ -468,7 +484,7 @@ export function startHero(hero: HTMLElement): void {
   window.addEventListener(
     "scroll",
     () => {
-      if (anyInView && override !== "rest") request();
+      if (override !== "rest") request();
     },
     { passive: true },
   );
@@ -480,24 +496,13 @@ export function startHero(hero: HTMLElement): void {
     else stopLoop();
   });
 
-  new IntersectionObserver(
-    ([entry]) => {
-      if (!entry) return;
-      anyInView = entry.isIntersecting;
-      inViewEnough = entry.intersectionRatio >= IN_VIEW_RATIO;
-      watchdog?.reset();
-      if (anyInView) request();
-      else stopLoop();
-    },
-    { threshold: [0, IN_VIEW_RATIO] },
-  ).observe(hero);
-
   // Re-sample when the name moves or changes size (4.7). Height-only changes under 120 px are
   // mobile browser chrome and are ignored.
   let resizeTimer = 0;
   let lastWidth = window.innerWidth;
   let lastHeight = window.innerHeight;
   window.addEventListener("resize", () => {
+    request();
     clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
       const width = window.innerWidth;
