@@ -35,7 +35,11 @@ is itself a resume project, so the front end is the point. Treat it as a product
 A change is done when `format:check`, `lint`, `check`, `build`, `test:unit` and `test:e2e` all pass
 locally, any new interactive piece has a reduced-motion fallback and a phone-size check, and
 the PR description says what changed and how it was verified. CI runs the same gates plus
-Lighthouse; a PR merges only when CI is green.
+Lighthouse; a PR merges only when CI is green. Before merge, a PR that changes code gets a
+`/code-review high` pass on its diff (plus `/security-review` when it handles input, links or
+third-party code); findings go to Luis before any fix. A Stop hook
+(`.claude/hooks/stop-checks.sh`) runs `lint` and `check` before an agent finishes and sends
+failures back to it.
 
 ## Workflow
 
