@@ -454,7 +454,7 @@ Hover and press change `color`, `background-color` and `border-color` over `--du
 - Native scroll only. No smooth-scroll library, no scroll snapping, no programmatic scrolling
   except the instant jump inside a cut.
 - GSAP is `gsap` core plus `ScrollTrigger`, imported only by the islands that pin or scrub,
-  set up inside `gsap.matchMedia()`.
+  set up inside `gsap.matchMedia()`. The hero is the exception: it uses none.
 - **Pinning is allowed only when all of these are true:**
   `(min-width: 1024px) and (min-height: 760px) and (pointer: fine) and (prefers-reduced-motion: no-preference)`,
   **and** the scene opts in (`pin: true`, which it may do only if its simulation accepts a
@@ -463,8 +463,10 @@ Hover and press change `color`, `background-color` and `border-color` over `--du
 - A pinned scene holds for **75% of `--frame-h`** of extra scroll (`end: "+=75%"`,
   `scrub: true`, `pin: true`, `anticipatePin: 1`). During the hold, scroll drives exactly one
   thing: the simulation's `progress` from 0 to 1. Nothing else in the scene changes.
-- The hero may pin for 100% of `--frame-h` under the same media query; its one scrubbed thing
-  is the field's break-apart.
+- The hero pins for 100% of `--frame-h` under the same media query, with CSS `position: sticky`
+  in a `.hero-pin` wrapper twice the frame tall (no GSAP, no pin-spacer; see ADR-006). Its one
+  scrubbed thing is the field's break-apart, `p = scrollY / (wrapper height - hero height)`.
+  Elsewhere the hero does not pin and `p = scrollY / (0.85 * hero height)`.
 - Opening a drawer in a pinned scene kills that scene's pin and calls
   `ScrollTrigger.refresh()`.
 - Phones and tablets never pin. Simulations there play on a button tap.
@@ -472,7 +474,9 @@ Hover and press change `color`, `background-color` and `border-color` over `--du
 ### 4.5 Running and pausing
 
 - Animated pieces run only while at least 60% in view (IntersectionObserver) and pause on
-  `visibilitychange`. Each simulation plays once on entry on desktop, then waits for input; on
+  `visibilitychange`. Scroll-driven frames are the exception: the hero draws a frame for every
+  scroll event while any part of it is in view, because the unpinned break-apart happens while
+  the hero is leaving the frame. Each simulation plays once on entry on desktop, then waits for input; on
   phones it waits for a tap.
 - Anything that moves by itself for more than 5 seconds (hero field, hero title card) has a
   visible Pause control.
@@ -871,18 +875,18 @@ styled as a Primary button with the neutral tokens (bg `--color-text`, text `--c
 
 What the design system provides and what the 3D hero must respect.
 
-| Topic       | Contract                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Container   | `<section class="hero">`: `min-height: var(--frame-h)`, `position: relative`, `isolation: isolate`, background `--color-bg`, no `data-world`                                                                                                                                                                                                                                                                                     |
-| Layering    | `div.hero-field` at `position: absolute; inset: 0; z-index: var(--z-below); pointer-events: none`. It holds the still image and, later, the canvas. All text sits above it at `--z-base`. The field never extends under the bars                                                                                                                                                                                                 |
-| Real text   | The `h1`, slug, sub-line and title card are DOM text in tokens and are the first paint. When the field is live and has formed the name, the hero adds `.hero--live`, which sets the `h1` to `opacity: 0` in a single step (no fade); it stays in the accessibility tree and keeps its box                                                                                                                                        |
-| Type        | Name: `text-hero`, two lines ("LUIS" / "ZARATE"); _measured_ "ZARATE" is 557 px at 1440 and 321 px at 390. Slug: `text-slug`. Sub-line: `text-lead`. Title-card number: `text-stat` in neutral accent                                                                                                                                                                                                                            |
-| Colors      | Clear color transparent (the CSS background shows through). Points: the four world colors plus `--color-text`. Dark theme uses each world's `fill`; light theme uses each world's `textLight` (fills fail 3:1 on the light background). Read them from `--w-<id>-fill` and `--w-<id>-text-light` on `:root`, and re-read on `themechange`. No other colors, no bloom, no glow, no fog                                            |
-| Still frame | Pre-rendered image of the settled field, shown before the canvas is ready, on WebGL failure, on weak devices if the 2D fallback is not used, and always under reduced motion. Desktop **2880 × 1576** (the 1440 × 788 frame at 2×); phone **1170 × 1560** (390 × 520 at 3×). AVIF with WebP fallback, one pair per theme, `object-fit: cover`, `alt=""` (decorative; the name is real text). Budget: 120 KB desktop, 60 KB phone |
-| Loading     | three.js is imported only inside the hero island, after first paint (`client:idle`); the still stays until the first rendered frame, then is swapped in one step                                                                                                                                                                                                                                                                 |
-| Motion      | Pointer and tilt parallax move the field only. Scroll break-apart is the hero's one scrubbed property and follows the pinning rule in 4.4. A visible Pause button (Ghost, bottom-left of the hero) stops the field and the title card                                                                                                                                                                                            |
-| Tokens used | `--frame-h`, `--bar-top`, `--bar-bottom`, `--z-below`, `--z-base`, `--ease-cut`, `--dur-card`, `prefersReducedMotion()`, `themechange`, `cutTo()`                                                                                                                                                                                                                                                                                |
-| Canvas      | `touch-action: pan-y`; device pixel ratio capped at 1.5 on phones and 2 on desktop                                                                                                                                                                                                                                                                                                                                               |
+| Topic       | Contract                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Container   | `<section class="hero">`: `min-height: var(--frame-h)`, `position: relative`, `isolation: isolate`, background `--color-bg`, no `data-world`                                                                                                                                                                                                                                                                                                                                                                     |
+| Layering    | `div.hero-field` at `position: absolute; inset: 0; z-index: var(--z-below); pointer-events: none`. It holds the still image and, later, the canvas. All text sits above it at `--z-base`. The field never extends under the bars                                                                                                                                                                                                                                                                                 |
+| Real text   | The `h1`, slug, sub-line and title card are DOM text in tokens and are the first paint. When the field is live and has formed the name, the hero adds `.hero--live`, which sets the `h1` to `opacity: 0` in a single step (no fade); it stays in the accessibility tree and keeps its box. The slug, sub-line, Pause button and title card get a `--color-bg` ground inside the hero, because cards pass behind them during the break-apart                                                                      |
+| Type        | Name: `text-hero`, two lines ("LUIS" / "ZARATE"); _measured_ "ZARATE" is 557 px at 1440 and 321 px at 390. Slug: `text-slug`. Sub-line: `text-lead`. Title-card number: `text-stat` in neutral accent                                                                                                                                                                                                                                                                                                            |
+| Colors      | Clear color transparent (the CSS background shows through). Points: the four world colors plus `--color-text`. Dark theme uses each world's `fill`; light theme uses each world's `textLight` (fills fail 3:1 on the light background). Read them from `--w-<id>-fill` and `--w-<id>-text-light` on `:root`, and re-read on `themechange`. Add `--color-bg`, used for the opaque card behind each dot (without cards, far plates show through the gaps of near ones). No other colors, no bloom, no glow, no fog |
+| Still frame | CSS, not images: four dotted copies of the name inside the `h1`, behind its text, in the world colors, at the rest pose (`--hero-pitch`, `--hero-dot`, `--hero-step`). Shown under reduced motion, with JavaScript off, on weak devices and when the canvas fails. Registered to the fluid `h1` at every size, 0 bytes, follows the theme tokens                                                                                                                                                                 |
+| Loading     | three.js is imported only inside the hero island, after `load` and idle, and only on the full tier. The solid `h1` is the first paint and stays until the first rendered frame, which is the registered name; then `.hero--live` cuts to the field in one step                                                                                                                                                                                                                                                   |
+| Motion      | Pointer and tilt parallax move the field only. Scroll break-apart is the hero's one scrubbed property and follows the pinning rule in 4.4. A visible Pause button (Ghost, bottom-left of the hero) stops the field and the title card                                                                                                                                                                                                                                                                            |
+| Tokens used | `--frame-h`, `--bar-top`, `--bar-bottom`, `--z-below`, `--z-base`, `--ease-cut`, `--dur-card`, `prefersReducedMotion()`, `themechange`, `cutTo()`                                                                                                                                                                                                                                                                                                                                                                |
+| Canvas      | `touch-action: pan-y`; device pixel ratio `max(1, min(2, floor(dpr)))` everywhere (whole numbers keep the 3 px lattice even)                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ---
 
@@ -1181,6 +1185,12 @@ Metric overrides measured against Arial (Liberation Sans metrics) from the shipp
   --bar-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
   --frame-h: calc(100svh - var(--bar-top) - var(--bar-bottom));
 
+  /* Hero lattice: dot pitch, dot size and per-plate step of the still. Phone values;
+     src/lib/hero/constants.ts holds the same numbers for the canvas. */
+  --hero-pitch: 3px;
+  --hero-dot: 2px;
+  --hero-step: 6px;
+
   /* World mixing: what a scene's surface and lines are mixed toward */
   --mix-surface-keep: 94%;
   --mix-surface-toward: #f2efe9;
@@ -1191,6 +1201,9 @@ Metric overrides measured against Arial (Liberation Sans metrics) from the shipp
   :root {
     --bar-top: 3.5rem;
     --bar-bottom: 3.5rem;
+    --hero-pitch: 4px;
+    --hero-dot: 3px;
+    --hero-step: 8px;
   }
 }
 

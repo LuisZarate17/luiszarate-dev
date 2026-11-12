@@ -4,6 +4,13 @@
  * Pure functions only, so they run in unit tests without a DOM.
  */
 export const FPS = 24;
+
+/**
+ * The elements that count as sections: every scene, and the hero. The hero is wrapped in
+ * `.hero-pin` (the sticky pin, twice the frame tall), so the wrapper is section 0: a sticky
+ * section's own top moves while it is pinned, the wrapper's does not.
+ */
+export const SECTION_SELECTOR = "main > .hero-pin, main > section";
 export const SECTION_SECONDS = 30;
 
 const pad = (n: number) => String(n).padStart(2, "0");

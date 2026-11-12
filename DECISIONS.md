@@ -91,3 +91,49 @@ would touch two files and lose the build-time contrast check.
 
 **Consequences.** A new project is still one file. A badly chosen color cannot ship. The
 light theme's tokens exist but no toggle ships yet; it is a later, additive change.
+
+## ADR-006: Hero: five dot-lattice plates, CSS still, CSS sticky pin, three.js off the critical path
+
+**Status:** accepted, 2026-11-12. Refines ADR-002 (the hero) and amends design-system spec 4.4,
+4.5 and 7. Full direction: `docs/hero/HERO-SPEC.md` ("Five plates").
+
+**Context.** ADR-002 asked for a point field in the hero, upgraded to real 3D with three.js,
+loaded after first paint. A free-floating particle cloud reads as a template, and the name has
+to stay legible, selectable text that is the page's LCP. The hand-off contract also called for
+AVIF/WebP stills of the settled field, a GSAP-pinned hero and a 1.5 device-pixel-ratio cap on
+phones; building the prototype showed each of those had a better answer.
+
+**Decision.**
+
+- The name is five flat plates stacked in depth, each a full copy of LUIS ZARATE as a lattice
+  of small square dots on an opaque card (off-white in front, one project color per plate
+  behind). The lattice is sampled from the laid-out `h1`, so plate 0 is registered to it at
+  every size. Colors come only from the tokens and world variables, at run time.
+- The still is CSS: four dotted copies inside the `h1`, behind its text. It serves reduced
+  motion, no-JS, weak devices and any failure.
+- The hero pins with CSS `position: sticky` in a wrapper twice the frame tall, under the same
+  media query as before. No GSAP in the hero.
+- three.js is imported by one file, `render-gl.ts`, with named imports, after `load` and idle,
+  and only on the full tier. A 2D canvas renderer covers weak and WebGL-less devices. The
+  budget (three.js chunk under 140 KB gzip, hero code under 8 KB, nothing on the critical
+  path) is enforced by `npm run check:budget` in CI.
+- Tests reach WebGL through `?hero=gl` and `?hero=2d`, which exist only in dev and in builds
+  made with `PUBLIC_HERO_TEST_HOOKS=1`; the budget check fails if they ever ship.
+
+**Considered.**
+
+- _Raster stills (AVIF/WebP)._ A `cover` image of the settled field cannot stay registered
+  with a fluid `h1`: the page would show two misaligned names, or hide the real one. CSS is
+  exact at every size, costs no bytes or requests, and follows the theme.
+- _GSAP ScrollTrigger pin._ Works, but adds about 27 KB gzip before the first scroll, a
+  pin-spacer and main-thread scrubbing; sticky is compositor-driven and the hero needs no
+  other GSAP feature.
+- _Raw WebGL2 instead of three.js._ The scene is two draws of one buffer, about 3 KB instead of
+  about 127 KB. Rejected because ADR-002 names three.js and it is a resume keyword; the weight
+  is kept off the critical path instead.
+
+**Consequences.** First paint is the plain `h1`, so Lighthouse sees text, not a canvas. The
+site carries a pinned dependency on three (exact version, re-measured on upgrade). The still
+is part of the design and is checked against the live rest pose by `npm run hero:still`.
+Timecode and scene tracking treat `main > .hero-pin` as section 0, because a sticky section's
+own position moves while it is pinned.

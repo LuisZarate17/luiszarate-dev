@@ -11,6 +11,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "off",
+    // Headless Chromium has no hardware GL: software GL lets the hero's WebGL tier run.
+    launchOptions: { args: ["--use-gl=swiftshader", "--enable-unsafe-swiftshader"] },
   },
   // Desktop is the design target; the phone project guards that mobile still works.
   projects: [
@@ -21,7 +23,8 @@ export default defineConfig({
     { name: "phone", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: `npm run build && npm run preview -- --port ${PORT} --ignore-lock`,
+    // PUBLIC_HERO_TEST_HOOKS switches on the hero's ?hero= query overrides for this build only.
+    command: `PUBLIC_HERO_TEST_HOOKS=1 npm run build && npm run preview -- --port ${PORT} --ignore-lock`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

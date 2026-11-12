@@ -75,10 +75,15 @@
 
 <script>
   import { onReducedMotionChange, prefersReducedMotion } from "../../lib/motion";
-  import { formatTimecode, secondsAt, sectionStartSeconds } from "../../lib/timecode";
+  import {
+    formatTimecode,
+    SECTION_SELECTOR,
+    secondsAt,
+    sectionStartSeconds,
+  } from "../../lib/timecode";
 
   const out = document.getElementById("timecode");
-  const sections = [...document.querySelectorAll<HTMLElement>("main > section")];
+  const sections = [...document.querySelectorAll<HTMLElement>(SECTION_SELECTOR)];
 
   if (out && sections.length > 0) {
     let tops: number[] = [];
@@ -114,6 +119,14 @@
       measure();
       schedule();
     });
+    // The hero's pin changes the page height after load (once the hero island arms it).
+    const main = document.querySelector("main");
+    if (main) {
+      new ResizeObserver(() => {
+        measure();
+        schedule();
+      }).observe(main);
+    }
     window.addEventListener("load", () => {
       measure();
       schedule();

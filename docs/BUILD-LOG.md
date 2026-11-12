@@ -42,3 +42,21 @@ built, which model did the work, and why. Written as the work happens, not recon
 - Claude Code setup committed: `AGENTS.md` (project rules, imported by a one-line
   `CLAUDE.md`), three model-pinned subagents in `.claude/agents/`, a permissions allowlist and
   a format-on-edit hook in `.claude/settings.json`.
+
+## 2026-11-12: 3D hero, "Five plates" (Fable direction, Sonnet build)
+
+- Fable specified the hero after a working prototype: five registered dot-lattice plates sampled
+  from the real `h1`, an off-axis projection (five lines in the vertex shader, the same five in
+  TypeScript), and a scroll break-apart by letter and plate that ends on a line along the hero's
+  bottom edge. See ADR-006.
+- Built as a plain TypeScript island: pure logic in `src/lib/hero/` (unit tested), WebGL and
+  2D canvas renderers, CSS still. three.js 0.187.0 pinned; the GL chunk is 127 KB gzip, the hero
+  code about 6.6 KB.
+- Snag: the pin wrapper moved the hero out of `main > section`, which the timecode and scene
+  strip count. Fixed with one shared selector, and the timecode now re-measures when the page
+  height changes (the island arms the pin after load).
+- Snag: headless Chromium has no hardware GL. Playwright launches with software GL, and a
+  build-time flag enables `?hero=gl` / `?hero=2d` for tests only; the budget check fails if it
+  ships.
+- Snag: the first still painted its plates nearest-first, so the back plate covered the others.
+  The DOM order is farthest first.

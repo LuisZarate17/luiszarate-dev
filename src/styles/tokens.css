@@ -198,6 +198,12 @@
   --bar-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
   --frame-h: calc(100svh - var(--bar-top) - var(--bar-bottom));
 
+  /* Hero lattice: dot pitch, dot size and per-plate step of the still. Phone values;
+     src/lib/hero/constants.ts holds the same numbers for the canvas. */
+  --hero-pitch: 3px;
+  --hero-dot: 2px;
+  --hero-step: 6px;
+
   /* World mixing: what a scene's surface and lines are mixed toward */
   --mix-surface-keep: 94%;
   --mix-surface-toward: #f2efe9;
@@ -208,6 +214,9 @@
   :root {
     --bar-top: 3.5rem;
     --bar-bottom: 3.5rem;
+    --hero-pitch: 4px;
+    --hero-dot: 3px;
+    --hero-step: 8px;
   }
 }
 

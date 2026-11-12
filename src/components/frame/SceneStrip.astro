@@ -151,11 +151,13 @@ const total = projects.length;
 </style>
 
 <script>
+  import { SECTION_SELECTOR } from "../../lib/timecode";
+
   /** Tracks the current scene with an observer collapsed to the frame's midline (spec 5.5). */
   const links = [...document.querySelectorAll<HTMLAnchorElement>(".strip a")];
   const counter = document.getElementById("strip-counter-current");
   const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
-  const sections = [...document.querySelectorAll<HTMLElement>("main > section")];
+  const sections = [...document.querySelectorAll<HTMLElement>(SECTION_SELECTOR)];
 
   function setCurrent(id: string | null) {
     const current = id ? (byId.get(id) ?? null) : null;

@@ -28,6 +28,7 @@ jobs:
       - run: npm run check
       - run: npm run test:unit
       - run: npm run build
+      - run: npm run check:budget
       - uses: actions/upload-artifact@v4
         with:
           name: dist
