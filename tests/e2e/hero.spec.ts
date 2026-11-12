@@ -374,6 +374,34 @@ test.describe("the line in the WebGL drawing buffer", () => {
   }
 });
 
+test("a lost WebGL context falls back to the still, and a restored one cuts back to the field", async ({
+  page,
+}) => {
+  await live(page);
+  await page.evaluate(() => {
+    const canvas = document.querySelector<HTMLCanvasElement>(".hero-field canvas")!;
+    const gl = canvas.getContext("webgl2")!;
+    const ext = gl.getExtension("WEBGL_lose_context")!;
+    (window as unknown as { __lose: typeof ext }).__lose = ext;
+    ext.loseContext();
+  });
+  await expect(hero(page)).toHaveClass(/hero--still/);
+  await expect(hero(page)).not.toHaveClass(/hero--live/);
+  await expect(page.locator("h1")).toHaveCSS("opacity", "1");
+  await expect(page.locator(".hero-pin")).not.toHaveClass(/is-armed/);
+  // Nothing may put the field back over the dead canvas: scroll, resize and Pause all try.
+  await page.evaluate(() => scrollTo(0, 120));
+  await page.setViewportSize({ width: (page.viewportSize()?.width ?? 1000) - 30, height: 700 });
+  await page.waitForTimeout(600);
+  await expect(hero(page)).not.toHaveClass(/hero--live/);
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.evaluate(() =>
+    (window as unknown as { __lose: { restoreContext(): void } }).__lose.restoreContext(),
+  );
+  await expect(hero(page)).toHaveClass(/hero--live/, { timeout: 10_000 });
+  await expect(hero(page)).not.toHaveClass(/hero--still/);
+});
+
 test.describe("hero with reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 

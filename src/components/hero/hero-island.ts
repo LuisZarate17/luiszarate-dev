@@ -19,6 +19,7 @@ import {
   LITE_FRAME_MS,
   MAX_DT_MS,
   MAX_PLATES,
+  POINTER,
   PIN_QUERY,
   RESIZE_DEBOUNCE_MS,
   RESIZE_IGNORE_HEIGHT,
@@ -104,7 +105,12 @@ export function startHero(hero: HTMLElement): void {
   const plateIds = (hero.dataset.plates ?? "").split(",").filter(Boolean);
   const plates = plateIds.length + 1;
   if (!pin || !h1 || !inner || !box || !canvas || !pauseButton) return;
-  if (plates < 2 || plates > MAX_PLATES) return;
+  if (plates < 2 || plates > MAX_PLATES) {
+    // More projects than the shader has plates (Hero.astro also fails the build for this):
+    // show the CSS still rather than a hero with neither canvas nor plates.
+    hero.classList.add("hero--still");
+    return;
+  }
 
   const override = HOOKS ? readOverride(hero) : null;
   const pinQuery = matchMedia(PIN_QUERY);
@@ -121,6 +127,7 @@ export function startHero(hero: HTMLElement): void {
   let watchdog: ReturnType<typeof createWatchdog> | null = null;
   let generation = 0;
   let canvasUsed = false;
+  let lostCanvas: HTMLCanvasElement | null = null;
   let live = false;
   let paused = false;
   let visible = true;
@@ -249,7 +256,7 @@ export function startHero(hero: HTMLElement): void {
 
   function draw(dt: number) {
     if (!renderer || !field) return;
-    const k = 1 - Math.exp(-dt / 180);
+    const k = 1 - Math.exp(-dt / POINTER.tauMs);
     pointer.x += (pointer.tx - pointer.x) * k;
     pointer.y += (pointer.ty - pointer.y) * k;
     if (override === "rest") clock = HOLD_MS + INTRO_MS;
@@ -281,13 +288,15 @@ export function startHero(hero: HTMLElement): void {
     }
     lastDraw = now;
     readProgress();
+    const started = performance.now();
     draw(running ? dt : 0);
+    const cost = performance.now() - started;
     if (!live) {
       // The cut: the h1 goes off and the canvas on in the same frame (2.2).
       live = true;
       hero.classList.add("hero--live");
     }
-    if (running && watchdog && clock > HOLD_MS + INTRO_MS) act(watchdog.push(dt));
+    if (running && watchdog && clock > HOLD_MS + INTRO_MS) act(watchdog.push(dt, cost));
     if (running && renderer) raf = requestAnimationFrame(frame);
   }
 
@@ -325,8 +334,8 @@ export function startHero(hero: HTMLElement): void {
 
   /* ---------- Teardown ---------- */
 
-  function teardown() {
-    generation += 1;
+  /** Drops the renderer and the field, and takes the canvas off screen. Keeps `generation`. */
+  function releaseRenderer() {
     stopLoop();
     renderer?.dispose();
     renderer = null;
@@ -337,11 +346,15 @@ export function startHero(hero: HTMLElement): void {
     delete hero.dataset.heroTier;
   }
 
+  function teardown() {
+    generation += 1;
+    releaseRenderer();
+  }
+
   /** Failure or a weak device: the CSS still, no canvas, no pin, no Pause. */
   function toStill() {
     teardown();
     hero.classList.add("hero--still");
-    readProgress();
   }
 
   /* ---------- Boot ---------- */
@@ -356,20 +369,25 @@ export function startHero(hero: HTMLElement): void {
 
   function bindCanvas(target: HTMLCanvasElement) {
     target.addEventListener("webglcontextlost", (event) => {
+      // Not ours (we release the renderer first), or a stale canvas: nothing to do.
+      if (!renderer || target !== canvas) return;
+      // preventDefault lets the browser restore the context later (spec 4.7). Meanwhile the
+      // canvas is dead: drop the renderer (so no frame can put .hero--live back over it) and
+      // show the still, with the pin released.
       event.preventDefault();
-      stopLoop();
-      live = false;
-      hero.classList.remove("hero--live");
+      lostCanvas = target;
+      toStill();
     });
     target.addEventListener("webglcontextrestored", () => {
-      if (!renderer || !palette) return;
-      rebuild();
-      request();
+      if (lostCanvas !== target || target !== canvas) return;
+      lostCanvas = null;
+      void boot(); // a fresh start: new canvas, new renderer, cut back to the field
     });
   }
 
   async function boot() {
     const mine = ++generation;
+    releaseRenderer(); // idempotent: a second boot must not leak the first one's renderer
     if (prefersReducedMotion()) return; // the CSS still is already showing
     hero.classList.remove("hero--still");
     const nav = navigator as Navigator & {

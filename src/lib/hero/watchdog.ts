@@ -17,31 +17,43 @@ const LITE_STEPS: readonly { action: WatchdogAction; limitMs: number }[] = [
  * windows of `windowFrames` and returns the next step once the current step's limit was
  * exceeded in `consecutiveWindows` windows in a row. A step is never repeated and the result
  * is not stored. Call `reset` after anything that makes the next frames unrepresentative
- * (resize, visibility change, a rebuild).
+ * (resize, visibility change, a rebuild). Frame intervals alone cannot tell a slow device from a
+ * capped frame rate, so callers also pass the render cost; see `WATCHDOG.cappedIntervalMs`.
  */
 export function createWatchdog(tier: "full" | "lite") {
+  let nearCap = 0;
+  let totalCost = 0;
   const steps = tier === "full" ? FULL_STEPS : LITE_STEPS;
   let stage = 0;
   let slow = 0;
   let frames = 0;
   let total = 0;
   return {
-    push(dt: number): WatchdogAction {
+    /** `dt` is the interval since the last frame; `cost` the time spent rendering it (default: `dt`). */
+    push(dt: number, cost: number = dt): WatchdogAction {
       const step = steps[stage];
       if (!step) return "none";
       frames += 1;
       total += dt;
+      totalCost += cost;
+      if (Math.abs(dt - WATCHDOG.cappedIntervalMs) <= WATCHDOG.cappedToleranceMs) nearCap += 1;
       if (frames < WATCHDOG.windowFrames) return "none";
       const mean = total / frames;
+      const capped =
+        nearCap / frames >= WATCHDOG.cappedShare && totalCost / frames <= WATCHDOG.cappedMaxCostMs;
       frames = 0;
       total = 0;
-      slow = mean > step.limitMs ? slow + 1 : 0;
+      nearCap = 0;
+      totalCost = 0;
+      slow = mean > step.limitMs && !capped ? slow + 1 : 0;
       if (slow < WATCHDOG.consecutiveWindows) return "none";
       slow = 0;
       stage += 1;
       return step.action;
     },
     reset() {
+      nearCap = 0;
+      totalCost = 0;
       slow = 0;
       frames = 0;
       total = 0;

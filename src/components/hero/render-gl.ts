@@ -109,6 +109,8 @@ export function createGlRenderer(canvas: HTMLCanvasElement, palette: Palette): R
 
   return {
     setField(f: Field, dpr: number) {
+      // A rebuild replaces the attributes: release the old ones' GPU buffers first.
+      geometry.dispose();
       const buffer = new InterleavedBuffer(f.pts, STRIDE);
       geometry.setAttribute("position", new InterleavedBufferAttribute(buffer, 3, 0));
       geometry.setAttribute("aux", new InterleavedBufferAttribute(buffer, 2, 3));
@@ -147,6 +149,9 @@ export function createGlRenderer(canvas: HTMLCanvasElement, palette: Palette): R
       geometry.dispose();
       material.dispose();
       renderer.dispose();
+      // Give the GPU context back now: browsers allow only a handful per page, and this
+      // canvas is never reused (the island puts a fresh one in before the next start).
+      renderer.forceContextLoss();
     },
   };
 }

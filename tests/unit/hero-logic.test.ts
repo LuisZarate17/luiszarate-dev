@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { parseColor } from "../../src/lib/hero/color";
 import {
@@ -6,6 +6,7 @@ import {
   HOLD_MS,
   INTRO_MS,
   LATTICE,
+  MAX_PLATES,
   REST,
   WATCHDOG,
 } from "../../src/lib/hero/constants";
@@ -282,6 +283,36 @@ describe("createWatchdog", () => {
     expect(window(wd, 30)).toBe("none");
     expect(window(wd, 30)).toBe("dpr");
   });
+  it("a steady 33.3 ms interval with cheap frames (capped rAF) never steps, however long it runs", () => {
+    for (const tier of ["full", "lite"] as const) {
+      const wd = createWatchdog(tier);
+      for (let w = 0; w < 20; w++) {
+        for (let i = 0; i < WATCHDOG.windowFrames; i++) {
+          expect(wd.push(1000 / 30, 3)).toBe("none");
+        }
+      }
+    }
+  });
+  it("a 33.3 ms interval with expensive frames is still slow", () => {
+    const wd = createWatchdog("full");
+    const run = () => {
+      let action = "none";
+      for (let i = 0; i < WATCHDOG.windowFrames; i++) action = wd.push(1000 / 30, 30);
+      return action;
+    };
+    expect(run()).toBe("none");
+    expect(run()).toBe("dpr");
+  });
+  it("an irregular 30 ms mean with cheap frames is still slow (not a capped cadence)", () => {
+    const wd = createWatchdog("full");
+    const run = () => {
+      let action = "none";
+      for (let i = 0; i < WATCHDOG.windowFrames; i++) action = wd.push(i % 2 ? 16 : 44, 3);
+      return action;
+    };
+    expect(run()).toBe("none");
+    expect(run()).toBe("dpr");
+  });
   it("the last full step needs more than 32 ms", () => {
     const wd = createWatchdog("full");
     for (let i = 0; i < 4; i++) window(wd, 30);
@@ -308,6 +339,18 @@ describe("tokens agree with the constants", () => {
       FAN_COLUMNS * LATTICE.full.phone.pitch,
       FAN_COLUMNS * LATTICE.full.desktop.pitch,
     ]);
+  });
+});
+
+describe("every project fits the hero", () => {
+  const ids = readdirSync("src/content/projects").filter((f) => f.endsWith(".md"));
+  it("has a plate for each project plus the name (Hero.astro fails the build otherwise)", () => {
+    expect(ids.length + 1).toBeLessThanOrEqual(MAX_PLATES);
+  });
+  it("hero-still.mjs reads the project ids from the collection", () => {
+    const script = readFileSync("scripts/hero-still.mjs", "utf8");
+    expect(script).toContain('readdirSync("src/content/projects")');
+    for (const id of ids) expect(script).not.toContain(`"${id.replace(/\.md$/, "")}"`);
   });
 });
 

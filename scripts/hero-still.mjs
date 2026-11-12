@@ -3,7 +3,7 @@
 // field (`?hero=rest`) and under reduced motion (the CSS still), and fails if the colored area
 // of the two differs by more than 40% (spec: 12%). Screenshots go to tests/e2e/__screenshots__/ (ignored).
 import { execFileSync, spawn } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
 import sharp from "sharp";
 
@@ -13,7 +13,10 @@ const OUT = "tests/e2e/__screenshots__";
 // drift is 24% (desktop) to 36% (phone). The bounding boxes (registration) are the tight check.
 const TOLERANCE = 0.4;
 const BOX_TOLERANCE = 3.5; // css px
-const WORLD_VARS = ["labq", "bifrost", "cougar-connect", "mastery-pilot"];
+// Every project in the collection (the entry id is the file name), so a fifth one is checked too.
+const WORLD_VARS = readdirSync("src/content/projects")
+  .filter((f) => f.endsWith(".md"))
+  .map((f) => f.replace(/\.md$/, ""));
 
 execFileSync("npm", ["run", "build"], {
   stdio: "inherit",

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Slug from "../scene/Slug.astro";
+import { MAX_PLATES } from "../../lib/hero/constants";
 
 /**
  * "Five plates" (HERO-SPEC, ADR-006). The name is the real h1; the island samples it into a
@@ -10,6 +11,11 @@ import Slug from "../scene/Slug.astro";
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
 // Plate order is reverse project order: the first scene's color is the back plate (spec 2.1).
 const plates = projects.map(({ id }) => id).reverse();
+if (plates.length + 1 > MAX_PLATES) {
+  throw new Error(
+    `The hero has room for ${MAX_PLATES - 1} projects (MAX_PLATES = ${MAX_PLATES}, including the name); found ${plates.length}. Raise MAX_PLATES in src/lib/hero/constants.ts and the shader array with it.`,
+  );
+}
 const name = "LUIS\nZARATE";
 ---
 

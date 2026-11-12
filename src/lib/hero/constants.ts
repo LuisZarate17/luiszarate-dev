@@ -86,4 +86,14 @@ export const WATCHDOG = {
   fullSlowMs: 24,
   fullStillMs: 32,
   liteStillMs: 45,
+  /**
+   * A browser that caps requestAnimationFrame (iOS Low Power Mode, battery savers) delivers a
+   * steady ~33.3 ms interval however cheap the frames are. That is not slowness: a window whose
+   * intervals sit within `cappedToleranceMs` of the cap for `cappedShare` of its frames, with a
+   * mean render cost under `cappedMaxCostMs`, never counts as slow.
+   */
+  cappedIntervalMs: 1000 / 30,
+  cappedToleranceMs: 2,
+  cappedShare: 0.9,
+  cappedMaxCostMs: 10,
 } as const;
