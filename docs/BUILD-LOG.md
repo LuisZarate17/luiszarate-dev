@@ -70,5 +70,5 @@ built, which model did the work, and why. Written as the work happens, not recon
   including crops that hid what the captions described, the hero's two name lines touching
   (a value in Fable's own spec), and a details drawer that only repeated the stack list. All
   were fixed before merge.
-- **Process change.** After #2 landed as a merge commit, the repository was switched to
-  squash merging only, so each PR is one commit on `main`.
+- **Process change.** #2 landed as a merge commit, carrying all of its branch commits onto
+  `main`. From #3 on, PRs are squash-merged, so each PR is one commit on `main`.
