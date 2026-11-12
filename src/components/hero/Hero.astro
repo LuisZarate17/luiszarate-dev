@@ -1,0 +1,236 @@
+---
+import { getCollection } from "astro:content";
+import Slug from "../scene/Slug.astro";
+import { MAX_PLATES } from "../../lib/hero/constants";
+
+/**
+ * "Five plates" (HERO-SPEC, ADR-006). The name is the real h1; the island samples it into a
+ * dot lattice and draws five registered plates behind it. This file holds the markup, the CSS
+ * (including the CSS still) and the script that boots the island after load.
+ */
+const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+// Plate order is reverse project order: the first scene's color is the back plate (spec 2.1).
+const plates = projects.map(({ id }) => id).reverse();
+if (plates.length + 1 > MAX_PLATES) {
+  throw new Error(
+    `The hero has room for ${MAX_PLATES - 1} projects (MAX_PLATES = ${MAX_PLATES}, including the name); found ${plates.length}. Raise MAX_PLATES in src/lib/hero/constants.ts and the shader array with it.`,
+  );
+}
+const name = "LUIS\nZARATE";
+---
+
+<div class="hero-pin">
+  <section class="hero" aria-labelledby="hero-title" data-plates={plates.join(",")}>
+    <div class="hero-field" aria-hidden="true">
+      <canvas></canvas>
+    </div>
+    <div class="hero-inner">
+      <Slug loc="INT. PORTFOLIO — FULL-STACK ENGINEER" />
+      <h1 id="hero-title" class="hero-title font-display text-hero uppercase">
+        <span class="hero-plates" aria-hidden="true">
+          {/* farthest plate first in the DOM, so the nearest paints last */}
+          {plates
+            .map((id, i) => ({ id, k: i + 1 }))
+            .reverse()
+            .map(({ id, k }) => (
+              <i
+                data-t={name}
+                style={`--k:${k};--cf:var(--w-${id}-fill);--cl:var(--w-${id}-text-light)`}
+              />
+            ))}
+        </span>
+        <span class="hero-line">Luis</span> <span class="hero-line">Zarate</span>
+      </h1>
+      <p class="hero-sub text-lead">
+        Full-stack engineer. I build systems and measure that they work.
+      </p>
+      <div class="hero-controls">
+        <button class="hero-pause text-control" type="button">
+          Pause
+        </button>
+      </div>
+    </div>
+    <noscript>
+      <style is:inline>
+        .hero-pin .hero .hero-plates {
+          display: block;
+        }
+      </style>
+    </noscript>
+  </section>
+</div>
+
+<style>
+  .hero-pin {
+    position: relative;
+  }
+  /* The island arms the pin (is-armed) once it knows the field will run; the still, reduced
+     motion and no-JS keep the hero one frame tall. Pinning is CSS sticky (spec 4.4). */
+  @media (min-width: 1024px) and (min-height: 760px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .hero-pin.is-armed {
+      height: calc(var(--frame-h) * 2);
+    }
+    .hero-pin.is-armed .hero {
+      position: sticky;
+      top: var(--bar-top);
+      height: var(--frame-h);
+    }
+  }
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    display: flex;
+    align-items: flex-end;
+    min-height: var(--frame-h);
+    padding-block: var(--spacing-scene);
+    padding-inline: max(var(--spacing-margin), env(safe-area-inset-left))
+      max(var(--spacing-margin), env(safe-area-inset-right));
+    background: var(--color-bg);
+    /* A horizontal drag moves the fan; vertical drags scroll the page. */
+    touch-action: pan-y pinch-zoom;
+  }
+  /* A tall phone would leave a screenful of empty ground above the name. */
+  @media (max-width: 1023px) {
+    .hero {
+      min-height: min(var(--frame-h), 37.5rem);
+    }
+  }
+  .hero-field {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-below);
+    pointer-events: none;
+  }
+  .hero-field :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+  }
+  .hero--live .hero-field :global(canvas) {
+    visibility: visible;
+  }
+  .hero-inner {
+    position: relative;
+    z-index: var(--z-base);
+    width: 100%;
+    max-width: var(--container-frame);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 4);
+  }
+
+  /* The name. Plate 0 is registered to this box; the h1 itself is never moved or faded: it is
+     there, or (once the field is live) off in one step. It keeps its box and its role. */
+  .hero-title {
+    position: relative;
+    z-index: 0;
+    margin: 0;
+    width: max-content;
+    max-width: 100%;
+  }
+  .hero-line {
+    display: block;
+  }
+  .hero--live .hero-title {
+    opacity: 0;
+  }
+
+  /* Hero text carries its own ground, so cards can pass behind it during the break-apart. */
+  .hero-inner :global(.slug),
+  .hero-sub {
+    width: fit-content;
+    padding: 2px 6px;
+    margin: -2px -6px;
+    background: var(--color-bg);
+  }
+  .hero-sub {
+    max-width: var(--container-measure);
+    color: var(--color-text);
+  }
+
+  /* Controls: Ghost button (design-system 5.6) on the page ground. Hidden, but keeping its
+     space so nothing moves, until the field is live. */
+  .hero-controls {
+    display: flex;
+    visibility: hidden;
+  }
+  .hero--live .hero-controls {
+    visibility: visible;
+  }
+  .hero-pause {
+    min-width: 44px;
+    min-height: calc(var(--spacing) * 12);
+    padding-inline: calc(var(--spacing) * 5);
+    border: 1px solid var(--color-text);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    transition-property: color, background-color, border-color;
+    transition-duration: var(--dur-ui);
+    transition-timing-function: var(--ease-ui);
+  }
+  @media (hover: hover) {
+    .hero-pause:hover {
+      background: var(--color-text);
+      color: var(--color-bg);
+    }
+  }
+  .hero-pause:active {
+    background: var(--color-accent);
+    color: var(--color-bg);
+    border-color: var(--color-accent);
+  }
+
+  /* The still (spec 6.1): four dotted copies of the name behind the real h1's text, drawn in
+     CSS so they register with the type at every size. Each is an opaque card in the page color
+     with the plate's dots printed on it, shifted to the rest pose (eye 5deg right, 1deg up). */
+  .hero-plates {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: none;
+  }
+  .hero-plates i {
+    --c: var(--cf);
+    position: absolute;
+    inset: 0;
+    font-style: normal;
+    white-space: pre;
+    color: transparent;
+    background:
+      conic-gradient(from 270deg at var(--hero-dot) var(--hero-dot), var(--c) 90deg, transparent 0)
+        0 0 / var(--hero-pitch) var(--hero-pitch),
+      var(--color-bg);
+    -webkit-background-clip: text;
+    background-clip: text;
+    transform: translate(
+      calc(var(--k) * var(--hero-step)),
+      calc(var(--k) * var(--hero-step) * -0.2)
+    );
+  }
+  :global(:root[data-theme="light"]) .hero-plates i {
+    --c: var(--cl);
+  }
+  .hero-plates i::before {
+    content: attr(data-t);
+  }
+  .hero--still .hero-plates {
+    display: block;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-plates {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+  import { startHero } from "./hero-island";
+
+  const hero = document.querySelector<HTMLElement>(".hero");
+  if (hero) startHero(hero);
+</script>

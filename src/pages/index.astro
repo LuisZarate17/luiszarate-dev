@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
-import HeroStatic from "../components/hero/HeroStatic.astro";
+import Hero from "../components/hero/Hero.astro";
 import Scene from "../components/scene/Scene.astro";
 
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
@@ -11,7 +11,7 @@ const projects = (await getCollection("projects")).sort((a, b) => a.data.order -
   title="Luis Zarate · Full-stack engineer"
   description="Portfolio of Luis Zarate, full-stack engineer. Four projects, each with the numbers measured from its repository."
 >
-  <HeroStatic />
+  <Hero />
   {projects.map((entry) => (
     <Scene entry={entry} />
   ))}
