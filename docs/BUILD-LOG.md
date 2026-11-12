@@ -42,3 +42,33 @@ built, which model did the work, and why. Written as the work happens, not recon
 - Claude Code setup committed: `AGENTS.md` (project rules, imported by a one-line
   `CLAUDE.md`), three model-pinned subagents in `.claude/agents/`, a permissions allowlist and
   a format-on-edit hook in `.claude/settings.json`.
+
+## 2026-11-11: Design system (Fable spec, three Sonnet implementers, Fable review)
+
+- **Spec (Fable).** `docs/design-system/SPEC.md`, about 1,400 lines. Contrast ratios, font
+  sizes and string widths were computed from the real colors and font files, not estimated.
+  Luis settled the four open questions: real metrics only, color worlds in the content files
+  (ADR-005), light theme after launch, `BUILD` as the strip label.
+- **Tickets (orchestrator).** The spec was split into three tickets, each owning a disjoint set
+  of files: T1 tokens, fonts and schema; T2 frame, scene cut and strip; T3 scene template and
+  page. The orchestrator wrote the scene copy and pulled the missing metrics from the project
+  repos (32 xUnit tests counted in Cougar Connect's code; 1,100+ tests and the 76% vs 43%
+  benchmark from Bifrost's README).
+- **T1 first, alone (#2).** T2 and T3 both depend on the tokens and the schema, so running all
+  three at once would have meant conflicts in shared files. The Sonnet implementer caught three
+  errors in the spec while building: the font import paths broke the build, a new `slug` field
+  silently became every entry's id (breaking the color worlds), and Zod v4 runs a refine even
+  after a failed regex.
+- **Snag: an edit on GitHub.** The README was edited in the browser to rename "LabsQ" to
+  "LabQ". It skipped the local format hook, so the next PR's CI failed on formatting. The fix
+  also corrected the name in 61 places, including the content file and the world id.
+- **T2 and T3 in parallel (#3, #4).** Two Sonnet implementers worked at the same time in
+  separate git worktrees. The branches merged with no conflicts. The orchestrator merged them
+  together locally and ran every test against the combined page before either PR merged: 66
+  browser tests passed, and Lighthouse scored 100 in all four categories.
+- **Design review (Fable).** Screenshots at four widths found seven must-fix problems,
+  including crops that hid what the captions described, the hero's two name lines touching
+  (a value in Fable's own spec), and a details drawer that only repeated the stack list. All
+  were fixed before merge.
+- **Process change.** #2 landed as a merge commit, carrying all of its branch commits onto
+  `main`. From #3 on, PRs are squash-merged, so each PR is one commit on `main`.
