@@ -62,8 +62,9 @@ for (const project of projects) {
         project.credit === "team" ? /^team project$/i : /^solo project$/i,
       );
       await expect(s.locator("p.credit")).toContainText(project.role);
-      const img = s.locator(".sim-still img");
-      await expect(img).toHaveAttribute("alt", /.{40,}/);
+      // LabQ shows a simulation: its stage is a role=img with a descriptive label, not a screenshot.
+      const img = project.id === "labq" ? s.locator(".sim-stage") : s.locator(".sim-still img");
+      await expect(img).toHaveAttribute(project.id === "labq" ? "aria-label" : "alt", /.{40,}/);
       await expect(s.locator("figcaption")).not.toBeEmpty();
     });
 
