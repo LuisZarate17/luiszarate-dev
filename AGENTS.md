@@ -28,6 +28,7 @@ is itself a resume project, so the front end is the point. Treat it as a product
 - `npm run build`: static build into `dist/`
 - `npm run test:unit`: Vitest unit tests (pure logic, no browser)
 - `npm run test:e2e`: Playwright, desktop and phone projects (builds first)
+- `npm run check:budget`: JavaScript budgets for the hero and each simulation (run after `npm run build`)
 - `npm run lhci`: Lighthouse budget against `dist/` (run `npm run build` first)
 
 ## Definition of done
@@ -35,9 +36,10 @@ is itself a resume project, so the front end is the point. Treat it as a product
 A change is done when `format:check`, `lint`, `check`, `build`, `test:unit` and `test:e2e` all pass
 locally, any new interactive piece has a reduced-motion fallback and a phone-size check, and
 the PR description says what changed and how it was verified. CI runs the same gates plus
-Lighthouse; a PR merges only when CI is green. Before merge, a PR that changes code gets a
-`/code-review high` pass on its diff (plus `/security-review` when it handles input, links or
-third-party code); findings go to Luis before any fix. A Stop hook
+Lighthouse; a PR merges only when CI is green. Every PR gets the automatic GitHub Claude
+review. Before merge, the code a phase changes gets one `/code-review high` pass on its
+integrated diff (plus `/security-review` when it handles input, links or third-party code);
+findings go to Luis before any fix. A Stop hook
 (`.claude/hooks/stop-checks.sh`) runs `lint` and `check` before an agent finishes and sends
 failures back to it.
 
