@@ -69,10 +69,14 @@ export function applyEdit(file: readonly string[], diff: readonly DiffLine[] = D
   return sideAfter(diff);
 }
 
-/** Undo restores the backup taken at apply time, so the original comes back unchanged. */
-export function undoEdit(applied: readonly string[], backup: readonly string[]): string[] {
-  void applied;
-  return [...backup];
+/**
+ * Undo is the inverse of apply: it takes the file as applied, checks it is the file the diff
+ * produced, and returns the file as it was before the edit, so the original comes back
+ * unchanged. It refuses any other file rather than guess.
+ */
+export function undoEdit(applied: readonly string[], diff: readonly DiffLine[] = DIFF): string[] {
+  if (!same(applied, sideAfter(diff))) throw new Error("file is not the one the edit produced");
+  return sideBefore(diff);
 }
 
 // ---- state machine -------------------------------------------------------------------------
@@ -83,7 +87,15 @@ export interface CardState {
   phase: Phase;
   /** Rows typed so far; ROW_COUNT once typing is done. */
   typed: number;
+  /**
+   * A scrubbed frame: the rows typed so far, held still. Only real play (typing without this
+   * flag) advances on ticks, so a scrub never starts the typing interval.
+   */
+  frozen?: true;
 }
+
+/** True while the diff is typing in by itself, i.e. the typing interval should run. */
+export const isPlaying = (state: CardState) => state.phase === "typing" && !state.frozen;
 
 export type CardEvent =
   | { type: "play" }
@@ -103,12 +115,16 @@ export function reduce(state: CardState, event: CardEvent): CardState {
     case "play":
       return { phase: "typing", typed: 0 };
     case "tick":
-      if (state.phase !== "typing") return state;
+      if (!isPlaying(state)) return state;
       return state.typed + 1 >= ROW_COUNT ? STILL : { phase: "typing", typed: state.typed + 1 };
     case "apply":
-      return state.phase === "review" ? { phase: "applied", typed: ROW_COUNT } : state;
+      return state.phase === "review" || state.frozen
+        ? { phase: "applied", typed: ROW_COUNT }
+        : state;
     case "deny":
-      return state.phase === "review" ? { phase: "declined", typed: ROW_COUNT } : state;
+      return state.phase === "review" || state.frozen
+        ? { phase: "declined", typed: ROW_COUNT }
+        : state;
     case "undo":
       return state.phase === "applied" ? { phase: "undone", typed: ROW_COUNT } : state;
     case "replay":
@@ -117,11 +133,34 @@ export function reduce(state: CardState, event: CardEvent): CardState {
         : state;
     case "scrub": {
       const typed = Math.round(Math.min(1, Math.max(0, event.progress)) * ROW_COUNT);
-      return typed >= ROW_COUNT ? STILL : { phase: "typing", typed };
+      return typed >= ROW_COUNT ? STILL : { phase: "typing", typed, frozen: true };
     }
     case "reset":
       return STILL;
   }
+}
+
+// ---- session: the card plus the file it edits ---------------------------------------------
+
+/** The card's state and the file on disk. The UI shows what apply and undo produce. */
+export interface Session {
+  card: CardState;
+  file: readonly string[];
+}
+
+export const STILL_SESSION: Session = { card: STILL, file: sideBefore() };
+
+/**
+ * `reduce` for the card, plus the file: Apply writes it with `applyEdit`, Undo restores it with
+ * `undoEdit`, and every other event leaves the file as the original.
+ */
+export function reduceSession(session: Session, event: CardEvent): Session {
+  const card = reduce(session.card, event);
+  if (card === session.card) return session;
+  if (card.phase === "applied" && session.card.phase !== "applied")
+    return { card, file: applyEdit(sideBefore()) };
+  if (card.phase === "undone") return { card, file: undoEdit(session.file) };
+  return { card, file: sideBefore() };
 }
 
 export type RowView = "diff" | "plain" | "collapsed";
@@ -134,6 +173,15 @@ export function rowView(state: CardState, i: number): RowView {
   if (kind === "ctx") return "plain";
   const kept: LineKind = state.phase === "applied" ? "add" : "del";
   return kind === kept ? "plain" : "collapsed";
+}
+
+/**
+ * The text of every row. A plain row (settled Applied or Undone) shows the next line of `file`,
+ * so the UI renders exactly what apply and undo produced; other rows show the diff's own text.
+ */
+export function rowTexts(state: CardState, file: readonly string[]): string[] {
+  let next = 0;
+  return DIFF.map((l, i) => (rowView(state, i) === "plain" ? (file[next++] ?? "") : l.text));
 }
 
 /** Whether row `i` has been typed yet (rows beyond the count stay hidden, but keep their space). */

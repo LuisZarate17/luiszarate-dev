@@ -134,6 +134,23 @@ test.describe("labq simulation", () => {
     await context.close();
   });
 
+  test("reduced motion: Replay keeps the selected run", async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await context.newPage();
+    await page.goto("/");
+    await stage(page, SCOPE).scrollIntoViewIfNeeded();
+    await waitForHydration(page, SCOPE);
+    await page.getByRole("button", { name: "Without constraint" }).click();
+    await page.getByRole("button", { name: "Replay" }).click();
+    await expect(values(page)).toHaveText(WITHOUT);
+    await expect(page.getByRole("button", { name: "Without constraint" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.locator(`${SCOPE} .sim-still`)).toHaveAttribute("data-picked", "without");
+    await context.close();
+  });
+
   test("controls are at least 44 px", async ({ page }) => {
     await page.goto("/");
     for (const name of ["Without constraint", "With constraint", "Replay"]) {

@@ -34,7 +34,9 @@ test.describe("cougar connect simulation", () => {
     await expect(page.locator(`${SCOPE} .sim-stage`)).toBeVisible();
     await expect(rows(page)).toHaveCount(5);
     expect(await flippedRows(page)).toBe(5);
-    await expect(slider(page)).toHaveAttribute("aria-valuetext", "2026 rows shown: 5 of 5");
+    // Without JavaScript the handle is inert: no slider role, not tabbable.
+    await expect(slider(page)).toHaveCount(0);
+    await expect(page.locator(`${SCOPE} .cougar-handle`)).not.toHaveAttribute("tabindex", /.*/);
     await expect(page.locator(`${SCOPE} .cougar-credit`)).toHaveText(CREDIT);
     await expect(page.locator(`${SCOPE} .sim-still`)).toContainText(
       "32 xUnit tests, CI on every push",
@@ -119,6 +121,10 @@ test.describe("cougar connect simulation", () => {
       await expect(s).toHaveAttribute("aria-valuetext", `2026 rows shown: ${text}`);
     }
     await page.keyboard.press("ArrowLeft");
+    await expect(s).toHaveAttribute("aria-valuenow", "40");
+    await page.keyboard.press("PageUp");
+    await expect(s).toHaveAttribute("aria-valuenow", "70");
+    await page.keyboard.press("PageDown");
     await expect(s).toHaveAttribute("aria-valuenow", "40");
     await page.keyboard.press("End");
     await expect(s).toHaveAttribute("aria-valuetext", "2026 rows shown: 5 of 5");

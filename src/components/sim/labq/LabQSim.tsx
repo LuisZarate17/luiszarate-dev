@@ -122,20 +122,21 @@ interface Frame {
   t: number;
 }
 
-function drawFrame(
-  canvas: HTMLCanvasElement,
-  colors: WorldColors,
-  mono: string,
-  sans: string,
-  frame: Frame,
-) {
+/** What a frame needs besides the colors: measured on resize and theme change, not per frame. */
+interface View {
+  w: number;
+  h: number;
+  dpr: number;
+  layout: Layout;
+  mono: string;
+  sans: string;
+}
+
+function drawFrame(canvas: HTMLCanvasElement, colors: WorldColors, view: View, frame: Frame) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
-  const w = canvas.clientWidth;
-  const h = canvas.clientHeight;
-  if (!w || !h) return;
-  const dpr = canvas.width / w;
-  const l = makeLayout(w, h);
+  const { w, h, dpr, mono, sans } = view;
+  const l = view.layout;
   const { slot } = l;
   const small = h < 150;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -197,6 +198,8 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
   const raf = useRef(0);
   const frame = useRef<Frame>({ run: "with", t: runDuration("with") });
   const colors = useRef<WorldColors | null>(null);
+  const view = useRef<View | null>(null);
+  const fonts = useRef({ mono: "monospace", sans: "sans-serif" });
   const [live, setLive] = useState(false);
   const [selected, setSelected] = useState<Run>("with");
   const [picked, setPicked] = useState<Run | null>(null);
@@ -205,15 +208,23 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
+    if (!canvas || !colors.current || !view.current) return;
+    drawFrame(canvas, colors.current, view.current, frame.current);
+  }, []);
+
+  /** Reads the computed fonts and colors; run on mount, theme change and font load only. */
+  const readStyle = useCallback(() => {
     const stage = stageRef.current;
-    if (!canvas || !stage) return;
-    colors.current ??= readWorldColors(stage);
+    if (!stage) return;
+    colors.current = readWorldColors(stage);
     const style = getComputedStyle(stage);
     const mono = style.getPropertyValue("--font-mono").trim() || "monospace";
     const sans = style.getPropertyValue("--font-sans").trim() || "sans-serif";
-    drawFrame(canvas, colors.current, mono, sans, frame.current);
+    fonts.current = { mono, sans };
+    if (view.current) view.current = { ...view.current, mono, sans };
   }, []);
 
+  /** Sizes the canvas and rebuilds the layout; run on mount and resize only. */
   const fit = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -222,6 +233,8 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
     const h = canvas.clientHeight;
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
+    view.current =
+      w && h ? { w, h, dpr: canvas.width / w, layout: makeLayout(w, h), ...fonts.current } : null;
     draw();
   }, [draw]);
 
@@ -230,21 +243,24 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
     const canvas = canvasRef.current;
     const stage = stageRef.current;
     if (!showCanvas || !canvas || !stage) return;
-    colors.current = readWorldColors(stage);
+    readStyle();
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(canvas);
     const theme = new MutationObserver(() => {
-      colors.current = readWorldColors(stage);
+      readStyle();
       draw();
     });
     theme.observe(document.documentElement, { attributes: true });
-    void document.fonts?.ready.then(draw);
+    void document.fonts?.ready.then(() => {
+      readStyle();
+      draw();
+    });
     return () => {
       ro.disconnect();
       theme.disconnect();
     };
-  }, [showCanvas, fit, draw]);
+  }, [showCanvas, fit, draw, readStyle]);
 
   const stop = useCallback(() => cancelAnimationFrame(raf.current), []);
 
@@ -301,6 +317,14 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
     animate("sequence");
   }, [reduced, animate]);
 
+  /** The Replay button: the sequence, or under reduced motion the selected run's end state again. */
+  const replay = useCallback(() => {
+    if (!reduced) return animate("sequence");
+    stop();
+    setPicked(selected);
+    setSettled(selected);
+  }, [reduced, selected, animate, stop]);
+
   const reset = useCallback(() => {
     stop();
     setLive(false);
@@ -353,7 +377,7 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
             <SimButton onClick={() => choose("with")} pressed={selected === "with"}>
               With constraint
             </SimButton>
-            <SimButton onClick={() => (reduced ? play() : animate("sequence"))}>Replay</SimButton>
+            <SimButton onClick={replay}>Replay</SimButton>
           </Controls>
           <Readout
             items={READOUT_LABELS.map((label, i) => ({ label, value: counters[i] ?? "" }))}

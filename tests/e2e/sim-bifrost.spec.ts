@@ -143,6 +143,51 @@ test.describe("bifrost simulation", () => {
     await expect.poll(() => state(page)).toBe("declined");
   });
 
+  test("keyboard focus stays on the pressed button through Replay and is not stolen back", async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name === "phone", "keyboard path is checked at desktop size");
+    await ready(page);
+    await settleOnReview(page);
+    await btn(page, "Apply edit").focus();
+    await page.keyboard.press("Enter");
+    await expect(btn(page, "Undo")).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(btn(page, "Replay")).toBeFocused();
+    await page.keyboard.press("Enter");
+    // Typing: the button is still the focused element (aria-disabled, not removed).
+    expect(await state(page)).toBe("typing");
+    await expect(btn(page, "Apply edit")).toBeFocused();
+    await expect(btn(page, "Apply edit")).toHaveAttribute("aria-disabled", "true");
+    // Tab away to the diff while it types; focus must not be pulled back.
+    await page.keyboard.press("Tab");
+    await expect(btn(page, "Deny")).toBeFocused();
+    await expect.poll(() => state(page)).toBe("review");
+    await expect(btn(page, "Deny")).toBeFocused();
+  });
+
+  test("Apply then Undo renders the original lines byte for byte", async ({ page }) => {
+    await ready(page);
+    await settleOnReview(page);
+    const plain = async () =>
+      page
+        .locator(`${SCOPE} .bifrost-row[data-view="plain"] .bifrost-text`)
+        .evaluateAll((els) => els.map((el) => el.textContent ?? ""));
+    await btn(page, "Apply edit").click();
+    await expect.poll(() => state(page)).toBe("applied");
+    const applied = await plain();
+    expect(applied).toHaveLength(10);
+    expect(applied.join("\n")).toContain("fn welcome(name: &str) -> String {");
+    expect(applied.join("\n")).not.toContain("greet");
+    await btn(page, "Undo").click();
+    await expect.poll(() => state(page)).toBe("undone");
+    const restored = await plain();
+    expect(restored).toHaveLength(10);
+    expect(restored[2]).toBe("fn greet(name: &str) -> String {");
+    expect(restored[7]).toBe('    println!("{}", greet("world"));');
+    expect(restored.join("\n")).not.toContain("welcome");
+  });
+
   test("reduced motion shows Review at once and switches states instantly", async ({ browser }) => {
     const context = await browser.newContext({ reducedMotion: "reduce" });
     const page = await context.newPage();

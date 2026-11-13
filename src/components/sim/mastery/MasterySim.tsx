@@ -79,6 +79,15 @@ export const MasterySim = forwardRef<SimHandle>(function MasterySim(_props, hand
   const label = answerLabel(state.step);
   const { cited, replies } = citationCount();
 
+  // A new tutor line appears with no focus change, so say it. The tutor's latest line only,
+  // and only once a visitor or play has engaged the session (the still is plain text).
+  const tutorIndex = state.replied ? state.step * 2 - 1 : state.step * 2 - 3;
+  const tutorLine = TRANSCRIPT[tutorIndex];
+  const announcement =
+    state.engaged && tutorLine
+      ? `Tutor: ${tutorLine.text}${tutorLine.citation ? ` ${tutorLine.citation}` : ""}`
+      : "";
+
   // The main button leaves at the end of the session; keep the keyboard where it was.
   useEffect(() => {
     if (state.engaged && done && userDriven.current) restartRef.current?.focus();
@@ -86,13 +95,13 @@ export const MasterySim = forwardRef<SimHandle>(function MasterySim(_props, hand
 
   return (
     <SimStage
-      label={done ? "The whole session is shown." : `Exchange ${meter(state)} is shown.`}
+      announce={announcement}
       stageRef={stageRef}
       controls={
         <>
           <Controls label="Mastery Pilot controls">
             {live && state.engaged && label !== null && (
-              <SimButton onClick={onAnswer} disabled={!state.replied}>
+              <SimButton onClick={onAnswer} busy={!state.replied}>
                 {label}
               </SimButton>
             )}

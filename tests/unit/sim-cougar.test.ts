@@ -75,6 +75,10 @@ describe("keys and pointer", () => {
     expect(stepPosition(5, "ArrowDown")).toBe(0);
     expect(stepPosition(37, "Home")).toBe(0);
     expect(stepPosition(37, "End")).toBe(100);
+    expect(stepPosition(50, "PageUp")).toBe(80);
+    expect(stepPosition(50, "PageDown")).toBe(20);
+    expect(stepPosition(90, "PageUp")).toBe(100);
+    expect(stepPosition(10, "PageDown")).toBe(0);
     expect(stepPosition(37, "a")).toBeNull();
   });
 

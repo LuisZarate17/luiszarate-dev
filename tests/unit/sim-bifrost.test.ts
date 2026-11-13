@@ -6,6 +6,10 @@ import {
   NOTE,
   ROW_COUNT,
   STILL,
+  STILL_SESSION,
+  isPlaying,
+  reduceSession,
+  rowTexts,
   applyEdit,
   reduce,
   rowTyped,
@@ -44,13 +48,38 @@ describe("apply and undo", () => {
     const applied = applyEdit(original);
     expect(applied).toEqual(sideAfter());
     expect(applied).not.toEqual(original);
-    const restored = undoEdit(applied, original);
+    const restored = undoEdit(applied);
     expect(restored).toEqual(original);
     expect(restored.join("\n") + "\n").toBe(original.join("\n") + "\n");
-    expect(restored).not.toBe(original);
   });
   it("refuses a file the diff was not made for", () => {
     expect(() => applyEdit(["fn other() {}"])).toThrow();
+    expect(() => undoEdit(["fn other() {}"])).toThrow();
+    // Undo needs the applied file: the original is not it.
+    expect(() => undoEdit(sideBefore())).toThrow();
+  });
+});
+
+describe("session: the file the UI shows", () => {
+  const session = (events: CardEvent[]) => events.reduce(reduceSession, STILL_SESSION);
+  const plain = (s: ReturnType<typeof session>) =>
+    rowTexts(s.card, s.file).filter((_, i) => rowView(s.card, i) === "plain");
+  it("starts on the original file", () => {
+    expect(STILL_SESSION.file).toEqual(sideBefore());
+  });
+  it("Apply shows exactly the lines applyEdit produced", () => {
+    const s = session([{ type: "apply" }]);
+    expect(s.file).toEqual(applyEdit(sideBefore()));
+    expect(plain(s)).toEqual(sideAfter());
+  });
+  it("Apply then Undo shows the original lines byte for byte", () => {
+    const s = session([{ type: "apply" }, { type: "undo" }]);
+    expect(s.file).toEqual(sideBefore());
+    expect(plain(s).join("\n") + "\n").toBe(sideBefore().join("\n") + "\n");
+  });
+  it("declining or replaying leaves the original file", () => {
+    expect(session([{ type: "deny" }]).file).toEqual(sideBefore());
+    expect(session([{ type: "apply" }, { type: "reset" }]).file).toEqual(sideBefore());
   });
 });
 
@@ -87,10 +116,29 @@ describe("state machine", () => {
     expect(reduce(STILL, { type: "tick" })).toBe(STILL);
   });
   it("scrubs to a typed count and reset returns to the still", () => {
-    expect(reduce(STILL, { type: "scrub", progress: 0.5 })).toEqual({ phase: "typing", typed: 6 });
+    expect(reduce(STILL, { type: "scrub", progress: 0.5 })).toEqual({
+      phase: "typing",
+      typed: 6,
+      frozen: true,
+    });
     expect(reduce(STILL, { type: "scrub", progress: 1 })).toEqual(STILL);
-    expect(reduce(STILL, { type: "scrub", progress: -1 })).toEqual({ phase: "typing", typed: 0 });
+    expect(reduce(STILL, { type: "scrub", progress: -1 })).toEqual({
+      phase: "typing",
+      typed: 0,
+      frozen: true,
+    });
     expect(run([{ type: "deny" }, { type: "reset" }])).toEqual(STILL);
+  });
+  it("a scrubbed frame is static: it is not playing and ticks do not advance it", () => {
+    const scrubbed = reduce(STILL, { type: "scrub", progress: 0.5 });
+    expect(isPlaying(scrubbed)).toBe(false);
+    expect(reduce(scrubbed, { type: "tick" })).toBe(scrubbed);
+    // Real play is the only state the typing interval runs for.
+    expect(isPlaying(reduce(STILL, { type: "play" }))).toBe(true);
+    expect(isPlaying(STILL)).toBe(false);
+    // A scrubbed frame can still be answered, and play restarts typing from it.
+    expect(reduce(scrubbed, { type: "apply" }).phase).toBe("applied");
+    expect(isPlaying(reduce(scrubbed, { type: "play" }))).toBe(true);
   });
   it("has the documented chip, note and buttons per state", () => {
     expect(CHIP.review).toBe("Review");

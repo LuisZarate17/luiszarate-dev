@@ -115,6 +115,31 @@ test("the keyboard alone runs the whole session", async ({ page }, info) => {
   await expect(meter(page)).toHaveText("1 of 4");
 });
 
+test("a new tutor line is announced in a polite live region, and focus stays on Answer", async ({
+  page,
+}, info) => {
+  await load(page);
+  await reachFirstExchange(page);
+  const live = page.locator(`${SCOPE} [data-testid="sim-announce"]`);
+  await expect(live).toHaveAttribute("aria-live", "polite");
+  await expect(live).toContainText("What is the first step");
+  const button = answerBtn(page, "20");
+  if (info.project.name !== "phone") {
+    await button.focus();
+    await page.keyboard.press("Enter");
+    // During the reply pause the button is aria-disabled but stays focused.
+    await expect(page.getByRole("button", { name: /^Answer/ })).toBeFocused();
+    await expect(page.getByRole("button", { name: /^Answer/ })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  } else {
+    await button.tap();
+  }
+  await expect(live).toContainText("Subtract 6 from both sides");
+  await expect(live).toContainText("algebra_linear_equations.md");
+});
+
 test("reduced motion shows the whole transcript and steps instantly", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce" });
   const page = await context.newPage();

@@ -36,6 +36,10 @@ export const CougarSim = forwardRef<SimHandle>(function CougarSim(_props, ref) {
   const [pos, setPos] = useState(STILL);
   // What the readout announces: it follows the divider only when a move settles, not per frame.
   const [settled, setSettled] = useState(STILL);
+  // The slider role exists only once hydrated: before that the handle is inert, so it is not
+  // announced or tabbable. Same element and size either way, so nothing shifts.
+  const [live, setLive] = useState(false);
+  useEffect(() => setLive(true), []);
   const stageRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const posRef = useRef(STILL);
@@ -135,11 +139,8 @@ export const CougarSim = forwardRef<SimHandle>(function CougarSim(_props, ref) {
   };
 
   const count = flippedCount(pos);
-  const label = `Cougar Connect, 2024 against 2026. ${valueText(settled)}.`;
-
   return (
     <SimStage
-      label={label}
       stageRef={stageRef}
       controls={
         <>
@@ -193,19 +194,23 @@ export const CougarSim = forwardRef<SimHandle>(function CougarSim(_props, ref) {
             <div
               className="cougar-handle"
               style={{ left: `${pos}%` }}
-              role="slider"
-              tabIndex={0}
-              aria-label="Compare 2024 and 2026"
-              aria-orientation="horizontal"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(pos)}
-              aria-valuetext={valueText(pos)}
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerEnd}
-              onPointerCancel={onPointerEnd}
-              onKeyDown={onKeyDown}
+              {...(live
+                ? {
+                    role: "slider",
+                    tabIndex: 0,
+                    "aria-label": "Compare 2024 and 2026",
+                    "aria-orientation": "horizontal" as const,
+                    "aria-valuemin": 0,
+                    "aria-valuemax": 100,
+                    "aria-valuenow": Math.round(pos),
+                    "aria-valuetext": valueText(pos),
+                    onPointerDown,
+                    onPointerMove,
+                    onPointerUp: onPointerEnd,
+                    onPointerCancel: onPointerEnd,
+                    onKeyDown,
+                  }
+                : {})}
             >
               <span className="cougar-grip" aria-hidden="true" />
             </div>

@@ -14,10 +14,12 @@ import {
   DISK,
   FILE_PATH,
   NOTE,
-  STILL,
   TYPE_INTERVAL_MS,
   USER_MESSAGE,
-  reduce,
+  STILL_SESSION,
+  isPlaying,
+  reduceSession,
+  rowTexts,
   rowTyped,
   rowView,
   summary,
@@ -70,7 +72,8 @@ function Pencil() {
  */
 export const BifrostSim = forwardRef(function BifrostSim(_props: object, ref: Ref<SimHandle>) {
   const reduced = useReducedMotion();
-  const [state, dispatch] = useReducer(reduce, STILL);
+  const [session, dispatch] = useReducer(reduceSession, STILL_SESSION);
+  const state = session.card;
   const stageRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<HTMLDivElement>(null);
   const moveFocus = useRef(false);
@@ -98,37 +101,42 @@ export const BifrostSim = forwardRef(function BifrostSim(_props: object, ref: Re
     [play],
   );
 
-  const typing = state.phase === "typing";
+  // Only real play types; a scrubbed frame is held still.
+  const typing = isPlaying(state);
   useEffect(() => {
     if (!typing) return;
     const id = window.setInterval(() => dispatch({ type: "tick" }), TYPE_INTERVAL_MS);
     return () => window.clearInterval(id);
   }, [typing]);
 
-  // The button that was pressed is replaced by the next state's button: keep keyboard focus in the row.
+  // Buttons are keyed by position, so Apply, Undo and Replay are one element and keep focus.
+  // A button with no successor (Deny) is removed: move focus to the first button then, but
+  // only if focus is still in the sim (or lost to the body), never if the visitor moved on.
   useEffect(() => {
-    if (!moveFocus.current || typing) return;
+    if (!moveFocus.current) return;
     moveFocus.current = false;
-    controlsRef.current?.querySelector<HTMLButtonElement>("button:not(:disabled)")?.focus();
-  }, [state.phase, typing]);
+    const active = document.activeElement;
+    const root = controlsRef.current?.closest(".sim") ?? controlsRef.current;
+    if (active && active !== document.body && !root?.contains(active)) return;
+    controlsRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+  }, [state.phase]);
 
   const press = (id: ButtonId) => {
     moveFocus.current = true;
     send(EVENT[id]);
   };
 
-  const label = `Mimir edit card for ${FILE_PATH}, ${summary()}. State: ${CHIP[state.phase]}.`;
+  const texts = rowTexts(state, session.file);
 
   return (
     <SimStage
-      label={label}
       stageRef={stageRef}
       controls={
         <>
           <div ref={controlsRef}>
             <Controls label="Edit card controls">
-              {BUTTONS[state.phase].map((id) => (
-                <SimButton key={id} onClick={() => press(id)} disabled={typing}>
+              {BUTTONS[state.phase].map((id, i) => (
+                <SimButton key={i} onClick={() => press(id)} busy={typing}>
                   {LABEL[id]}
                 </SimButton>
               ))}
@@ -175,7 +183,7 @@ export const BifrostSim = forwardRef(function BifrostSim(_props: object, ref: Re
                   <span className="bifrost-mark" aria-hidden="true">
                     {MARK[l.kind]}
                   </span>
-                  <span className="bifrost-text">{l.text}</span>
+                  <span className="bifrost-text">{texts[i]}</span>
                 </div>
               );
             })}

@@ -68,6 +68,8 @@ export const CREDIT =
   "Team project, fall 2024 (Jonah Jellison, Cameron, Luis). Solo rebuild by Luis, 2026.";
 
 export const KEY_STEP = 10;
+/** PageUp and PageDown move three arrow steps (30%), the larger step the slider pattern asks for. */
+export const PAGE_STEP = 30;
 
 export function commitUrl(commit: Commit): string {
   return `${REPO_URL}/commit/${commit.hash}`;
@@ -102,6 +104,10 @@ export function stepPosition(position: number, key: string): number | null {
     case "ArrowLeft":
     case "ArrowDown":
       return clampPosition(position - KEY_STEP);
+    case "PageUp":
+      return clampPosition(position + PAGE_STEP);
+    case "PageDown":
+      return clampPosition(position - PAGE_STEP);
     case "Home":
       return 0;
     case "End":
