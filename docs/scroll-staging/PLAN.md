@@ -1,6 +1,7 @@
 # Phase 6 plan: scroll staging
 
-Status: **draft for Luis to review**. Written by the orchestrator. Fable's budget for the week
+Status: **accepted 2026-11-13**. Luis left both open questions to the orchestrator; the
+recommendations below stand. Written by the orchestrator. Fable's budget for the week
 is spent, so this plan rests on the design spec (4.4, 4.6) and Fable's phase 5 notes, not a
 new Fable pass.
 
@@ -45,14 +46,17 @@ A test asserts every scene fits 1440 × 900 and 1280 × 800.
 
 **3. Which scenes pin.** All four simulations already accept `setProgress`. Proposed:
 
-| Scene          | Pins? | What the scroll drives                                                                          |
-| -------------- | ----- | ----------------------------------------------------------------------------------------------- |
-| LabQ           | Yes   | Without → with: the 50 land, the pairs counter cuts to 1,225, then the constraint turns 49 back |
-| Cougar Connect | Yes   | The divider sweeps 2024 → 2026, rows flipping as it passes; the most natural fit for scroll     |
-| Bifrost        | No    | Apply and Undo are choices the visitor makes; scrubbing them would fake a decision              |
-| Mastery Pilot  | No    | Its point is that the visitor gives the answers; scroll would answer for them                   |
+| Scene          | Pins? | What the scroll drives                                                                                                                                                        |
+| -------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LabQ           | Yes   | Without → with: the 50 land, the pairs counter cuts to 1,225, then the constraint turns 49 back                                                                               |
+| Bifrost        | Yes   | The diff types in, then Apply collapses the removed rows: the byte-for-byte edit plays as the visitor scrolls. On release the card is live again, so Undo and Deny still work |
+| Cougar Connect | No    | A team project; its slider stays a direct control                                                                                                                             |
+| Mastery Pilot  | No    | Its point is that the visitor gives the answers                                                                                                                               |
 
-Two of four pinned keeps the rhythm: hold, read, hold, read.
+Two of four pinned keeps the rhythm: hold, read, hold, read. Pinning gives a scene the most
+screen time, so it goes to the two solo projects with the strongest technical story: LabQ for a
+backend reviewer, Bifrost for a systems reviewer. Luis chose this pairing over LabQ and
+Cougar Connect on 2026-11-13.
 
 ## Bridge from scroll to island
 
@@ -68,7 +72,7 @@ changes.
    visual regression on phone. One Sonnet implementer.
 2. **Stage (pinning).**
    - the `scroll-stage` module and the wrapper in `Scene.astro`
-   - the bridge in LabQ and Cougar Connect, with `pin: true` in their content files
+   - the bridge in LabQ and Bifrost, with `pin: true` in their content files
    - ADR-007
 
    Tests check that pinning is off under each failing media condition and under reduced
@@ -87,7 +91,8 @@ changes.
 - **The timecode and scene strip treat the hero's wrapper as section 0** (`main > .hero-pin`).
   Scene wrappers need the same selector care.
 
-## Open questions for Luis
+## Decisions (2026-11-13)
 
-1. CSS sticky instead of GSAP: accept losing "GSAP" as a keyword?
-2. Pin LabQ and Cougar Connect only, or all four?
+1. CSS sticky, not GSAP. One pinning model for the whole site, no 27 KB library. Recorded as
+   ADR-007 in the staging PR.
+2. LabQ and Bifrost pin; Cougar Connect and Mastery Pilot stay interactive blocks.
