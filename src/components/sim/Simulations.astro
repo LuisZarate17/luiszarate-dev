@@ -12,6 +12,7 @@ import { CougarSim } from "./cougar/CougarSim";
 import { LabQSim } from "./labq/LabQSim";
 
 // import: mastery-pilot
+import { MasterySim } from "./mastery/MasterySim";
 
 interface Props {
   id: string;
@@ -31,3 +32,4 @@ void id; // delete with the first simulation, which reads it
 {id === "labq" && <LabQSim client:visible />}
 
 {/* mastery-pilot */}
+{id === "mastery-pilot" && <MasterySim client:visible />}

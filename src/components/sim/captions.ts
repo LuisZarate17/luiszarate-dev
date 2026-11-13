@@ -13,4 +13,6 @@ export const simCaptions: Record<string, string> = {
   // labq
   labq: "Fifty bookings for one slot, before and after the exclusion constraint. Counts from the k6 run in the repo.",
   // mastery-pilot
+  "mastery-pilot":
+    "A real session on a local Qwen3-4B, captured unedited: the tutor asks for the next step instead of giving the answer, and names the curriculum file it used.",
 };
