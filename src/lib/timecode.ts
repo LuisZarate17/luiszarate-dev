@@ -8,9 +8,16 @@ export const FPS = 24;
 /**
  * The elements that count as sections: every scene, and the hero. The hero is wrapped in
  * `.hero-pin` (the sticky pin, twice the frame tall), so the wrapper is section 0: a sticky
- * section's own top moves while it is pinned, the wrapper's does not.
+ * section's own top moves while it is pinned, the wrapper's does not. A scene that pins is
+ * wrapped the same way (`.scene-pin`, ADR-007), and its wrapper is the section. The wrapper
+ * has no id: it names its scene in `data-scene` (see `sectionId`).
  */
-export const SECTION_SELECTOR = "main > .hero-pin, main > section";
+export const SECTION_SELECTOR = "main > .hero-pin, main > .scene-pin, main > section";
+
+/** The scene id of a section element: its own id, or the scene a pin wrapper holds. */
+export function sectionId(section: { id: string; dataset: { scene?: string } }): string | null {
+  return section.id || section.dataset.scene || null;
+}
 export const SECTION_SECONDS = 30;
 
 const pad = (n: number) => String(n).padStart(2, "0");

@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { Controls, SimButton } from "../Controls";
-import { usePlayOnView, useReducedMotion } from "../hooks";
+import { usePlayOnView, useReducedMotion, useScrollStage } from "../hooks";
 import { Readout } from "../Readout";
 import { SimStage } from "../SimStage";
 import type { SimHandle } from "../types";
@@ -342,7 +342,24 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
     [draw, stop],
   );
 
+  /** The pin ended: back to the still above the hold, else the end state of the run it reached. */
+  const release = useCallback(
+    (p: number) => {
+      if (p <= 0) return reset();
+      stop();
+      const { run } = sequenceAt(Math.min(1, p) * SEQUENCE_MS);
+      frame.current = { run, t: runDuration(run) };
+      setLive(true);
+      setPicked(null);
+      setSelected(run);
+      setSettled(run);
+      draw();
+    },
+    [draw, reset, stop],
+  );
+
   useImperativeHandle(handle, () => ({ play, reset, setProgress }), [play, reset, setProgress]);
+  useScrollStage(stageRef, setProgress, release);
   useEffect(() => stop, [stop]);
   // A live switch to reduced motion drops the animation and shows the end state.
   useEffect(() => {

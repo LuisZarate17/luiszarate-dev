@@ -105,7 +105,16 @@ export type CardEvent =
   | { type: "undo" }
   | { type: "replay" }
   | { type: "scrub"; progress: number }
+  | { type: "stage"; progress: number }
+  | { type: "settle" }
   | { type: "reset" };
+
+/**
+ * Scroll staging (spec 4.4): the share of a pinned scene's hold in which the diff types in, and
+ * the point where the edit is applied. Between the two the card waits in Review.
+ */
+export const STAGE_TYPE_END = 0.55;
+export const STAGE_APPLY_AT = 0.8;
 
 /** The still: the Review state, complete. */
 export const STILL: CardState = { phase: "review", typed: ROW_COUNT };
@@ -133,8 +142,18 @@ export function reduce(state: CardState, event: CardEvent): CardState {
         : state;
     case "scrub": {
       const typed = Math.round(Math.min(1, Math.max(0, event.progress)) * ROW_COUNT);
-      return typed >= ROW_COUNT ? STILL : { phase: "typing", typed, frozen: true };
+      if (typed >= ROW_COUNT) return STILL;
+      // The same frame again is the same state, so a scroll that types nothing renders nothing.
+      if (state.frozen && state.phase === "typing" && state.typed === typed) return state;
+      return { phase: "typing", typed, frozen: true };
     }
+    case "stage":
+      if (event.progress < STAGE_APPLY_AT)
+        return reduce(state, { type: "scrub", progress: event.progress / STAGE_TYPE_END });
+      return state.phase === "applied" ? state : { phase: "applied", typed: ROW_COUNT };
+    case "settle":
+      // A half-typed frame is not a state the card can be left in: finish it as Review.
+      return state.frozen ? STILL : state;
     case "reset":
       return STILL;
   }

@@ -27,7 +27,7 @@ import {
   type CardEvent,
 } from "../../../lib/sim/bifrost";
 import { Controls, SimButton } from "../Controls";
-import { usePlayOnView, useReducedMotion } from "../hooks";
+import { usePlayOnView, useReducedMotion, useScrollStage } from "../hooks";
 import { Readout } from "../Readout";
 import { SimStage } from "../SimStage";
 import type { SimHandle } from "../types";
@@ -91,14 +91,16 @@ export const BifrostSim = forwardRef(function BifrostSim(_props: object, ref: Re
   const play = useCallback(() => send({ type: "play" }), [send]);
   usePlayOnView(stageRef, play);
 
+  // Scroll staging: the diff types in, waits in Review, then applies. On release the card is
+  // live at the state the scroll reached, so Undo (or Apply and Deny) work from there.
+  const setProgress = useCallback((progress: number) => dispatch({ type: "stage", progress }), []);
+  const release = useCallback(() => dispatch({ type: "settle" }), []);
+  useScrollStage(stageRef, setProgress, release);
+
   useImperativeHandle(
     ref,
-    () => ({
-      play,
-      reset: () => dispatch({ type: "reset" }),
-      setProgress: (progress: number) => dispatch({ type: "scrub", progress }),
-    }),
-    [play],
+    () => ({ play, reset: () => dispatch({ type: "reset" }), setProgress }),
+    [play, setProgress],
   );
 
   // Only real play types; a scrubbed frame is held still.

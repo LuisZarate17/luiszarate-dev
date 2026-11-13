@@ -1,6 +1,8 @@
 # Phase 6 plan: scroll staging
 
-Status: **accepted 2026-11-13**. Luis left both open questions to the orchestrator; the
+Status: **accepted 2026-11-13; PR 1 (fit) merged, PR 2 (stage) built**, with ADR-007. One
+change from the text below: the pin's media query lives in the script, not in CSS, so every
+change of state goes through the code that keeps the scene in place (see ADR-007). Luis left both open questions to the orchestrator; the
 recommendations below stand. Written by the orchestrator. Fable's budget for the week
 is spent, so this plan rests on the design spec (4.4, 4.6) and Fable's phase 5 notes, not a
 new Fable pass.

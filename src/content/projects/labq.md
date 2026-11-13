@@ -5,7 +5,7 @@ credit: solo
 slug: "INT. POSTGRES 17 — READ COMMITTED"
 headline: ["50 bookings.", "One slot."]
 logline: "Fifty simultaneous bookings for one lab slot all succeeded. I measured the race, closed it with an exclusion constraint, then measured again."
-pin: false
+pin: true
 world:
   fill: "#F59E1B"
   onFill: "#1A1206"

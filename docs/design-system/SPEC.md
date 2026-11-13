@@ -453,22 +453,25 @@ Hover and press change `color`, `background-color` and `border-color` over `--du
 
 - Native scroll only. No smooth-scroll library, no scroll snapping, no programmatic scrolling
   except the instant jump inside a cut.
-- GSAP is `gsap` core plus `ScrollTrigger`, imported only by the islands that pin or scrub,
-  set up inside `gsap.matchMedia()`. The hero is the exception: it uses none.
+- Pinning is CSS `position: sticky`, for the hero (ADR-006) and for scenes (ADR-007). The site
+  ships no GSAP. _(Amended by ADR-007; this section first specified `gsap` core plus
+  `ScrollTrigger`.)_
 - **Pinning is allowed only when all of these are true:**
   `(min-width: 1024px) and (min-height: 760px) and (pointer: fine) and (prefers-reduced-motion: no-preference)`,
   **and** the scene opts in (`pin: true`, which it may do only if its simulation accepts a
   scrubbed `progress`), **and** the scene's content height is ≤ `--frame-h` when measured, and
   its drawer is closed. If any condition fails the scene is an ordinary block.
-- A pinned scene holds for **75% of `--frame-h`** of extra scroll (`end: "+=75%"`,
-  `scrub: true`, `pin: true`, `anticipatePin: 1`). During the hold, scroll drives exactly one
-  thing: the simulation's `progress` from 0 to 1. Nothing else in the scene changes.
+- A pinned scene holds for **75% of `--frame-h`** of extra scroll: its `.scene-pin` wrapper is
+  that much taller than the scene while armed (`is-armed`), and the scene is sticky under the
+  top bar. During the hold, scroll drives exactly one thing: the simulation's `progress` from
+  0 to 1, sent as a `sim:progress` event by `src/lib/scroll-stage.ts`; `sim:release` hands the
+  controls back when the hold ends. Nothing else in the scene changes.
 - The hero pins for 100% of `--frame-h` under the same media query, with CSS `position: sticky`
   in a `.hero-pin` wrapper twice the frame tall (no GSAP, no pin-spacer; see ADR-006). Its one
   scrubbed thing is the field's break-apart, `p = scrollY / (wrapper height - hero height)`.
   Elsewhere the hero does not pin and `p = scrollY / (0.85 * hero height)`.
-- Opening a drawer in a pinned scene kills that scene's pin and calls
-  `ScrollTrigger.refresh()`.
+- Opening a drawer in a pinned scene disarms that scene's wrapper: the extra height goes, and
+  the scroll position is corrected so the scene stays where it was on screen.
 - Phones and tablets never pin. Simulations there play on a button tap.
 
 ### 4.5 Running and pausing
@@ -477,7 +480,8 @@ Hover and press change `color`, `background-color` and `border-color` over `--du
   `visibilitychange`. Scroll-driven frames are the exception: the hero draws a frame for every
   scroll event while any part of it is in view, because the unpinned break-apart happens while
   the hero is leaving the frame. Each simulation plays once on entry on desktop, then waits for input; on
-  phones it waits for a tap.
+  phones it waits for a tap. A scene that is armed to pin (4.4) does not play on entry: the
+  scroll plays it.
 - Anything that moves by itself for more than 5 seconds (hero field, hero title card) has a
   visible Pause control.
 

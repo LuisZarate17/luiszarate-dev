@@ -109,8 +109,11 @@ function swapDom(target: CutTarget) {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     history.replaceState(null, "", location.pathname + location.search);
   } else {
-    // scroll-padding-top on <html> keeps the section's top edge under the top bar.
-    target.scrollIntoView({ behavior: "instant", block: "start" });
+    // scroll-padding-top on <html> keeps the section's top edge under the top bar. A scene in
+    // a pin wrapper (ADR-007) is sticky, so its own rectangle moves with the scroll while it
+    // holds: the wrapper's top is where the scene starts.
+    const pin = target.parentElement?.classList.contains("scene-pin") ? target.parentElement : null;
+    (pin ?? target).scrollIntoView({ behavior: "instant", block: "start" });
     history.replaceState(null, "", `#${target.id}`);
   }
   headingOf(target).focus({ preventScroll: true });

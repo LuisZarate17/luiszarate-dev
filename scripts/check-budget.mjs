@@ -6,7 +6,10 @@
 //  - the test-only query overrides (`heroHooks`) are not in the build;
 //  - each simulation's chunk (a component named `<Id>Sim.tsx`) stays under 12 KB gzip and is
 //    never loaded by the initial HTML;
-//  - the test-only simulation probe (`simProbe`, /sim-probe/) is not in the build.
+//  - the test-only simulation probe (`simProbe`, /sim-probe/) is not in the build;
+//  - scroll staging (src/lib/scroll-stage.ts, ADR-007) is one chunk under 2 KB gzip, with no
+//    imports of its own, and the initial HTML never loads it statically: Scene.astro imports
+//    it at run time, only on a page with a `.scene-pin`.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { join } from "node:path";
@@ -17,6 +20,8 @@ const THREE_BUDGET = 140 * 1024;
 const HERO_BUDGET = 8 * 1024;
 const SIM_BUDGET = 12 * 1024;
 const SIM_CHUNK = /Sim\.[\w-]+\.js$/;
+const STAGE_BUDGET = 2 * 1024;
+const STAGE_CHUNK = /^scroll-stage\.[\w-]+\.js$/;
 
 const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 const failures = [];
@@ -101,6 +106,30 @@ for (const [name, c] of sims) {
   if (c.gzip > SIM_BUDGET) failures.push(`${name} is ${kb(c.gzip)}, over ${kb(SIM_BUDGET)}`);
 }
 if (sims.length === 0) console.log("simulation      none built yet");
+// Scroll staging: one small chunk, self-contained, loaded on demand.
+const stage = [...chunks].filter(([name]) => STAGE_CHUNK.test(name));
+if (stage.length !== 1)
+  failures.push(
+    `expected one scroll-stage chunk, found ${stage.length}: is it still a dynamic import?`,
+  );
+for (const [name, c] of stage) {
+  console.log(`scroll staging  ${name}  ${kb(c.gzip)} gzip (budget ${kb(STAGE_BUDGET)})`);
+  if (c.gzip > STAGE_BUDGET) failures.push(`${name} is ${kb(c.gzip)}, over ${kb(STAGE_BUDGET)}`);
+  if (/(?:from|import)\s*["']\.\/[^"']+\.js["']|import\(/.test(c.text))
+    failures.push(`${name} imports another chunk: scroll staging must stay self-contained`);
+  if (seen.has(name)) failures.push(`${name} is loaded statically by the initial HTML`);
+}
+const loaders = [...chunks].filter(
+  ([name, c]) => !STAGE_CHUNK.test(name) && c.text.includes("scroll-stage."),
+);
+const inlineLoader = /scroll-stage\.[\w-]+\.js/.test(html);
+for (const [name, c] of loaders)
+  if (!/querySelector\(["'`]\.scene-pin["'`]\)/.test(c.text))
+    failures.push(`${name} loads scroll staging without checking for a .scene-pin`);
+if (inlineLoader && !/querySelector\(["'`]\.scene-pin["'`]\)/.test(html))
+  failures.push("the page loads scroll staging without checking for a .scene-pin");
+if (loaders.length === 0 && !inlineLoader) failures.push("nothing loads the scroll-stage chunk");
+
 if (existsSync(join(DIST, "sim-probe")))
   failures.push("dist/sim-probe exists: rebuild without PUBLIC_SIM_PROBE");
 

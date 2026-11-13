@@ -5,7 +5,7 @@ credit: solo
 slug: "INT. WINDOWS 11 — ONE LOCAL MODEL"
 headline: ["Your model.", "Your machine."]
 logline: "A screen assistant, a code chat app and a terminal coding agent, all on one local model. Every edit is shown as an exact diff before it is written."
-pin: false
+pin: true
 world:
   fill: "#7FD6EE"
   onFill: "#071419"
