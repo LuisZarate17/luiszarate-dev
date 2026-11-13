@@ -62,8 +62,13 @@ for (const project of projects) {
         project.credit === "team" ? /^team project$/i : /^solo project$/i,
       );
       await expect(s.locator("p.credit")).toContainText(project.role);
-      const img = s.locator(".sim-still img");
-      await expect(img).toHaveAttribute("alt", /.{40,}/);
+      if (project.id === "bifrost") {
+        // Bifrost shows a DOM simulation, not a screenshot: check its stage and real text.
+        await expect(s.locator(".sim-stage .sim-still")).toContainText("Edit file");
+      } else {
+        const img = s.locator(".sim-still img");
+        await expect(img).toHaveAttribute("alt", /.{40,}/);
+      }
       await expect(s.locator("figcaption")).not.toBeEmpty();
     });
 
