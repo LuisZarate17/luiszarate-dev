@@ -1,0 +1,47 @@
+---
+import { Picture } from "astro:assets";
+import { stills } from "../scene/stills";
+import { simCaptions } from "./captions";
+import Simulations from "./Simulations.astro";
+import "./sim.css";
+
+interface Props {
+  id: string;
+  /** Only with slot content (the test fixture): the caption for that content. */
+  caption?: string;
+}
+
+const { id, caption: slotCaption } = Astro.props;
+const custom = Astro.slots.has("default");
+const caption = custom ? slotCaption : simCaptions[id];
+const still = stills[id];
+---
+
+<figure class="sim">
+  {custom ? (
+    <slot />
+  ) : caption ? (
+    // The island draws its own stage and controls (astro-island is display: contents).
+    <Simulations id={id} />
+  ) : (
+    <div class="sim-stage">
+      {still && (
+        <div class:list={["sim-still", { light: still.tone === "light" }]}>
+          <Picture
+            src={still.src}
+            alt={still.alt}
+            formats={["avif", "webp"]}
+            fallbackFormat="webp"
+            widths={[480, 720, 960, 1256]}
+            sizes="(min-width: 64rem) 39.25rem, calc(100vw - 2rem)"
+            pictureAttributes={{ class: "sim-picture" }}
+            class="sim-image"
+          />
+        </div>
+      )}
+    </div>
+  )}
+  {(caption ?? still?.caption) && (
+    <figcaption class="text-small">{caption ?? still?.caption}</figcaption>
+  )}
+</figure>

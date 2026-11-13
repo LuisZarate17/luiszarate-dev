@@ -1,9 +1,8 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { Picture } from "astro:assets";
 import Slug from "./Slug.astro";
 import { liveLabels, notes } from "./notes";
-import { stills } from "./stills";
+import SimSlot from "../sim/SimSlot.astro";
 
 interface Props {
   entry: CollectionEntry<"projects">;
@@ -11,7 +10,6 @@ interface Props {
 
 const { entry } = Astro.props;
 const { id, data } = entry;
-const still = stills[id];
 const note = notes[id];
 const number = `SC ${String(data.order).padStart(2, "0")}`;
 const teamProject = data.credit === "team";
@@ -53,25 +51,7 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     </div>
 
     <div class="scene-proof">
-      <figure class="sim">
-        <div class="sim-stage">
-          {still && (
-            <div class:list={["sim-still", { light: still.tone === "light" }]}>
-              <Picture
-                src={still.src}
-                alt={still.alt}
-                formats={["avif", "webp"]}
-                fallbackFormat="webp"
-                widths={[480, 720, 960, 1256]}
-                sizes="(min-width: 64rem) 39.25rem, calc(100vw - 2rem)"
-                pictureAttributes={{ class: "sim-picture" }}
-                class="sim-image"
-              />
-            </div>
-          )}
-        </div>
-        {still && <figcaption class="text-small">{still.caption}</figcaption>}
-      </figure>
+      <SimSlot id={id} />
 
       {data.metrics.length > 0 && (
         <dl class="stats">
@@ -275,39 +255,6 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     flex-direction: column;
     min-width: 0;
   }
-  .sim-stage {
-    overflow: hidden;
-    aspect-ratio: 4 / 3;
-    background: var(--color-surface);
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-md);
-  }
-  .sim-still,
-  .sim-still :global(.sim-picture) {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .sim-still :global(.sim-image) {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-  /* A light screenshot on a dark scene: the surface frames it. Not inverted or tinted. */
-  .sim-still.light {
-    padding: calc(var(--spacing) * 3);
-  }
-  .sim-still.light :global(.sim-image) {
-    border-radius: var(--radius-sm);
-  }
-  figcaption {
-    margin-top: calc(var(--spacing) * 2);
-    max-width: var(--container-measure-wide);
-    color: var(--color-muted);
-  }
-
   .stats {
     margin-top: calc(var(--spacing) * 8);
     border-bottom: 1px solid var(--color-line);
@@ -553,12 +500,6 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     .scene-meta {
       grid-area: meta;
       align-self: end;
-    }
-    .sim-stage {
-      aspect-ratio: 3 / 2;
-    }
-    .sim-still.light {
-      padding: calc(var(--spacing) * 6);
     }
     .stat-arrow {
       stroke-width: 4px;

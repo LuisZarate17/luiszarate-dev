@@ -1,0 +1,19 @@
+---
+import Base from "../../layouts/Base.astro";
+import SimSlot from "../../components/sim/SimSlot.astro";
+import { Probe } from "../../components/sim/_probe/Probe";
+
+// Test-only page: it exists only in builds made with PUBLIC_SIM_PROBE=1 (the Playwright web
+// server). Production builds emit no page here. `npm run check:budget` also checks that.
+export function getStaticPaths() {
+  return import.meta.env.PUBLIC_SIM_PROBE === "1" ? [{ params: { name: "probe" } }] : [];
+}
+---
+
+<Base title="Simulation probe" description="Test fixture for the simulation slot.">
+  <section class="probe" id="sim-probe" data-world="labq" aria-label="Probe scene">
+    <SimSlot id="sim-probe" caption="simProbe fixture caption.">
+      <Probe client:visible />
+    </SimSlot>
+  </section>
+</Base>

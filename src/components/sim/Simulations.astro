@@ -1,0 +1,13 @@
+---
+// The simulation of each project, one block per id. Astro needs a static import for every
+// component it hydrates, so this cannot be a lookup table. Add a project's block here and its
+// caption in captions.ts.
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+void id; // delete with the first simulation, which reads it
+---
+
+{/* e.g. {id === "labq" && <LabQSim client:visible />} */}
