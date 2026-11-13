@@ -1,0 +1,91 @@
+/* Mastery Pilot stage. The shared 3:2 ratio becomes a minimum height (a ratio box would not
+   grow with its content), so on a narrow desktop the stage grows instead of clipping a line. */
+.sim-stage:has(.mastery-sim) {
+  overflow: visible;
+  aspect-ratio: auto;
+  container-type: inline-size;
+}
+@media (min-width: 64rem) {
+  .mastery-sim {
+    min-height: 66.667cqw;
+  }
+}
+/* The controls row keeps its height before hydration so nothing below it moves. */
+.sim-stage:has(.mastery-sim) + .sim-controls {
+  min-height: calc(var(--spacing) * 11);
+}
+
+.mastery-sim {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 3);
+  height: auto;
+  padding: calc(var(--spacing) * 4);
+}
+.mastery-meter {
+  margin: 0;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.mastery-lines {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mastery-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: calc(var(--spacing) * 0.5);
+  opacity: 1;
+  transition-property: opacity, visibility;
+  transition-duration: var(--dur-reveal);
+  transition-timing-function: var(--ease-cut);
+}
+.mastery-row[data-visible="false"] {
+  visibility: hidden;
+  opacity: 0;
+}
+.mastery-who {
+  color: var(--color-muted);
+}
+.mastery-row[data-speaker="tutor"] .mastery-who {
+  color: var(--world-text);
+}
+.mastery-text {
+  color: var(--color-text);
+}
+.mastery-chip {
+  display: block;
+  width: fit-content;
+  margin-top: calc(var(--spacing) * 1);
+  padding: 0 calc(var(--spacing) * 2);
+  border: 1px solid var(--world-text);
+  border-radius: var(--radius-sm);
+  color: var(--world-text);
+  letter-spacing: 0;
+}
+@media (min-width: 64rem) {
+  .mastery-sim {
+    padding: calc(var(--spacing) * 5);
+    gap: calc(var(--spacing) * 3);
+  }
+  .mastery-row {
+    grid-template-columns: 4rem 1fr;
+    gap: calc(var(--spacing) * 2);
+  }
+  .mastery-who {
+    padding-top: 0.25rem;
+  }
+  .mastery-chip {
+    display: inline-block;
+    margin: 0 0 0 calc(var(--spacing) * 2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mastery-row {
+    transition: none;
+  }
+}

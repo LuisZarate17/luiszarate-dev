@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 4321;
+// PORT lets parallel worktrees run their own server.
+const PORT = Number(process.env.PORT ?? 4321);
 
 export default defineConfig({
   testDir: "tests/e2e",

@@ -61,13 +61,14 @@
   color: var(--color-on-fill);
   border-color: var(--color-accent);
 }
-.sim-btn:disabled {
+.sim-btn:disabled,
+.sim-btn[aria-disabled="true"] {
   cursor: default;
   border-color: var(--color-line-strong);
   color: var(--color-muted);
 }
 @media (hover: hover) {
-  .sim-btn:not(:disabled):not([aria-pressed="true"]):hover {
+  .sim-btn:not(:disabled):not([aria-disabled="true"]):not([aria-pressed="true"]):hover {
     background: var(--color-text);
     color: var(--color-bg);
   }

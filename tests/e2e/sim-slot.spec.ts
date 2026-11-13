@@ -80,8 +80,10 @@ test.describe("simulation slot", () => {
   });
 });
 
-test("a project with no simulation keeps its screenshot", async ({ page }) => {
+test("every scene has one stage and a caption, simulation or screenshot", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("#labq .sim-still img")).toBeVisible();
-  await expect(page.locator("#labq .sim-stage")).toHaveCount(1);
+  for (const id of ["labq", "bifrost", "cougar-connect", "mastery-pilot"]) {
+    await expect(page.locator(`#${id} .sim-stage`)).toHaveCount(1);
+    await expect(page.locator(`#${id} .sim > figcaption`)).toHaveCount(1);
+  }
 });

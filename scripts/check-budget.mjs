@@ -59,7 +59,35 @@ const visit = (name) => {
   // Static imports only: `import"./x.js"` and `from"./x.js"`, never `import("./x.js")`.
   for (const m of text.matchAll(/(?:from|import)\s*["']\.\/([^"']+\.js)["']/g)) visit(m[1]);
 };
-for (const m of html.matchAll(/_astro\/([^"']+\.js)/g)) visit(m[1]);
+// What the page loads on its own, whatever the attribute order:
+//  - <script src> and <link rel="modulepreload" href> in _astro/;
+//  - static imports inside inline <script type="module"> bodies;
+//  - every <astro-island>: a simulation island must hydrate with client="visible" only. A
+//    `client:load`, `client:idle` or `client:only` island fetches its chunk at page load.
+const attr = (tag, name) =>
+  tag
+    .match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`))
+    ?.slice(1)
+    .find(Boolean);
+const astroName = (url) => url?.match(/_astro\/([^"'?#/]+\.js)/)?.[1];
+for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+  const src = astroName(attr(m[1], "src"));
+  if (src) visit(src);
+  else if (/\stype=["']?module/.test(m[1]))
+    for (const i of m[2].matchAll(/(?:from|import)\s*["']([^"']*_astro\/[^"']+\.js)["']/g))
+      visit(astroName(i[1]));
+}
+for (const m of html.matchAll(/<link\b[^>]*>/g)) {
+  if (attr(m[0], "rel") !== "modulepreload") continue;
+  const name = astroName(attr(m[0], "href"));
+  if (name) visit(name);
+}
+for (const m of html.matchAll(/<astro-island\b[^>]*>/g)) {
+  const name = astroName(attr(m[0], "component-url"));
+  const client = attr(m[0], "client");
+  if (name && SIM_CHUNK.test(name) && client !== "visible")
+    failures.push(`${name} hydrates with client="${client}": simulations must be client:visible`);
+}
 for (const name of seen)
   if (SIM_CHUNK.test(name)) failures.push(`${name} is a simulation loaded by the initial HTML`);
 console.log(

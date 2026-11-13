@@ -73,7 +73,7 @@ async function pauseWithKeyboard(page: Page) {
   }
   await expect(pause).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: "Play" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Play", exact: true })).toBeVisible();
   await page.waitForTimeout(300);
 }
 

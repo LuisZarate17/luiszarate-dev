@@ -1,0 +1,158 @@
+/* Bifrost: the Mimir edit card in site tokens. Row heights are fixed so no state changes the stage. */
+.sim-stage:has(.bifrost) {
+  aspect-ratio: auto;
+}
+.sim-still.bifrost {
+  --row: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 3);
+  padding: calc(var(--spacing) * 3);
+  height: auto;
+}
+.bifrost-bubble {
+  align-self: flex-end;
+  max-width: 85%;
+  min-height: calc(var(--spacing) * 10);
+  display: flex;
+  align-items: center;
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.bifrost-card {
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  min-width: 0;
+}
+.bifrost-head {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 2);
+  height: calc(var(--spacing) * 10);
+  padding-inline: calc(var(--spacing) * 3);
+  border-bottom: 1px solid var(--color-line);
+  font-size: var(--text-small);
+  white-space: nowrap;
+}
+.bifrost-icon {
+  flex: none;
+  color: var(--color-accent);
+}
+.bifrost-title {
+  font-weight: 600;
+  color: var(--color-text);
+}
+.bifrost-path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+.bifrost-sum {
+  margin-left: auto;
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+.bifrost-chip {
+  padding: 0 calc(var(--spacing) * 2);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+}
+/* Twelve rows, reserved whether or not two of them have collapsed. */
+.bifrost-diff {
+  height: calc(var(--row) * 12);
+  overflow-x: auto;
+  overflow-y: hidden;
+  font-size: 0.8125rem;
+  line-height: var(--row);
+}
+.bifrost-diff:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+.bifrost-row {
+  display: grid;
+  grid-template-columns: 3ch 3ch 2ch max-content;
+  column-gap: 1ch;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 100%;
+  height: var(--row);
+  padding-inline: calc(var(--spacing) * 2);
+  overflow: hidden;
+  white-space: pre;
+  color: var(--color-text);
+  transition-property: height, opacity, background-color, color;
+  transition-duration: var(--dur-reveal);
+  transition-timing-function: var(--ease-cut);
+}
+.bifrost-ln {
+  text-align: right;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.bifrost-mark {
+  text-align: center;
+}
+.bifrost-row[data-typed="no"] {
+  visibility: hidden;
+}
+.bifrost-row[data-view="diff"][data-kind="del"] {
+  color: var(--color-muted);
+}
+.bifrost-row[data-view="diff"][data-kind="add"] {
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+/* Settled file text: no marks, no tint, and the marks' space is not needed. */
+.bifrost-row[data-view="plain"] .bifrost-mark {
+  opacity: 0;
+}
+.bifrost-row[data-view="collapsed"] {
+  height: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition-property: height, opacity, background-color, color, visibility;
+  transition-delay: 0s, 0s, 0s, 0s, var(--dur-reveal);
+}
+.bifrost-note {
+  min-height: calc(var(--spacing) * 16);
+  margin: 0;
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+  border-top: 1px solid var(--color-line);
+  color: var(--color-muted);
+}
+
+@media (max-width: 63.999rem) {
+  .bifrost-diff {
+    font-size: 0.75rem;
+  }
+  /* A single line-number gutter: the new number, or the old one on a removed row. */
+  .bifrost-row {
+    grid-template-columns: 3ch 2ch max-content;
+  }
+  .bifrost-row:not([data-kind="del"]) .bifrost-old,
+  .bifrost-row[data-kind="del"] .bifrost-new {
+    display: none;
+  }
+  .bifrost-bubble {
+    max-width: 100%;
+    min-height: calc(var(--spacing) * 12);
+  }
+  .bifrost-note {
+    min-height: calc(var(--spacing) * 20);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bifrost-row,
+  .bifrost-row[data-view="collapsed"] {
+    transition: none;
+  }
+}

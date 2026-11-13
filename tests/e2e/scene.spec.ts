@@ -62,8 +62,15 @@ for (const project of projects) {
         project.credit === "team" ? /^team project$/i : /^solo project$/i,
       );
       await expect(s.locator("p.credit")).toContainText(project.role);
-      const img = s.locator(".sim-still img");
-      await expect(img).toHaveAttribute("alt", /.{40,}/);
+      // Every scene shows a simulation, not a screenshot: check its stage and some real content.
+      const stage = s.locator(".sim-stage");
+      if (project.id === "labq") await expect(stage).toHaveAttribute("aria-label", /.{40,}/);
+      if (project.id === "bifrost")
+        await expect(stage.locator(".sim-still")).toContainText("Edit file");
+      if (project.id === "cougar-connect")
+        await expect(stage.locator(".cougar-credit")).toContainText(/Solo rebuild by Luis/);
+      if (project.id === "mastery-pilot")
+        await expect(stage.locator(".mastery-sim")).toHaveCount(1);
       await expect(s.locator("figcaption")).not.toBeEmpty();
     });
 
