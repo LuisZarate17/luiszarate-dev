@@ -212,9 +212,10 @@ history says which model built what.
   dates, size, the commits on its branch and the check runs on its last commit. It writes
   `src/data/history.json`, which is committed.
 - `src/data/build.ts` maps each pull request and phase to the models that did the work. It is
-  written by hand, only from `docs/BUILD-LOG.md`, `docs/ROADMAP.md`, the plans and the pull
-  request descriptions, and each entry names its source. Where the record names no model, the
-  entry has no credit and the page says "Model not recorded".
+  written by hand, only from `docs/BUILD-LOG.md`, `docs/ROADMAP.md`, the plans, the pull
+  request descriptions and the orchestrator's session record (it ran the work), and each entry
+  names its source. Where no source names a model, the entry has no credit and the page says
+  "Model not recorded".
 - The page renders both at build time as static HTML. The script notes are parsed from this
   file. A unit test checks the snapshot's shape and that every pull request in the curated file
   is in it.

@@ -3,18 +3,19 @@
  *
  * Every commit is authored by Luis and carries no AI trailer (AGENTS.md, Workflow), so git
  * cannot say which model did what. This file can, and only from the written record: each
- * entry names its source in `docs/BUILD-LOG.md`, `docs/ROADMAP.md`, a plan or the pull
- * request's own description. Where the record names no model, `credits` is empty and the page
- * says so. Nothing here is inferred.
+ * entry names its source in `docs/BUILD-LOG.md`, `docs/ROADMAP.md`, a plan, the pull request's
+ * own description, or the orchestrator's session record (the orchestrator ran the work, and
+ * supplied what the written log left out during phase 7). Where no source names a model,
+ * `credits` is empty and the page says so. Nothing here is inferred.
  *
  * The other half, `history.json`, is written by `npm run history:sync`. A unit test fails if a
  * pull request listed here is missing from it.
  */
 
 /**
- * The record credits the three subagents by model. It credits the orchestrator by role, and
- * names its model once ("Opus, orchestrator", for the foundation PR), so a credit says
- * "Orchestrator" and the crew list carries the model.
+ * The three subagents are credited by model. The orchestrator is credited by role: it ran on
+ * Claude Opus 5.5 for most of the build and on Claude Sonnet 5.5 for a stretch of phase 5, so a
+ * credit says "Orchestrator" and the note or the crew list carries the model.
  */
 export type CrewId = "orchestrator" | "fable" | "sonnet" | "haiku";
 
@@ -28,7 +29,8 @@ export const CREW_NAMES: Record<CrewId, string> = {
 export interface Credit {
   by: CrewId;
   /** What it did on this pull request, in one word. */
-  work: "Build" | "Plan" | "Spec" | "Direction" | "Review";
+  work:
+    "Build" | "Plan" | "Spec" | "Direction" | "Review" | "Docs" | "Edit" | "Integration" | "Fixes";
   /** How many instances worked in parallel, when the record gives a number above one. */
   count?: number;
 }
@@ -64,7 +66,8 @@ export const phases: Phase[] = [
   {
     n: 5,
     title: "Project simulations",
-    roles: "Fable spec review, Sonnet slot, four Sonnet implementers in parallel, Fable review",
+    roles:
+      "Fable spec review, orchestrator slot, four Sonnet implementers in parallel, Fable review",
   },
   { n: 6, title: "Scroll staging", roles: "Orchestrator plan, Fable build" },
   { n: 7, title: "How it was built", roles: "Fable" },
@@ -102,8 +105,17 @@ export const prRecords: Record<number, PrRecord> = {
     note: "Ticket T2, built by a second Sonnet implementer in a parallel worktree. The orchestrator merged both branches locally and ran every test against the combined page before either merged.",
     source: "BUILD-LOG, 2026-11-11: Design system",
   },
-  5: { credits: [] },
-  6: { credits: [] },
+  5: {
+    credits: [{ by: "orchestrator", work: "Docs" }],
+    note: "Written by the orchestrator directly, on Claude Opus 5.5, with no subagent.",
+    source: "orchestrator session record, 2026-11-11..13",
+  },
+  6: {
+    phase: 3,
+    credits: [{ by: "orchestrator", work: "Docs" }],
+    note: "Written by the orchestrator directly, on Claude Opus 5.5, with no subagent.",
+    source: "orchestrator session record, 2026-11-11..13",
+  },
   7: {
     phase: 4,
     credits: [
@@ -114,44 +126,66 @@ export const prRecords: Record<number, PrRecord> = {
     note: "Fable specified the hero after a working prototype; a Sonnet implementer built it. Fable's design review changed the fan, the front plate and the phone height, approved by Luis.",
     source: "BUILD-LOG, 2026-11-12: 3D hero; ROADMAP phase 4; PR #7 description",
   },
-  8: { credits: [] },
-  9: { credits: [] },
+  8: {
+    credits: [{ by: "orchestrator", work: "Build" }],
+    note: "Written by the orchestrator directly, on Claude Opus 5.5, with no subagent.",
+    source: "orchestrator session record, 2026-11-11..13",
+  },
+  9: {
+    credits: [{ by: "orchestrator", work: "Edit" }],
+    note: "Luis generated the workflow files by running /install-github-app locally. The orchestrator, on Claude Opus 5.5, then formatted them and changed the triggers: one review per pull request, docs-only pull requests skipped.",
+    source: "orchestrator session record, 2026-11-11..13",
+  },
   10: {
     phase: 5,
-    credits: [{ by: "sonnet", work: "Build" }],
-    note: "The shared slot the four simulations plug into, built by one Sonnet implementer and landed first.",
-    source: "ROADMAP phase 5; SIM-SPEC, build plan",
+    credits: [{ by: "orchestrator", work: "Build" }],
+    note: "The shared slot the four simulations plug into. Built by the orchestrator directly, with no subagent, while its session ran on Claude Sonnet 5.5: Luis had switched the model to save usage.",
+    source: "orchestrator session record, 2026-11-11..13",
   },
   11: {
     phase: 5,
-    credits: [{ by: "sonnet", work: "Build", count: 4 }],
-    note: "Four Sonnet implementers in parallel worktrees, one per simulation, then merged and tested together by the orchestrator. One code review ran on the integrated diff; all nine findings were fixed before merge.",
-    source: "PR #11 description; BUILD-LOG, 2026-11-13: Project simulations",
+    credits: [
+      { by: "sonnet", work: "Build", count: 4 },
+      { by: "orchestrator", work: "Integration" },
+      { by: "sonnet", work: "Fixes" },
+    ],
+    note: "Four Sonnet implementers in parallel worktrees, one per simulation. The orchestrator, on Claude Sonnet 5.5 at that point, integrated them and ran one code review on the combined diff; a Sonnet implementer fixed the nine findings before merge.",
+    source:
+      "PR #11 description; BUILD-LOG, 2026-11-13: Project simulations; orchestrator session record, 2026-11-11..13",
   },
-  12: { credits: [] },
+  12: {
+    credits: [{ by: "orchestrator", work: "Docs" }],
+    note: "The roadmap and build-log update for phases 4 and 5, written by the orchestrator directly, on Claude Opus 5.5.",
+    source: "orchestrator session record, 2026-11-11..13",
+  },
   13: {
     phase: 6,
     credits: [{ by: "orchestrator", work: "Plan" }],
-    note: "Written by the orchestrator from the design spec and Fable's phase 5 notes, without a new Fable pass.",
-    source: "docs/scroll-staging/PLAN.md; BUILD-LOG, 2026-11-13: Scroll staging",
+    note: "Written by the orchestrator, on Claude Opus 5.5, from the design spec and Fable's phase 5 notes, without a new Fable pass.",
+    source:
+      "docs/scroll-staging/PLAN.md; BUILD-LOG, 2026-11-13: Scroll staging; orchestrator session record, 2026-11-11..13",
   },
   14: {
     phase: 5,
-    credits: [{ by: "fable", work: "Review" }],
-    note: "Fixes from Fable's design review of the four simulations, made from 25 screenshots. The record does not say which model applied them.",
-    source: "PR #14 description; BUILD-LOG, 2026-11-13: Project simulations",
+    credits: [
+      { by: "fable", work: "Review" },
+      { by: "sonnet", work: "Fixes" },
+    ],
+    note: "Fable reviewed the four simulations from 25 screenshots. A Sonnet implementer applied the fixes; the orchestrator, on Claude Opus 5.5, added one line (the primary outline on Mastery Pilot's Answer button) and verified.",
+    source:
+      "PR #14 description; BUILD-LOG, 2026-11-13: Project simulations; orchestrator session record, 2026-11-11..13",
   },
   15: {
     phase: 6,
     credits: [{ by: "fable", work: "Build" }],
-    note: "Built by Fable: implementation shifted to Fable this week to balance usage.",
-    source: "PR #15 description",
+    note: "Built by Fable, after a first Sonnet attempt stopped at its usage limit with no changes. Implementation shifted to Fable this week to balance usage.",
+    source: "PR #15 description; orchestrator session record, 2026-11-11..13",
   },
   16: {
     phase: 6,
     credits: [{ by: "fable", work: "Build" }],
-    note: "The scroll stage: LabQ and Bifrost hold for 75% of a frame and the scroll plays them.",
-    source: "BUILD-LOG, 2026-11-13: Scroll staging",
+    note: "The scroll stage, by Fable end to end, through the push and the pull request; the orchestrator only dispatched it.",
+    source: "BUILD-LOG, 2026-11-13: Scroll staging; orchestrator session record, 2026-11-11..13",
   },
 };
 
@@ -163,7 +197,7 @@ export interface CrewMember {
   model: string;
   /** What the role is for (AGENTS.md, Workflow). */
   brief: string;
-  /** What it was delegated, from the build log. */
+  /** What it was delegated, from the build log and the orchestrator's session record. */
   did: string;
 }
 
@@ -171,9 +205,9 @@ export const crew: CrewMember[] = [
   {
     id: "orchestrator",
     role: "Orchestrator",
-    model: "Opus",
+    model: "Opus 5.5",
     brief: "Plans, writes specs and merges.",
-    did: "Named as Opus in the build log's foundation entry. Built the foundation directly, split Fable's design spec into three tickets with disjoint files, wrote the simulation spec from the four project repos, and merged the parallel branches locally to run every test before any of them landed.",
+    did: "Ran on Claude Opus 5.5 for most of the build, and on Claude Sonnet 5.5 for the simulation slot and the integration of the four simulations. Built the foundation and the slot directly, split Fable's design spec into three tickets with disjoint files, wrote the simulation spec from the four project repos, and merged the parallel branches locally to run every test before any of them landed.",
   },
   {
     id: "fable",
@@ -187,7 +221,7 @@ export const crew: CrewMember[] = [
     role: "implementer",
     model: "Sonnet",
     brief: "Well-specified feature work, one branch or worktree each.",
-    did: "Built the tokens, the scene template and the frame (two of them in parallel worktrees), the 3D hero, the simulation slot, and the four simulations as four implementers at once.",
+    did: "Built the tokens, the scene template and the frame (two of them in parallel worktrees), the 3D hero, and the four simulations as four implementers at once; then fixed the findings of the code review and of Fable's design review.",
   },
   {
     id: "haiku",

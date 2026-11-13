@@ -158,8 +158,16 @@ built, which model did the work, and why. Written as the work happens, not recon
   design. So the section has two sources (ADR-008): `npm run history:sync` writes the commits,
   pull requests, branch commits and check runs to `src/data/history.json`, and
   `src/data/build.ts` maps each pull request to the models, by hand, from this log, the roadmap
-  and the PR descriptions. Five of the first sixteen PRs name no model anywhere; their cards say
-  "Model not recorded" instead of guessing.
+  and the PR descriptions. Five of the first sixteen PRs named no model in any of those, so the
+  first version of their cards said "Model not recorded" instead of guessing.
+- **The orchestrator filled the gaps from its session record.** It ran the work, so it is a
+  primary source. It ran on Claude Opus 5.5 for most of the build, and on Claude Sonnet 5.5
+  while it built the simulation slot (#10) itself and integrated the four simulations (#11):
+  Luis had switched the model to save usage. It wrote #5, #6, #8, #12 and #13 directly, and
+  edited the generated review workflow in #9. Sonnet implementers fixed the code-review findings
+  in #11 and applied Fable's design-review fixes in #14. #15 went to Fable after a first Sonnet
+  attempt stopped at its usage limit with no changes. An unrecorded pull request still renders
+  as "Model not recorded", which is what a new one shows until it is curated.
 - **A committed snapshot, not a build step.** The concept wanted the history read at build
   time. Vercel builds from a shallow clone and has no GitHub token, so the snapshot is
   committed and the page says which pull request it runs to. A unit test fails if the curated

@@ -89,7 +89,11 @@ test.describe("how it was built, without JavaScript", () => {
     await expect(card(page, 11)).not.toHaveAttribute("open");
     await summary(page, 11).click();
     await expect(card(page, 11)).toHaveAttribute("open");
-    await expect(summary(page, 11).locator(".credit-badge")).toHaveText(["Sonnet ×4 · Build"]);
+    await expect(summary(page, 11).locator(".credit-badge")).toHaveText([
+      "Sonnet ×4 · Build",
+      "Orchestrator · Integration",
+      "Sonnet · Fixes",
+    ]);
     await expect(card(page, 11).locator(".credit")).toContainText("Four Sonnet implementers");
     const passed = eleventh.checks.filter((c) => c.conclusion === "success").length;
     await expect(summary(page, 11).locator(".pr-ci")).toContainText(
@@ -103,13 +107,19 @@ test.describe("how it was built, without JavaScript", () => {
     await expect(card(page, 11)).not.toHaveAttribute("open");
   });
 
-  test("a pull request the record names no model for says so, and credits no one", async ({
+  test("every pull request in the snapshot is credited, with a statement and its source", async ({
     page,
   }) => {
     await page.goto("/");
-    await expect(summary(page, 5).locator(".credit-badge")).toHaveCount(0);
-    await expect(summary(page, 5)).toContainText("Model not recorded");
-    await expect(card(page, 5).locator(".credit")).toHaveCount(0);
+    await expect(section(page).locator(".pr-none")).toHaveCount(0);
+    for (const pr of history.prs) {
+      expect(await summary(page, pr.number).locator(".credit-badge").count()).toBeGreaterThan(0);
+      await expect(card(page, pr.number).locator(".credit")).toHaveCount(1);
+      await expect(card(page, pr.number).locator(".pr-facts")).toContainText("Record");
+    }
+    await expect(summary(page, 5).locator(".credit-badge")).toHaveText(["Orchestrator · Docs"]);
+    await expect(summary(page, 10).locator(".credit-badge")).toHaveText(["Orchestrator · Build"]);
+    await expect(card(page, 10).locator(".credit")).toContainText("Claude Sonnet 5.5");
   });
 
   test("a timeline mark is a plain link to its card", async ({ page }) => {
@@ -123,7 +133,7 @@ test.describe("how it was built, without JavaScript", () => {
     await page.goto("/");
     const s = section(page);
     await expect(s.locator(".crew > li")).toHaveCount(4);
-    await expect(s.locator(".crew-model")).toHaveText(["Opus", "Fable", "Sonnet", "Haiku"]);
+    await expect(s.locator(".crew-model")).toHaveText(["Opus 5.5", "Fable", "Sonnet", "Haiku"]);
     const adrs = s.locator(".adrs a");
     expect(await adrs.count()).toBeGreaterThanOrEqual(8);
     await expect(adrs.first()).toHaveAttribute(
