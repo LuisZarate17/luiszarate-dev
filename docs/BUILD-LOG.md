@@ -90,3 +90,37 @@ built, which model did the work, and why. Written as the work happens, not recon
   ships.
 - Snag: the first still painted its plates nearest-first, so the back plate covered the others.
   The DOM order is farthest first.
+
+## 2026-11-13: Project simulations (Fable spec review, Sonnet ×4 in parallel, Fable design review)
+
+- **Spec from the repos (orchestrator).** `docs/simulations/SIM-SPEC.md` takes every value from
+  the four project repos: the k6 output of LabQ's race (50 → 1 confirmed, 49 refused, 1,225
+  overlapping pairs → 0), Mimir's real edit card and wording, Cougar Connect's commits (the 2024
+  side checked against the tree before the 2026 rebuild), and Mastery Pilot's captured tutor
+  session, verbatim. Luis chose the Cougar Connect before/after split over a search demo, and
+  deferred LabQ's deadlock replay.
+- **Fable spec review.** Six must-fixes before any code. Among them: the Cougar split's geometry
+  contradicted itself, the Mastery lines were not quite verbatim, Bifrost said `Denied` where
+  Mimir says `Declined`, and timings were off-token. Mastery's weakest point became its best
+  idea: the visitor gives the student's real wrong answer (`Answer "20"`) instead of pressing
+  Next.
+- **Shared slot (#10).** One component owns the stage, caption and screenshot fallback. Snag: a
+  lookup table of components can't hydrate, because Astro needs a static import for every
+  island (`NoMatchingImport`). Each simulation gets one line in `Simulations.astro` instead. A
+  test-only fixture page proves the slot and never ships; the budget script checks that.
+- **Four in parallel (#11).** Four Sonnet implementers, one worktree each. Two things made it
+  conflict-free: a marker per project in the two shared wiring files, and a `PORT` variable so
+  four Playwright servers could run at once. All four found the same bug in the budget
+  script: it counted an island's lazy `component-url` as an initial load. Merged together
+  locally, the four needed one hand-resolved test conflict, and the nested worktrees had to be
+  kept out of lint.
+- **One review for the phase.** `/code-review high` ran once on the integrated diff instead of
+  once per PR, to save usage. Nine findings, all fixed before merge. They included tutor
+  replies a screen reader never heard, focus dropping to the page during Replay, an Undo that
+  flipped a label instead of running the byte-for-byte logic its test proved, and a budget
+  check a `client:load` could slip past.
+- **Fable design review.** From 25 screenshots. Top finding: Cougar Connect and Mastery Pilot
+  used a color variable that exists nowhere, so the browser silently dropped those styles, and
+  Cougar's divider never drew. No test caught it, so a unit test now fails on any undefined
+  `var(--…)`. Other fixes: LabQ showed its counters twice, Mastery's first frame looked empty,
+  and Bifrost's code font turned `->` into an arrow, on a card whose claim is the exact diff.
