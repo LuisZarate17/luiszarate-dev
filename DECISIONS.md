@@ -193,3 +193,45 @@ second half (Review, then Applied), so the scroll plays the whole edit. Sticky n
 ancestor of a scene to stay `overflow: visible` or `clip`; a test asserts it. A scene that grows
 past one frame at some window size quietly stops pinning there, which is the intended fallback,
 and `tests/e2e/scene-fit.spec.ts` guards the two common laptop sizes.
+
+## ADR-008: "How it was built" from a committed history snapshot and a curated credit file
+
+**Status:** accepted, 2026-11-13. Amends the concept's "generated at build time from `git log`"
+(`docs/art-direction/CONCEPTS.md`, concept A).
+
+**Context.** The section shows the repository's real history and which model did the work. Two
+facts stand in the way of generating it during the build. Vercel builds from a shallow clone
+with no GitHub token, so the build can read neither the full `git log` nor the pull requests.
+And every commit is authored by Luis, with no AI trailer (AGENTS.md), so no amount of git
+history says which model built what.
+
+**Decision.**
+
+- `npm run history:sync` (`scripts/history.mjs`) runs on a developer machine. It reads the
+  first-parent log of `main` and, through `gh api`, each merged pull request: title, branch,
+  dates, size, the commits on its branch and the check runs on its last commit. It writes
+  `src/data/history.json`, which is committed.
+- `src/data/build.ts` maps each pull request and phase to the models that did the work. It is
+  written by hand, only from `docs/BUILD-LOG.md`, `docs/ROADMAP.md`, the plans, the pull
+  request descriptions and the orchestrator's session record (it ran the work), and each entry
+  names its source. Where no source names a model, the entry has no credit and the page says
+  "Model not recorded".
+- The page renders both at build time as static HTML. The script notes are parsed from this
+  file. A unit test checks the snapshot's shape and that every pull request in the curated file
+  is in it.
+
+**Considered.**
+
+- _Reading git at build time, as the concept says._ Works locally and breaks on Vercel, or
+  needs a deep clone and a token in the build for data that changes only when a PR merges.
+- _AI trailers on commits (`Co-Authored-By`)._ Would make attribution machine-readable, but the
+  repository's rule is that Luis authors every commit, and a trailer names one model where the
+  truth is often "Fable specified, Sonnet built, Fable reviewed".
+- _Inferring the model from the roadmap's plan._ The plan and what happened differ (phase 6 was
+  planned for Sonnet and built by Fable). Only what the record says happened is shown.
+
+**Consequences.** The section is true as of its last sync and says which pull request that was;
+it lags `main` until someone runs the script, and a pull request can never appear in the
+snapshot it ships in. A new pull request shows up uncredited until the curated file is edited,
+which is the safe failure. The curated file is a second place to keep honest, so it stays small
+and cites its sources.

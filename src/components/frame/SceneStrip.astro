@@ -3,11 +3,14 @@ import { getCollection } from "astro:content";
 
 /**
  * Bottom letterbox bar with the scene strip and counter (spec 5.1, 5.5).
- * One item per project, by `order`; section ids are the entry ids.
+ * One item per project, by `order`; section ids are the entry ids. Then the sections that
+ * are not projects and have no color world: `05 BUILD` ("How it was built", shortened so the
+ * strip fits; spec 5.5 and open question 4).
  */
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
 const pad = (n: number) => String(n).padStart(2, "0");
-const total = projects.length;
+const others = [{ id: "build", name: "Build", label: "How it was built" }];
+const total = projects.length + others.length;
 ---
 
 <nav class="frame-bar frame-bar--bottom" aria-label="Scenes">
@@ -17,6 +20,14 @@ const total = projects.length;
         <a href={`#${id}`} data-world={id} aria-label={`Scene ${i + 1}: ${data.title}`}>
           <span class="strip-no">{pad(i + 1)}</span>
           <span class="strip-name">{data.title}</span>
+        </a>
+      </li>
+    ))}
+    {others.map(({ id, name, label }, i) => (
+      <li>
+        <a href={`#${id}`} aria-label={`Scene ${projects.length + i + 1}: ${label}`}>
+          <span class="strip-no">{pad(projects.length + i + 1)}</span>
+          <span class="strip-name">{name}</span>
         </a>
       </li>
     ))}

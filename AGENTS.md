@@ -30,6 +30,8 @@ is itself a resume project, so the front end is the point. Treat it as a product
 - `npm run test:e2e`: Playwright, desktop and phone projects (builds first)
 - `npm run check:budget`: JavaScript budgets for the hero and each simulation (run after `npm run build`)
 - `npm run lhci`: Lighthouse budget against `dist/` (run `npm run build` first)
+- `npm run history:sync`: rewrite `src/data/history.json` from `git log` and the GitHub API (needs
+  `gh`); the source of the "How it was built" section, with `src/data/build.ts` (ADR-008)
 
 ## Definition of done
 
@@ -63,4 +65,5 @@ failures back to it.
   directive that works (prefer `client:visible`).
 - Colors and type come from design tokens in `src/styles/`; components never hard-code hex
   values (project colors come from the content files).
-- Heavy libraries (three.js, GSAP) are imported only inside the islands that use them.
+- three.js is the one heavy library, imported only inside the island that uses it. Pinning is
+  CSS `position: sticky` (ADR-007); the site ships no GSAP.
