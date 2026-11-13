@@ -9,6 +9,7 @@ export default defineConfig(
   {
     ignores: [
       "dist/",
+      ".claude/worktrees/",
       ".astro/",
       "node_modules/",
       ".lighthouseci/",
