@@ -59,7 +59,11 @@ const visit = (name) => {
   // Static imports only: `import"./x.js"` and `from"./x.js"`, never `import("./x.js")`.
   for (const m of text.matchAll(/(?:from|import)\s*["']\.\/([^"']+\.js)["']/g)) visit(m[1]);
 };
-for (const m of html.matchAll(/_astro\/([^"']+\.js)/g)) visit(m[1]);
+// Only what the page loads on its own: <script src> and modulepreload links. An island's
+// `component-url` attribute is fetched later, when the island is visible, so it does not count.
+const initial =
+  /<script[^>]*\ssrc="[^"]*_astro\/([^"]+\.js)"|<link[^>]*rel="modulepreload"[^>]*href="[^"]*_astro\/([^"]+\.js)"/g;
+for (const m of html.matchAll(initial)) visit(m[1] ?? m[2]);
 for (const name of seen)
   if (SIM_CHUNK.test(name)) failures.push(`${name} is a simulation loaded by the initial HTML`);
 console.log(
