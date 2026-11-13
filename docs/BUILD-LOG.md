@@ -125,12 +125,15 @@ built, which model did the work, and why. Written as the work happens, not recon
   `var(--…)`. Other fixes: LabQ showed its counters twice, Mastery's first frame looked empty,
   and Bifrost's code font turned `->` into an arrow, on a card whose claim is the exact diff.
 
-## 2026-11-13: Scroll staging (orchestrator plan, Sonnet fit, Fable stage)
+## 2026-11-13: Scroll staging (orchestrator plan, Fable build)
 
 - **Plan without a Fable pass.** Fable's weekly budget was spent, so the orchestrator wrote the
   plan from the design spec and Fable's phase 5 notes. Its main call: pin scenes the way the
   hero already pins, with CSS sticky, and drop GSAP (ADR-007). About 27 KB saved; "GSAP" leaves
   the resume keyword list.
+- **Who built it.** The plan gave both PRs to a Sonnet implementer. Luis shifted implementation
+  to Fable this week to balance usage, so Fable built both (#15's description says so; this
+  entry's heading first read "Sonnet fit" and was corrected in phase 7).
 - **Fit before pin (#15).** The spec only pins a scene that fits one frame, and none did. A
   layout-only PR capped the stages at 2:1 and tightened the proof column; a test holds every
   scene to one frame at 1440 x 900 and 1280 x 800.
@@ -145,3 +148,32 @@ built, which model did the work, and why. Written as the work happens, not recon
 - **Snag: a sticky scene is a moving target.** While it holds, its rectangle follows the
   scroll, so a strip link to it went nowhere. Cuts, the timecode and the strip all measure the
   wrapper instead.
+
+## 2026-11-13: How it was built (Fable)
+
+- **One PR, design to tests (Fable).** Implementation stayed with Fable. The section is end
+  credits crossed with a call sheet (concept A): a timeline of the real history, a card per pull
+  request, the crew, and the ADRs as numbered script notes. It is `05 BUILD` in the scene strip.
+- **Git cannot say who did the work.** Every commit is authored by Luis, with no AI trailer, by
+  design. So the section has two sources (ADR-008): `npm run history:sync` writes the commits,
+  pull requests, branch commits and check runs to `src/data/history.json`, and
+  `src/data/build.ts` maps each pull request to the models, by hand, from this log, the roadmap
+  and the PR descriptions. Five of the first sixteen PRs name no model anywhere; their cards say
+  "Model not recorded" instead of guessing.
+- **A committed snapshot, not a build step.** The concept wanted the history read at build
+  time. Vercel builds from a shallow clone and has no GitHub token, so the snapshot is
+  committed and the page says which pull request it runs to. A unit test fails if the curated
+  file names a pull request the snapshot lacks.
+- **The time axis is warped.** Sixteen merges in three days put three of them inside fifteen
+  minutes; to scale, they would be one dot. Each merge is one column wide and everything else
+  sits between its neighbours in proportion, so order is true and distance is not, and the
+  caption says so. Lanes are branches that were open at the same time; squash merges keep the
+  branch commits off `main`, so they come from the pull-request API.
+- **No JavaScript needed.** The timeline is HTML and CSS positioned from custom properties; the
+  marks are links and the cards are native `details`. A 1 KB module, fetched when the section
+  comes near, makes a mark open its card in place instead of cutting to it. On a desktop window
+  the timeline sticks under the top bar, so the open card and its mark stay on screen together;
+  on phones it is a strip that scrolls sideways.
+- **Snag: the record disagreed with itself.** The phase 6 heading above said Sonnet built the
+  fit PR; the PR's own description says Fable. The first-hand source won and the heading was
+  corrected.
