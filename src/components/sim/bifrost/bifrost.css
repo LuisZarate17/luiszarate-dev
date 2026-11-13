@@ -157,6 +157,23 @@
   }
 }
 
+/* Desktop: the card is trimmed so the scene fits one frame. Rows stay fixed, so no state
+   changes the stage. */
+@media (min-width: 64rem) {
+  .sim-still.bifrost {
+    --row: 1.0625rem;
+  }
+  .bifrost-bubble {
+    min-height: calc(var(--spacing) * 9);
+  }
+  .bifrost-head {
+    height: calc(var(--spacing) * 9);
+  }
+  .bifrost-note {
+    min-height: calc(var(--spacing) * 15);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bifrost-row,
   .bifrost-row[data-view="collapsed"] {
