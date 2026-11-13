@@ -1,0 +1,176 @@
+/* Cougar Connect simulation: the before/after ledger. Tokens and world variables only. */
+.sim-stage:has(.cougar) {
+  aspect-ratio: auto;
+}
+.cougar {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 3);
+  padding: calc(var(--spacing) * 4);
+}
+.cougar-heads {
+  display: none;
+}
+.cougar-body {
+  position: relative;
+}
+.cougar-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cougar-row {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 1);
+  padding-block: calc(var(--spacing) * 2);
+  border-top: 1px solid var(--color-line);
+}
+.cougar-label {
+  color: var(--color-muted);
+}
+.cougar-cell {
+  display: block;
+  color: var(--color-muted);
+}
+.cougar-year {
+  margin-right: calc(var(--spacing) * 2);
+}
+.cougar-mark::before {
+  content: "\25CB\00a0"; /* hollow: not the current state */
+}
+/* Active state of a row: filled mark and full strength. Never color alone. */
+.cougar-row:not([data-flipped="true"]) .cougar-before,
+.cougar-row[data-flipped="true"] .cougar-after {
+  font-weight: 600;
+}
+.cougar-row:not([data-flipped="true"]) .cougar-before .cougar-mark::before,
+.cougar-row[data-flipped="true"] .cougar-after .cougar-mark::before {
+  content: "\25CF\00a0";
+}
+.cougar-row:not([data-flipped="true"]) .cougar-before {
+  color: var(--color-text);
+}
+.cougar-row[data-flipped="true"] .cougar-after {
+  color: var(--world-text);
+}
+.cougar-hashes {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 calc(var(--spacing) * 2);
+  margin-left: calc(var(--spacing) * 1);
+  font-weight: 400;
+}
+.cougar-hashes a {
+  display: inline-block;
+  padding-block: calc(var(--spacing) * 1);
+  color: var(--world-text);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Phone: the divider is a horizontal slider under the rows. */
+.cougar-track {
+  position: relative;
+  height: calc(var(--spacing) * 11);
+  margin-top: calc(var(--spacing) * 2);
+}
+.cougar-track::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--color-line-strong);
+}
+.cougar-line {
+  display: none;
+}
+.cougar-handle {
+  position: absolute;
+  top: 0;
+  width: calc(var(--spacing) * 11);
+  height: calc(var(--spacing) * 11);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--world-text);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--world-text);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+.cougar-handle:active {
+  cursor: grabbing;
+}
+.cougar-handle:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+.cougar-grip::before {
+  content: "\2194"; /* left-right arrow */
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.cougar-credit {
+  margin: 0;
+  padding-top: calc(var(--spacing) * 3);
+  border-top: 1px solid var(--color-line);
+  color: var(--color-muted);
+}
+
+@media (min-width: 40rem) {
+  .cougar-heads {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--spacing) * 6);
+    color: var(--color-muted);
+  }
+  .cougar-heads span:last-child {
+    color: var(--world-text);
+  }
+  .cougar-year {
+    display: none;
+  }
+  .cougar-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: calc(var(--spacing) * 6);
+  }
+  .cougar-label {
+    grid-column: 1 / -1;
+  }
+  /* The track becomes the whole ledger: a vertical divider with a knob. */
+  .cougar-track {
+    position: absolute;
+    inset: 0;
+    height: auto;
+    margin: 0;
+    pointer-events: none;
+  }
+  .cougar-track::before {
+    display: none;
+  }
+  .cougar-line {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--world-text);
+  }
+  .cougar-handle {
+    top: 50%;
+    margin-top: calc(var(--spacing) * -5.5);
+    pointer-events: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cougar-handle {
+    transition: none;
+  }
+}

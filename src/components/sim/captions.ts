@@ -8,6 +8,8 @@ export const simCaptions: Record<string, string> = {
   bifrost:
     "Mimir shows the exact diff and writes nothing until you apply it; Undo puts the file back byte for byte.",
   // cougar-connect
+  "cougar-connect":
+    "Drag to compare the 2024 team build with the 2026 solo rebuild. Each row links to its commit.",
   // labq
   labq: "Fifty bookings for one slot, before and after the exclusion constraint. Counts from the k6 run in the repo.",
   // mastery-pilot
