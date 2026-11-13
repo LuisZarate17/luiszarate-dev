@@ -92,7 +92,7 @@ export function flippedCount(position: number): number {
 
 /** The slider's `aria-valuetext`. */
 export function valueText(position: number): string {
-  return `2026 rows shown: ${flippedCount(position)} of ${LEDGER.length}`;
+  return `Rebuilt in 2026: ${flippedCount(position)} of ${LEDGER.length}`;
 }
 
 /** The new position for a key press, or null when the key does nothing. */

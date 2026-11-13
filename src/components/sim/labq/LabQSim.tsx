@@ -18,7 +18,6 @@ import {
   COUNTER_LABELS,
   END_COUNTERS,
   SEQUENCE_MS,
-  countersAt,
   countersList,
   dotsAt,
   makeLayout,
@@ -31,7 +30,8 @@ import {
 import "./labq.css";
 
 const STAGGER = staggers();
-const TALL = makeLayout(306, 400);
+/** Desktop still panels are square: two of them fill the 2:1 stage. */
+const TALL = makeLayout(320, 320);
 const BAND = makeLayout(358, 126);
 const HEAD: Record<Run, string> = { without: "Before", with: "After" };
 const LONG: Record<Run, string> = {
@@ -135,7 +135,7 @@ interface View {
 function drawFrame(canvas: HTMLCanvasElement, colors: WorldColors, view: View, frame: Frame) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
-  const { w, h, dpr, mono, sans } = view;
+  const { w, h, dpr, mono } = view;
   const l = view.layout;
   const { slot } = l;
   const small = h < 150;
@@ -178,14 +178,6 @@ function drawFrame(canvas: HTMLCanvasElement, colors: WorldColors, view: View, f
       ctx.stroke();
     }
   }
-  const counts = countersList(countersAt(frame.run, frame.t));
-  l.counters.forEach((c, i) => {
-    label(COUNTER_LABELS[i]?.toUpperCase() ?? "", { x: c.lx, y: c.ly }, colors.muted);
-    ctx.font = `600 ${small ? 12 : 15}px ${sans}`;
-    ctx.fillStyle = colors.accent;
-    ctx.textAlign = c.align === "end" ? "right" : "left";
-    ctx.fillText(counts[i] ?? "", c.vx, c.vy);
-  });
 }
 
 type Settled = Run | null;
@@ -234,7 +226,9 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
     view.current =
-      w && h ? { w, h, dpr: canvas.width / w, layout: makeLayout(w, h), ...fonts.current } : null;
+      w && h
+        ? { w, h, dpr: canvas.width / w, layout: makeLayout(w, h, false), ...fonts.current }
+        : null;
     draw();
   }, [draw]);
 
@@ -381,6 +375,7 @@ export const LabQSim = forwardRef<SimHandle>(function LabQSim(_props, handle) {
           </Controls>
           <Readout
             items={READOUT_LABELS.map((label, i) => ({ label, value: counters[i] ?? "" }))}
+            hide={showCanvas ? undefined : reduced ? "visually" : "reserve"}
           />
         </>
       }

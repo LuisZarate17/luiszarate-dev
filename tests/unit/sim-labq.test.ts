@@ -64,6 +64,12 @@ describe("labq layout", () => {
   });
 });
 
+describe("labq layout without counters", () => {
+  it("gives the field the counters' strip back", () => {
+    expect(makeLayout(640, 320, false).slot.h).toBeGreaterThanOrEqual(makeLayout(640, 320).slot.h);
+  });
+});
+
 describe("labq timeline", () => {
   const layout = makeLayout(626, 417);
   const stag = staggers();
@@ -91,6 +97,9 @@ describe("labq timeline", () => {
     expect(dots.filter((d) => d.filled)).toHaveLength(1);
     const inSlot = dots.filter((d) => d.x > layout.slot.x);
     expect(inSlot).toHaveLength(1);
+    // The confirmed booking sits in the middle of the slot.
+    expect(inSlot[0]?.x).toBeCloseTo(layout.slot.x + layout.slot.w / 2);
+    expect(inSlot[0]?.y).toBeCloseTo(layout.slot.y + layout.slot.h / 2);
     dots.slice(1).forEach((d, i) => {
       expect(d.x).toBeCloseTo(layout.refusal[i]?.x ?? NaN);
       expect(d.filled).toBe(false);

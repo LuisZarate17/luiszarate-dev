@@ -6,7 +6,7 @@ import {
   TRANSCRIPT,
   answer,
   answerLabel,
-  citationCount,
+  citationsShown,
   isComplete,
   meter,
   reply,
@@ -25,7 +25,7 @@ import "./mastery.css";
 /**
  * Mastery Pilot: the visitor steps through a real tutoring session, speaking the student's
  * lines. The first render is the still (all eight lines); unrevealed lines keep their space
- * with `visibility: hidden`, so the stage never changes size.
+ * (the speaker label dims, the text is `visibility: hidden`), so the stage never changes size.
  */
 export const MasterySim = forwardRef<SimHandle>(function MasterySim(_props, handle) {
   const reduced = useReducedMotion();
@@ -77,7 +77,7 @@ export const MasterySim = forwardRef<SimHandle>(function MasterySim(_props, hand
   const done = isComplete(state);
   const visible = visibleLines(state);
   const label = answerLabel(state.step);
-  const { cited, replies } = citationCount();
+  const { cited, replies } = citationsShown(state);
 
   // A new tutor line appears with no focus change, so say it. The tutor's latest line only,
   // and only once a visitor or play has engaged the session (the still is plain text).
@@ -101,7 +101,7 @@ export const MasterySim = forwardRef<SimHandle>(function MasterySim(_props, hand
         <>
           <Controls label="Mastery Pilot controls">
             {live && state.engaged && label !== null && (
-              <SimButton onClick={onAnswer} busy={!state.replied}>
+              <SimButton onClick={onAnswer} busy={!state.replied} primary>
                 {label}
               </SimButton>
             )}
@@ -118,11 +118,7 @@ export const MasterySim = forwardRef<SimHandle>(function MasterySim(_props, hand
             )}
           </Controls>
           <Readout
-            items={
-              done
-                ? [{ label: "Replies citing the curriculum", value: `${cited} of ${replies}` }]
-                : []
-            }
+            items={[{ label: "Replies citing the curriculum", value: `${cited} of ${replies}` }]}
           />
         </>
       }
@@ -139,7 +135,12 @@ export const MasterySim = forwardRef<SimHandle>(function MasterySim(_props, hand
               data-speaker={line.speaker}
               data-visible={visible[i] ? "true" : "false"}
             >
-              <span className="mastery-who font-mono text-meta uppercase">{line.speaker}</span>
+              <span
+                className="mastery-who font-mono text-meta uppercase"
+                aria-hidden={visible[i] ? undefined : true}
+              >
+                {line.speaker}
+              </span>
               <span className="mastery-text text-small">
                 {line.text}
                 {line.citation && (

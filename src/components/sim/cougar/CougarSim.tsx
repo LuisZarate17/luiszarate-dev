@@ -152,7 +152,7 @@ export const CougarSim = forwardRef<SimHandle>(function CougarSim(_props, ref) {
               2026
             </SimButton>
           </Controls>
-          <Readout items={[{ label: "2026 rows shown", value: `${flippedCount(settled)} of 5` }]} />
+          <Readout items={[{ label: "Rebuilt in 2026", value: `${flippedCount(settled)} of 5` }]} />
         </>
       }
     >
@@ -193,7 +193,7 @@ export const CougarSim = forwardRef<SimHandle>(function CougarSim(_props, ref) {
             <div className="cougar-line" style={{ left: `${pos}%` }} aria-hidden="true" />
             <div
               className="cougar-handle"
-              style={{ left: `${pos}%` }}
+              style={{ left: `clamp(22px, ${pos}%, calc(100% - 22px))` }}
               {...(live
                 ? {
                     role: "slider",

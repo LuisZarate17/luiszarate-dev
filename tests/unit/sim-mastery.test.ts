@@ -6,6 +6,7 @@ import {
   answer,
   answerLabel,
   citationCount,
+  citationsShown,
   isComplete,
   meter,
   reply,
@@ -65,5 +66,16 @@ describe("state machine", () => {
       'Answer "So x is 4?"',
     ]);
     expect(answerLabel(4)).toBeNull();
+  });
+});
+
+describe("citationsShown", () => {
+  it("counts the tutor replies shown so far", () => {
+    expect(citationsShown(start())).toEqual({ cited: 0, replies: 1 });
+    const second = reply(answer(start()));
+    expect(citationsShown(second)).toEqual({ cited: 1, replies: 2 });
+    expect(citationsShown(answer(start()))).toEqual({ cited: 0, replies: 1 });
+    expect(citationsShown(showAll())).toEqual({ cited: 3, replies: 4 });
+    expect(citationsShown(STILL)).toEqual({ cited: 3, replies: 4 });
   });
 });

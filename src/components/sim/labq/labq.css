@@ -76,6 +76,11 @@
 }
 
 @media (min-width: 64rem) {
+  /* Two square panels (or the wide canvas) fill a 2:1 stage with no dead band. */
+  .sim-stage:has(.labq-canvas),
+  .sim-stage:has(.labq-still) {
+    aspect-ratio: 2 / 1;
+  }
   .sim-stage .labq-still {
     flex-direction: row;
     gap: calc(var(--spacing) * 1);

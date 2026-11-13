@@ -77,8 +77,25 @@ test.describe("bifrost simulation", () => {
       await expect(btn(page, "Apply edit")).toBeEnabled();
       await expect.poll(() => state(page)).toBe("review");
     }
-    await expect(readout(page)).toContainText("Review");
+    // The readout is the file on disk only; the card's own chip carries the state.
+    await expect(readout(page)).toContainText("unchanged");
+    await expect(readout(page)).not.toContainText("State");
+    await expect(page.locator(`${SCOPE} .bifrost-chip`)).toHaveText("Review");
     await expect(btn(page, "Apply edit")).toBeEnabled();
+    // Apply is the primary action: accent border and text, not a fill (a fill means pressed).
+    const accent = await page
+      .locator(`${SCOPE} .bifrost-chip`)
+      .evaluate((e) => getComputedStyle(e).color);
+    await expect(btn(page, "Apply edit")).toHaveCSS("border-top-color", accent);
+    await expect(btn(page, "Apply edit")).toHaveCSS("color", accent);
+    await expect(btn(page, "Apply edit")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(btn(page, "Deny")).not.toHaveCSS("color", accent);
+    // Code rows keep `->` as two characters and the header uses the real minus.
+    await expect(page.locator(`${SCOPE} .bifrost-row`).nth(2).locator(".bifrost-text")).toHaveCSS(
+      "font-variant-ligatures",
+      "none",
+    );
+    await expect(page.locator(`${SCOPE} .bifrost-sum`)).toHaveText("+2 \u22122");
     await expect(btn(page, "Deny")).toBeVisible();
   });
 
@@ -92,8 +109,20 @@ test.describe("bifrost simulation", () => {
     await btn(page, "Apply edit").click();
     await expect.poll(() => state(page)).toBe("applied");
     await expect(page.locator(`${SCOPE} .bifrost-chip`)).toHaveText("Applied");
-    await expect(readout(page)).toContainText("Applied");
+    await expect(readout(page)).toContainText("edited");
     await expect(page.locator(`${SCOPE} .bifrost-note`)).toHaveText("");
+    // No note, no rule; and a plain file shows its line number in both gutters on every row.
+    await expect(page.locator(`${SCOPE} .bifrost-note`)).toHaveCSS(
+      "border-top-color",
+      "rgba(0, 0, 0, 0)",
+    );
+    const numbers = async (cls: string) =>
+      page
+        .locator(`${SCOPE} .bifrost-row[data-view="plain"] ${cls}`)
+        .evaluateAll((els) => els.map((e) => e.textContent));
+    const oldNos = await numbers(".bifrost-old");
+    expect(oldNos).toEqual(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]);
+    expect(await numbers(".bifrost-new")).toEqual(oldNos);
     await expect(rows(page, "collapsed")).toHaveCount(2);
     await expect(rows(page, "plain")).toHaveCount(10);
     await expect(btn(page, "Undo")).toBeVisible();

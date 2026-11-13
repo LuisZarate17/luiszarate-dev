@@ -90,16 +90,46 @@ test.describe("cougar connect simulation", () => {
     await expect(slider(page)).toHaveAttribute("aria-valuenow", "100");
   });
 
+  test("at 0% the handle rests clear of the text, inside the stage", async ({ page }, info) => {
+    test.skip(info.project.name === "phone", "the vertical divider is the desktop layout");
+    await ready(page);
+    await page.getByRole("button", { name: "2024", exact: true }).click();
+    await expect(slider(page)).toHaveAttribute("aria-valuenow", "0");
+    const h = await slider(page).boundingBox();
+    const stageBox = await page.locator(`${SCOPE} .sim-stage`).boundingBox();
+    expect(h && stageBox && h.x >= stageBox.x).toBe(true);
+    for (const cell of await page.locator(`${SCOPE} .cougar-before`).all()) {
+      const c = await cell.evaluate((el) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return range.getBoundingClientRect().left;
+      });
+      expect(c).toBeGreaterThanOrEqual((h?.x ?? 0) + (h?.width ?? 0));
+    }
+    await page.getByRole("button", { name: "2026", exact: true }).click();
+    await expect(slider(page)).toHaveAttribute("aria-valuenow", "100");
+    const e = await slider(page).boundingBox();
+    expect((e?.x ?? 0) + (e?.width ?? 0)).toBeLessThanOrEqual(
+      (stageBox?.x ?? 0) + (stageBox?.width ?? 0),
+    );
+  });
+
+  test("the readout says what was rebuilt", async ({ page }) => {
+    await ready(page);
+    await expect(readout(page)).toContainText(/Rebuilt in 2026/i);
+    await expect(readout(page)).not.toContainText(/rows shown/i);
+  });
+
   test("the buttons move the divider to the ends and set aria-pressed", async ({ page }) => {
     await ready(page);
     const b2024 = page.getByRole("button", { name: "2024", exact: true });
     const b2026 = page.getByRole("button", { name: "2026", exact: true });
     await b2024.click();
-    await expect(slider(page)).toHaveAttribute("aria-valuetext", "2026 rows shown: 0 of 5");
+    await expect(slider(page)).toHaveAttribute("aria-valuetext", "Rebuilt in 2026: 0 of 5");
     await expect(b2024).toHaveAttribute("aria-pressed", "true");
     expect(await flippedRows(page)).toBe(0);
     await b2026.click();
-    await expect(slider(page)).toHaveAttribute("aria-valuetext", "2026 rows shown: 5 of 5");
+    await expect(slider(page)).toHaveAttribute("aria-valuetext", "Rebuilt in 2026: 5 of 5");
     await expect(b2026).toHaveAttribute("aria-pressed", "true");
   });
 
@@ -109,7 +139,7 @@ test.describe("cougar connect simulation", () => {
     const s = slider(page);
     await s.focus();
     await page.keyboard.press("Home");
-    await expect(s).toHaveAttribute("aria-valuetext", "2026 rows shown: 0 of 5");
+    await expect(s).toHaveAttribute("aria-valuetext", "Rebuilt in 2026: 0 of 5");
     for (const [key, text] of [
       ["ArrowRight", "1 of 5"],
       ["ArrowRight", "1 of 5"],
@@ -118,7 +148,7 @@ test.describe("cougar connect simulation", () => {
       ["ArrowRight", "3 of 5"],
     ] as const) {
       await page.keyboard.press(key);
-      await expect(s).toHaveAttribute("aria-valuetext", `2026 rows shown: ${text}`);
+      await expect(s).toHaveAttribute("aria-valuetext", `Rebuilt in 2026: ${text}`);
     }
     await page.keyboard.press("ArrowLeft");
     await expect(s).toHaveAttribute("aria-valuenow", "40");
@@ -127,7 +157,7 @@ test.describe("cougar connect simulation", () => {
     await page.keyboard.press("PageDown");
     await expect(s).toHaveAttribute("aria-valuenow", "40");
     await page.keyboard.press("End");
-    await expect(s).toHaveAttribute("aria-valuetext", "2026 rows shown: 5 of 5");
+    await expect(s).toHaveAttribute("aria-valuetext", "Rebuilt in 2026: 5 of 5");
     await expect(readout(page)).toContainText("5 of 5");
 
     const b2024 = page.getByRole("button", { name: "2024", exact: true });
@@ -152,7 +182,7 @@ test.describe("cougar connect simulation", () => {
     await page.mouse.move(hb.x + hb.width / 2, y);
     await page.mouse.down();
     await page.mouse.move(tb.x + tb.width * 0.55, y, { steps: 6 });
-    await expect(handle).toHaveAttribute("aria-valuetext", "2026 rows shown: 3 of 5");
+    await expect(handle).toHaveAttribute("aria-valuetext", "Rebuilt in 2026: 3 of 5");
     await page.mouse.up();
     await expect(readout(page)).toContainText("3 of 5");
     expect(await flippedRows(page)).toBe(3);
