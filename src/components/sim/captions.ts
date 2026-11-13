@@ -5,6 +5,8 @@
  */
 export const simCaptions: Record<string, string> = {
   // bifrost
+  bifrost:
+    "Mimir shows the exact diff and writes nothing until you apply it; Undo puts the file back byte for byte.",
   // cougar-connect
   // labq
   labq: "Fifty bookings for one slot, before and after the exclusion constraint. Counts from the k6 run in the repo.",

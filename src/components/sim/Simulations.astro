@@ -3,6 +3,7 @@
 // component it hydrates, so this cannot be a lookup table. Each simulation adds its import
 // and its block under its own marker, and its caption in captions.ts.
 // import: bifrost
+import { BifrostSim } from "./bifrost/BifrostSim";
 
 // import: cougar-connect
 
@@ -20,6 +21,7 @@ void id; // delete with the first simulation, which reads it
 ---
 
 {/* bifrost */}
+{id === "bifrost" && <BifrostSim client:visible />}
 
 {/* cougar-connect */}
 
