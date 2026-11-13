@@ -62,8 +62,13 @@ for (const project of projects) {
         project.credit === "team" ? /^team project$/i : /^solo project$/i,
       );
       await expect(s.locator("p.credit")).toContainText(project.role);
-      const img = s.locator(".sim-still img");
-      await expect(img).toHaveAttribute("alt", /.{40,}/);
+      if (project.id === "mastery-pilot") {
+        // A simulation, not a screenshot: its still is real text inside the stage.
+        await expect(s.locator(".sim-stage .mastery-sim")).toHaveCount(1);
+      } else {
+        const img = s.locator(".sim-still img");
+        await expect(img).toHaveAttribute("alt", /.{40,}/);
+      }
       await expect(s.locator("figcaption")).not.toBeEmpty();
     });
 

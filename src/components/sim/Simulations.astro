@@ -9,6 +9,7 @@
 // import: labq
 
 // import: mastery-pilot
+import { MasterySim } from "./mastery/MasterySim";
 
 interface Props {
   id: string;
@@ -25,3 +26,4 @@ void id; // delete with the first simulation, which reads it
 {/* labq */}
 
 {/* mastery-pilot */}
+{id === "mastery-pilot" && <MasterySim client:visible />}

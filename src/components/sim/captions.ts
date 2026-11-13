@@ -8,4 +8,6 @@ export const simCaptions: Record<string, string> = {
   // cougar-connect
   // labq
   // mastery-pilot
+  "mastery-pilot":
+    "A real session on a local Qwen3-4B, captured unedited: the tutor asks for the next step instead of giving the answer, and names the curriculum file it used.",
 };
