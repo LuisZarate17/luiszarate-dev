@@ -21,13 +21,15 @@ interface ButtonProps {
    * The click is ignored here.
    */
   busy?: boolean;
+  /** The action the card is waiting for: accent border and text. Not a fill, which means pressed. */
+  primary?: boolean;
 }
 
-export function SimButton({ children, onClick, pressed, disabled, busy }: ButtonProps) {
+export function SimButton({ children, onClick, pressed, disabled, busy, primary }: ButtonProps) {
   return (
     <button
       type="button"
-      className="sim-btn text-control"
+      className={`sim-btn text-control${primary ? " sim-btn--primary" : ""}`}
       onClick={busy ? undefined : onClick}
       aria-pressed={pressed}
       disabled={disabled}

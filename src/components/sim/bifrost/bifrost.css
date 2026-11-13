@@ -3,11 +3,11 @@
   aspect-ratio: auto;
 }
 .sim-still.bifrost {
-  --row: 1.25rem;
+  --row: 1.125rem;
   display: flex;
   flex-direction: column;
-  gap: calc(var(--spacing) * 3);
-  padding: calc(var(--spacing) * 3);
+  gap: calc(var(--spacing) * 2);
+  padding: calc(var(--spacing) * 2);
   height: auto;
 }
 .bifrost-bubble {
@@ -71,6 +71,8 @@
   overflow-y: hidden;
   font-size: 0.8125rem;
   line-height: var(--row);
+  /* Code: `->` must stay two characters, not become an arrow. */
+  font-variant-ligatures: none;
 }
 .bifrost-diff:focus-visible {
   outline: 2px solid var(--color-focus);
@@ -127,6 +129,11 @@
   padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
   border-top: 1px solid var(--color-line);
   color: var(--color-muted);
+}
+
+/* No note, no rule: the box keeps its height but draws nothing. */
+.bifrost-note:empty {
+  border-top-color: transparent;
 }
 
 @media (max-width: 63.999rem) {

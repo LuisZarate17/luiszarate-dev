@@ -136,18 +136,13 @@ export const BifrostSim = forwardRef(function BifrostSim(_props: object, ref: Re
           <div ref={controlsRef}>
             <Controls label="Edit card controls">
               {BUTTONS[state.phase].map((id, i) => (
-                <SimButton key={i} onClick={() => press(id)} busy={typing}>
+                <SimButton key={i} onClick={() => press(id)} busy={typing} primary={id === "apply"}>
                   {LABEL[id]}
                 </SimButton>
               ))}
             </Controls>
           </div>
-          <Readout
-            items={[
-              { label: "state", value: CHIP[state.phase] },
-              { label: "file on disk", value: DISK[state.phase] },
-            ]}
-          />
+          <Readout items={[{ label: "file on disk", value: DISK[state.phase] }]} />
         </>
       }
     >
@@ -169,6 +164,8 @@ export const BifrostSim = forwardRef(function BifrostSim(_props: object, ref: Re
           >
             {DIFF.map((l, i) => {
               const view = rowView(state, i);
+              // Applied and Undone are a plain file, not a diff: both gutters show its line number.
+              const plain = view === "plain";
               return (
                 <div
                   className="bifrost-row"
@@ -178,8 +175,12 @@ export const BifrostSim = forwardRef(function BifrostSim(_props: object, ref: Re
                   data-typed={rowTyped(state, i) ? "yes" : "no"}
                   aria-hidden={view === "collapsed" || !rowTyped(state, i) ? true : undefined}
                 >
-                  <span className="bifrost-ln bifrost-old">{l.oldNo ?? ""}</span>
-                  <span className="bifrost-ln bifrost-new">{l.newNo ?? ""}</span>
+                  <span className="bifrost-ln bifrost-old">
+                    {(plain ? (l.oldNo ?? l.newNo) : l.oldNo) ?? ""}
+                  </span>
+                  <span className="bifrost-ln bifrost-new">
+                    {(plain ? (l.newNo ?? l.oldNo) : l.newNo) ?? ""}
+                  </span>
                   <span className="bifrost-mark" aria-hidden="true">
                     {MARK[l.kind]}
                   </span>

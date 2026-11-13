@@ -106,12 +106,16 @@ export interface Layout {
 
 const PAD = 10;
 
-/** The geometry of one drawing area (a canvas, or one still panel), in its own pixels. */
-export function makeLayout(w: number, h: number): Layout {
+/**
+ * The geometry of one drawing area (a canvas, or one still panel), in its own pixels.
+ * `counterRows` reserves the strip for the three counters; the live canvas leaves it out
+ * because the readout below the stage carries them.
+ */
+export function makeLayout(w: number, h: number, counterRows = true): Layout {
   const band = h < 150;
   const rows = w >= 340;
   const headerH = band ? 14 : 28;
-  const counterH = rows ? (band ? 28 : 44) : 54;
+  const counterH = !counterRows ? 0 : rows ? (band ? 28 : 44) : 54;
   const field: Rect = { x: PAD, y: headerH, w: w - PAD * 2, h: h - headerH - counterH };
 
   const slotX = field.x + field.w * 0.42;
@@ -198,7 +202,8 @@ export function dotsAt(layout: Layout, run: Run, t: number, stagger: number[]): 
       return { x: lerp(from.x, to.x, p), y: lerp(from.y, to.y, p), filled: true };
     }
     if (i === 0) {
-      const to = landing[Math.floor(DOTS / 2) - 1 + LAND_COLS] as Point;
+      // The one confirmed booking sits in the middle of the slot.
+      const to = { x: slot.x + slot.w / 2, y: slot.y + slot.h / 2 };
       return { x: lerp(from.x, to.x, p), y: lerp(from.y, to.y, p), filled: true };
     }
     // The other 49 reach the dashed line, then go back to the refusal grid.

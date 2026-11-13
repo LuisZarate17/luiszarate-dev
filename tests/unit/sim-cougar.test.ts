@@ -62,8 +62,8 @@ describe("flipping", () => {
   });
 
   it("words the slider value", () => {
-    expect(valueText(50)).toBe("2026 rows shown: 3 of 5");
-    expect(valueText(0)).toBe("2026 rows shown: 0 of 5");
+    expect(valueText(50)).toBe("Rebuilt in 2026: 3 of 5");
+    expect(valueText(0)).toBe("Rebuilt in 2026: 0 of 5");
   });
 });
 

@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--spacing) * 3);
-  padding: calc(var(--spacing) * 4);
+  padding: calc(var(--spacing) * 3);
 }
 .cougar-heads {
   display: none;
@@ -23,7 +23,7 @@
   display: flex;
   flex-direction: column;
   gap: calc(var(--spacing) * 1);
-  padding-block: calc(var(--spacing) * 2);
+  padding-block: calc(var(--spacing) * 1.5);
   border-top: 1px solid var(--color-line);
 }
 .cougar-label {
@@ -52,7 +52,7 @@
   color: var(--color-text);
 }
 .cougar-row[data-flipped="true"] .cougar-after {
-  color: var(--world-text);
+  color: var(--color-accent);
 }
 .cougar-hashes {
   display: inline-flex;
@@ -64,7 +64,7 @@
 .cougar-hashes a {
   display: inline-block;
   padding-block: calc(var(--spacing) * 1);
-  color: var(--world-text);
+  color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -95,10 +95,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--world-text);
+  border: 2px solid var(--color-accent);
   border-radius: 50%;
   background: var(--color-surface);
-  color: var(--world-text);
+  color: var(--color-accent);
   cursor: grab;
   touch-action: pan-y;
   user-select: none;
@@ -130,7 +130,12 @@
     color: var(--color-muted);
   }
   .cougar-heads span:last-child {
-    color: var(--world-text);
+    color: var(--color-accent);
+  }
+  /* The knob rests at the ends, clamped 22 px in: its 44 px box is kept clear of the text. */
+  .cougar-heads,
+  .cougar-row {
+    padding-inline: calc(var(--spacing) * 11);
   }
   .cougar-year {
     display: none;
@@ -161,7 +166,7 @@
     bottom: 0;
     width: 2px;
     margin-left: -1px;
-    background: var(--world-text);
+    background: var(--color-accent);
   }
   .cougar-handle {
     top: 50%;

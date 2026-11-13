@@ -93,6 +93,43 @@ test.describe("labq simulation", () => {
     await expect(values(page)).toHaveText(WITH, { timeout: 8000 });
   });
 
+  test("the live readout shows the counters once, outside the canvas", async ({ page }, info) => {
+    test.skip(info.project.name === "phone", "desktop autoplay");
+    await page.goto("/");
+    await stage(page, SCOPE).scrollIntoViewIfNeeded();
+    await waitForHydration(page, SCOPE);
+    await scrollStageIntoView(page, SCOPE);
+    await expect(page.locator(`${SCOPE} canvas`)).toBeVisible();
+    await expect(values(page)).toHaveText(WITH, { timeout: 8000 });
+    // The readout is the only place the counters show while the canvas is live.
+    await expect(page.locator(`${SCOPE} .sim-readout`)).toBeVisible();
+    await expect(page.locator(`${SCOPE} .sim-readout`)).not.toHaveClass(/sr-only|reserve/);
+    await expect(page.locator(`${SCOPE} .sim-stage`)).not.toContainText("Overlapping");
+  });
+
+  test("desktop stage is 2:1, so the slot is not surrounded by dead space", async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name === "phone", "ratio applies from 64rem");
+    await page.goto("/");
+    const size = await stageSize(page, SCOPE);
+    expect(size.w / size.h).toBeCloseTo(2, 1);
+  });
+
+  test("reduced motion: the readout is visually hidden but still read", async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await context.newPage();
+    await page.goto("/");
+    await stage(page, SCOPE).scrollIntoViewIfNeeded();
+    await waitForHydration(page, SCOPE);
+    const readout = page.locator(`${SCOPE} .sim-readout`);
+    await expect(readout).toHaveClass(/sr-only/);
+    await expect(values(page)).toHaveText(WITH);
+    const box = await readout.boundingBox();
+    expect((box?.width ?? 0) * (box?.height ?? 0)).toBeLessThanOrEqual(1);
+    await context.close();
+  });
+
   test("the readout is a polite live region", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator(`${SCOPE} .sim-readout`)).toHaveAttribute("aria-live", "polite");

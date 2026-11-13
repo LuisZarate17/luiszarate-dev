@@ -103,6 +103,13 @@ export function meter(s: MasteryState): string {
   return `${s.step} of ${STEPS}`;
 }
 
+/** The readout while stepping: tutor replies shown so far that cite the curriculum, of those shown. */
+export function citationsShown(s: MasteryState): { cited: number; replies: number } {
+  const visible = visibleLines(s);
+  const shown = TRANSCRIPT.filter((l, i) => l.speaker === "tutor" && visible[i]);
+  return { cited: shown.filter((l) => l.citation).length, replies: shown.length };
+}
+
 /** Tutor replies that cite the curriculum, and all tutor replies. */
 export function citationCount(): { cited: number; replies: number } {
   const tutor = TRANSCRIPT.filter((l) => l.speaker === "tutor");

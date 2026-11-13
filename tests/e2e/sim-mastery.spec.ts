@@ -65,17 +65,21 @@ test("plays the first exchange on view (desktop) or waits for a tap (phone)", as
   await expect(meter(page)).toHaveText("1 of 4");
   await expect.poll(() => visibleCount(page)).toBe(2);
   await expect(answerBtn(page, "20")).toBeVisible();
+  await expect(page.locator(`${SCOPE} .sim-readout`)).toHaveText(/0 of 1/);
 });
 
 test("steps through the session, labelled with the student's next line", async ({ page }) => {
   await load(page);
   await reachFirstExchange(page);
   const size = await stageSize(page, SCOPE);
+  const readout = page.locator(`${SCOPE} .sim-readout`);
   await answerBtn(page, "20").click();
   await expect(meter(page)).toHaveText("2 of 4");
+  await expect(readout).toHaveText(/1 of 2/);
   await expect.poll(() => visibleCount(page)).toBe(4);
   await answerBtn(page, "Oh, 8.").click();
   await expect.poll(() => visibleCount(page)).toBe(6);
+  await expect(readout).toHaveText(/2 of 3/);
   await answerBtn(page, "So x is 4?").click();
   await expect(meter(page)).toHaveText("4 of 4");
   await expect.poll(() => visibleCount(page)).toBe(8);
@@ -84,10 +88,25 @@ test("steps through the session, labelled with the student's next line", async (
   expect(await stageSize(page, SCOPE)).toEqual(size);
 });
 
+test("the readout is always there, so the caption never moves", async ({ page }) => {
+  await load(page);
+  await reachFirstExchange(page);
+  const caption = page.locator(`${SCOPE} figcaption`);
+  const before = await caption.boundingBox();
+  await page.getByRole("button", { name: "Show all" }).click();
+  await expect(page.locator(`${SCOPE} .sim-readout`)).toHaveText(/3 of 4/);
+  const after = await caption.boundingBox();
+  expect(Math.abs((after?.y ?? 0) - (before?.y ?? 0))).toBeLessThan(1);
+});
+
 test("hidden lines keep their space; Show all and Restart work", async ({ page }) => {
   await load(page);
   await reachFirstExchange(page);
-  await expect(rows(page).nth(7)).toHaveCSS("visibility", "hidden");
+  // An unrevealed line keeps its space: the text is hidden (and unread), the speaker label dims.
+  await expect(rows(page).nth(7).locator(".mastery-text")).toHaveCSS("visibility", "hidden");
+  await expect(rows(page).nth(7).locator(".mastery-who")).toHaveCSS("opacity", "0.35");
+  await expect(rows(page).nth(7).locator(".mastery-who")).toHaveAttribute("aria-hidden", "true");
+  await expect(rows(page).nth(1).locator(".mastery-who")).toHaveCSS("opacity", "1");
   await page.getByRole("button", { name: "Show all" }).click();
   await expect.poll(() => visibleCount(page)).toBe(8);
   await page.getByRole("button", { name: "Restart" }).click();
@@ -152,7 +171,7 @@ test("reduced motion shows the whole transcript and steps instantly", async ({ b
   await answerBtn(page, "20").click();
   // No pause: the tutor's reply is there at once.
   expect(await visibleCount(page)).toBe(4);
-  await expect(rows(page).first()).toHaveCSS("transition-duration", "0s");
+  await expect(rows(page).first().locator(".mastery-text")).toHaveCSS("transition-duration", "0s");
   await context.close();
 });
 
