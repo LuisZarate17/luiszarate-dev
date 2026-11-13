@@ -1,4 +1,5 @@
-// JavaScript budget for the hero (HERO-SPEC 7.6) and the simulations (SIM-SPEC section 1).
+// JavaScript budget for the hero (HERO-SPEC 7.6), the simulations (SIM-SPEC section 1), scroll
+// staging and the "How it was built" timeline.
 // Run after `npm run build`.
 //  - the chunk that holds three.js (it contains "WebGLRenderer") stays under 140 KB gzip;
 //  - the hero's own code stays under 8 KB gzip;
@@ -9,7 +10,10 @@
 //  - the test-only simulation probe (`simProbe`, /sim-probe/) is not in the build;
 //  - scroll staging (src/lib/scroll-stage.ts, ADR-007) is one chunk under 2 KB gzip, with no
 //    imports of its own, and the initial HTML never loads it statically: Scene.astro imports
-//    it at run time, only on a page with a `.scene-pin`.
+//    it at run time, only on a page with a `.scene-pin`;
+//  - the "How it was built" timeline (src/lib/build-timeline.ts) is one chunk under 6 KB gzip
+//    that the initial HTML never loads statically: Built.astro imports it when the section
+//    comes near.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { join } from "node:path";
@@ -22,6 +26,8 @@ const SIM_BUDGET = 12 * 1024;
 const SIM_CHUNK = /Sim\.[\w-]+\.js$/;
 const STAGE_BUDGET = 2 * 1024;
 const STAGE_CHUNK = /^scroll-stage\.[\w-]+\.js$/;
+const BUILT_BUDGET = 6 * 1024;
+const BUILT_CHUNK = /^build-timeline\.[\w-]+\.js$/;
 
 const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 const failures = [];
@@ -129,6 +135,18 @@ for (const [name, c] of loaders)
 if (inlineLoader && !/querySelector\(["'`]\.scene-pin["'`]\)/.test(html))
   failures.push("the page loads scroll staging without checking for a .scene-pin");
 if (loaders.length === 0 && !inlineLoader) failures.push("nothing loads the scroll-stage chunk");
+
+// "How it was built": the timeline's interaction is one small chunk, loaded on demand.
+const built = [...chunks].filter(([name]) => BUILT_CHUNK.test(name));
+if (built.length !== 1)
+  failures.push(
+    `expected one build-timeline chunk, found ${built.length}: is it still a dynamic import?`,
+  );
+for (const [name, c] of built) {
+  console.log(`build timeline  ${name}  ${kb(c.gzip)} gzip (budget ${kb(BUILT_BUDGET)})`);
+  if (c.gzip > BUILT_BUDGET) failures.push(`${name} is ${kb(c.gzip)}, over ${kb(BUILT_BUDGET)}`);
+  if (seen.has(name)) failures.push(`${name} is loaded statically by the initial HTML`);
+}
 
 if (existsSync(join(DIST, "sim-probe")))
   failures.push("dist/sim-probe exists: rebuild without PUBLIC_SIM_PROBE");

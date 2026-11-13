@@ -1,0 +1,867 @@
+---
+import decisions from "../../../DECISIONS.md?raw";
+import Slug from "../scene/Slug.astro";
+import { CREW_NAMES, crew, phases, prRecords } from "../../data/build";
+import { parseAdrs } from "../../lib/build/adrs";
+import { history } from "../../lib/build/history";
+import { buildTimeline, mergeOrder } from "../../lib/build/timeline";
+
+/**
+ * "How it was built" (concept A; ADR-008): the repository's real history as a timeline, a card
+ * per pull request, the crew and the decision records.
+ *
+ * Everything is rendered here, at build time, as plain HTML: the cards are native `details`
+ * and the timeline's marks are links to them, so the section reads and works without
+ * JavaScript. `src/lib/build-timeline.ts` (loaded when the section comes near) makes a mark
+ * open its card in place.
+ *
+ * History comes from `src/data/history.json` (`npm run history:sync`); who did the work comes
+ * from `src/data/build.ts`, curated from the build log. A pull request the curated file does
+ * not cover, such as one merged after it was last edited, renders with no credit.
+ */
+const ordered = mergeOrder(history.prs);
+const timeline = buildTimeline(history);
+const adrs = parseAdrs(decisions);
+const span = timeline.cols + 1;
+
+const number = "SC 05";
+const days = timeline.days.length;
+const location = `INT. GIT LOG — ${ordered.length} PULL REQUESTS, ${days} DAYS`;
+const last = ordered.at(-1);
+
+const dayFormat = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  timeZone: "UTC",
+});
+const stampFormat = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+  timeZone: "UTC",
+});
+const count = new Intl.NumberFormat("en-US");
+const plural = (n: number, one: string) => `${count.format(n)} ${one}${n === 1 ? "" : "s"}`;
+
+/** Runs of consecutive columns that belong to one phase, for the band above the lanes. */
+const phaseBands = phases.flatMap((phase) => {
+  const cols = timeline.prs
+    .filter((pr) => prRecords[pr.number]?.phase === phase.n)
+    .map((pr) => pr.col);
+  if (cols.length === 0) return [];
+  const from = Math.min(...cols);
+  const to = Math.max(...cols);
+  return [{ ...phase, from, to, wide: to - from >= 2 }];
+});
+
+const cards = ordered.map((pr) => {
+  const record = prRecords[pr.number];
+  const phase = phases.find((p) => p.n === record?.phase);
+  const passed = pr.checks.filter((c) => c.conclusion === "success").length;
+  return {
+    pr,
+    phase,
+    note: record?.note,
+    source: record?.source,
+    credits: (record?.credits ?? []).map(
+      (c) => `${CREW_NAMES[c.by]}${c.count ? ` ×${c.count}` : ""} · ${c.work}`,
+    ),
+    passed,
+    allPassed: pr.checks.length > 0 && passed === pr.checks.length,
+  };
+});
+
+/** The pull requests a crew member is credited on, in merge order. */
+const creditedOn = (id: string) =>
+  ordered.filter((pr) => prRecords[pr.number]?.credits.some((c) => c.by === id));
+---
+
+<section
+  class="built"
+  id="build"
+  aria-labelledby="build-title"
+  style={`--span:${span};--lanes:${timeline.lanes}`}
+>
+  <div class="built-grid">
+    <header class="built-head">
+      <div>
+        <Slug no={number} loc={location} />
+        <h2 id="build-title" class="built-title font-display text-title uppercase">
+          How it was built
+        </h2>
+      </div>
+      <div class="built-intro">
+        <p class="text-lead">
+          Luis directed Claude models in Claude Code and made the calls. An orchestrator planned,
+          wrote the specs and merged; subagents on other models built and reviewed, some of them
+          side by side in parallel git worktrees.
+        </p>
+        <p class="built-asof text-small">
+          {last && (
+            <>
+              This is the repository's real history, as of pull request #{last.number}, merged{" "}
+              <time datetime={last.mergedAt}>{dayFormat.format(new Date(last.mergedAt))}</time>
+              .{" "}
+            </>
+          )}
+          Every commit is authored by Luis, so the model credits come from the{" "}
+          <a href={`${history.url}/blob/main/docs/BUILD-LOG.md`} rel="noopener noreferrer">
+            build log
+          </a>
+          , written as the work happened. Where it names no model, the card says so.
+        </p>
+      </div>
+    </header>
+
+    <h3 id="build-timeline-title" class="built-tl-title font-display text-heading uppercase">
+      Timeline
+    </h3>
+    <div class="tl" role="group" aria-labelledby="build-timeline-title">
+      <div class="tl-track">
+        <div class="tl-bands font-mono text-meta uppercase" aria-hidden="true">
+          {timeline.days.map((day) => (
+            <span class="tl-band tl-band--day" style={`--from:${day.from};--to:${day.to}`}>
+              {dayFormat.format(new Date(`${day.date}T00:00:00Z`))}
+            </span>
+          ))}
+          {phaseBands.map((band) => (
+            <span class="tl-band tl-band--phase" style={`--from:${band.from};--to:${band.to}`}>
+              PH {band.n}
+              {band.wide && <span class="tl-band-title"> · {band.title}</span>}
+            </span>
+          ))}
+        </div>
+        <div class="tl-plot">
+          <div class="tl-art" aria-hidden="true">
+            <i class="tl-main"></i>
+            {timeline.direct.map((dot) => (
+              <i class="tl-dot tl-dot--main" style={`--x:${dot.x.toFixed(3)}`} />
+            ))}
+            {timeline.prs.map((pr) => (
+              <>
+                <i
+                  class="tl-branch"
+                  data-pr={pr.number}
+                  style={`--x0:${pr.startX.toFixed(3)};--x1:${pr.col};--lane:${pr.lane}`}
+                />
+                {pr.dots.map((dot) => (
+                  <i
+                    class="tl-dot"
+                    data-pr={pr.number}
+                    style={`--x:${dot.x.toFixed(3)};--lane:${pr.lane}`}
+                  />
+                ))}
+              </>
+            ))}
+          </div>
+          <ol class="tl-prs">
+            {cards.map(({ pr }, i) => (
+              <li style={`--x:${i + 1}`}>
+                <a href={`#pr-${pr.number}`} aria-label={`Pull request ${pr.number}: ${pr.title}`}>
+                  <span class="tl-mark" />
+                  <span class="tl-no font-mono text-meta">{pr.number}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </div>
+    <p class="tl-key text-small">
+      Each numbered mark is a pull request merged to <code>main</code>; open one to see who did the
+      work. The lines above are branches, with a dot per commit; stacked lines were open at the same
+      time. The order is real and the spacing is not to scale. Days are UTC.
+    </p>
+
+    <div class="built-prs">
+      <h3 class="font-display text-heading uppercase">Pull requests</h3>
+      <ol class="prs">
+        {cards.map(({ pr, phase, note, source, credits, passed, allPassed }) => (
+          <li>
+            <details class="pr" id={`pr-${pr.number}`} name="build-pr">
+              <summary>
+                <span class="pr-no font-mono text-meta">
+                  <span class="sr-only">Pull request </span>#{pr.number}
+                </span>
+                <span class="pr-title text-body">{pr.title}</span>
+                <span class="pr-credits">
+                  {credits.length > 0 ? (
+                    credits.map((credit) => (
+                      <span class="credit-badge font-mono text-meta uppercase">{credit}</span>
+                    ))
+                  ) : (
+                    <span class="pr-none font-mono text-meta uppercase">Model not recorded</span>
+                  )}
+                </span>
+                <span class="pr-ci font-mono text-meta uppercase">
+                  {pr.checks.length > 0 ? (
+                    <>
+                      {passed}/{pr.checks.length} checks
+                      <span class="sr-only"> passed</span>
+                    </>
+                  ) : (
+                    "No checks"
+                  )}
+                </span>
+              </summary>
+              <div class="pr-panel">
+                {note && (
+                  <p class="credit text-small">
+                    <span class="credit-label font-mono text-meta uppercase">Credit</span>
+                    <span>{note}</span>
+                  </p>
+                )}
+                <dl class="pr-facts text-small">
+                  {phase && (
+                    <div>
+                      <dt>Phase</dt>
+                      <dd>
+                        {phase.n}, {phase.title}: {phase.roles}
+                      </dd>
+                    </div>
+                  )}
+                  <div>
+                    <dt>Merged</dt>
+                    <dd>
+                      <time datetime={pr.mergedAt}>
+                        {stampFormat.format(new Date(pr.mergedAt))}
+                      </time>{" "}
+                      UTC
+                      {pr.mergeSha && (
+                        <>
+                          , on <code>main</code> as <code>{pr.mergeSha}</code>
+                        </>
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Branch</dt>
+                    <dd>
+                      <code>{pr.branch}</code>, {plural(pr.commits.length, "commit")}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Size</dt>
+                    <dd>
+                      +{count.format(pr.additions)} −{count.format(pr.deletions)} lines in{" "}
+                      {plural(pr.changedFiles, "file")}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Checks</dt>
+                    <dd>
+                      {pr.checks.length > 0 ? (
+                        <>
+                          {allPassed
+                            ? `All ${pr.checks.length} passed on the last commit`
+                            : `${passed} of ${pr.checks.length} passed on the last commit`}
+                          : {pr.checks.map((c) => c.name).join("; ")}.
+                        </>
+                      ) : (
+                        "None recorded."
+                      )}
+                    </dd>
+                  </div>
+                  {source && (
+                    <div>
+                      <dt>Record</dt>
+                      <dd>{source}</dd>
+                    </div>
+                  )}
+                </dl>
+                <a class="pr-link text-small" href={pr.url} rel="noopener noreferrer">
+                  Pull request #{pr.number} on GitHub
+                  <svg class="link-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                    <path
+                      d="M2 10 10 2M4 2h6v6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </details>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="built-side">
+      <div class="built-crew">
+        <h3 class="font-display text-heading uppercase">Crew</h3>
+        <ul class="crew">
+          {crew.map((member) => {
+            const on = creditedOn(member.id);
+            return (
+              <li>
+                <p class="crew-role font-mono text-meta uppercase">{member.role}</p>
+                <p class="crew-model font-display text-heading uppercase">{member.model}</p>
+                <p class="crew-brief text-small">{member.brief}</p>
+                <p class="crew-did text-small">{member.did}</p>
+                {on.length > 0 && (
+                  <p class="crew-on font-mono text-meta uppercase">
+                    Credited on{" "}
+                    {on.map((pr) => (
+                      <a href={`#pr-${pr.number}`}>
+                        <span class="sr-only">Pull request </span>#{pr.number}
+                      </a>
+                    ))}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <div class="built-notes">
+        <h3 class="font-display text-heading uppercase">Script notes</h3>
+        <p class="notes-key text-small">
+          The decisions with lasting consequences, each with what else was considered and what it
+          costs.
+        </p>
+        <ol class="adrs">
+          {adrs.map((adr) => (
+            <li>
+              <span class="adr-no font-mono text-meta">{String(adr.n).padStart(2, "0")}</span>
+              <a
+                class="text-small"
+                href={`${history.url}/blob/main/DECISIONS.md#${adr.anchor}`}
+                rel="noopener noreferrer"
+              >
+                <span class="sr-only">{adr.id}: </span>
+                {adr.title}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // The interaction is progressive and small: fetch it when the section comes near.
+  const section = document.getElementById("build");
+  if (section) {
+    const near = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        near.disconnect();
+        void import("../../lib/build-timeline").then((m) => m.startBuildTimeline(section));
+      },
+      { rootMargin: "100% 0px" },
+    );
+    near.observe(section);
+  }
+</script>
+
+<style>
+  .built {
+    /* Timeline metrics, on the section so the cards can clear the timeline when it sticks. */
+    --lane-h: 1.25rem;
+    --foot: 2rem;
+    --tl-h: calc((var(--lanes) + 1) * var(--lane-h) + var(--foot) + 5rem + 2px);
+    position: relative;
+    isolation: isolate;
+    min-height: var(--frame-h);
+    padding-block: calc(var(--spacing-scene) * 1.5) calc(var(--spacing-scene) * 2);
+    padding-inline: max(var(--spacing-margin), env(safe-area-inset-left))
+      max(var(--spacing-margin), env(safe-area-inset-right));
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .built-grid {
+    width: 100%;
+    max-width: var(--container-frame);
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: calc(var(--spacing) * 12);
+  }
+  h3 {
+    color: var(--color-text);
+  }
+  code {
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+  }
+
+  /* Text links (spec 5.6): the underline is always there; color is never what marks a link. */
+  .built-asof a,
+  .adrs a,
+  .crew-on a,
+  .pr-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--color-line-strong);
+  }
+  @media (hover: hover) {
+    .built-asof a:hover,
+    .adrs a:hover,
+    .crew-on a:hover,
+    .pr-link:hover {
+      color: var(--color-text);
+      text-decoration-thickness: 2px;
+      text-decoration-color: var(--color-text);
+    }
+  }
+
+  /* ---- head ---- */
+  .built-title {
+    margin-top: calc(var(--spacing) * 4);
+    text-wrap: balance;
+  }
+  .built-intro {
+    margin-top: calc(var(--spacing) * 6);
+    max-width: var(--container-measure);
+  }
+  .built-asof {
+    margin-top: calc(var(--spacing) * 4);
+    color: var(--color-muted);
+    text-wrap: pretty;
+  }
+
+  /* ---- timeline ----
+     One scale for everything in the track: x runs from -0.5 to cols + 0.5, so column k is
+     centred at (k + 0.5) / span of the width and a band from column a to b covers a..b + 1. */
+  .built-tl-title,
+  .tl,
+  .tl-key {
+    grid-column: 1 / -1;
+  }
+  /* The three are one block: pull them together across the grid's row gap. */
+  .tl,
+  .tl-key {
+    margin-top: calc(var(--spacing) * -8);
+  }
+  .tl-key {
+    max-width: var(--container-measure-wide);
+    color: var(--color-muted);
+    text-wrap: pretty;
+  }
+  .tl {
+    padding-block: calc(var(--spacing) * 1);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border-block: 1px solid var(--color-line);
+    background: var(--color-bg);
+  }
+  .tl-track {
+    --unit: calc(100% / var(--span));
+    --dot: 3px;
+    position: relative;
+    min-width: calc(var(--span) * 3.25rem);
+    padding-block: calc(var(--spacing) * 3) calc(var(--spacing) * 1);
+  }
+  .tl-band-title {
+    display: none;
+  }
+  .tl-bands {
+    position: relative;
+    height: 3.5rem;
+    color: var(--color-muted);
+  }
+  .tl-band {
+    position: absolute;
+    left: calc(var(--unit) * var(--from) + 2px);
+    width: calc(var(--unit) * (var(--to) - var(--from) + 1) - 4px);
+    padding-top: calc(var(--spacing) * 1);
+    border-top: 1px solid var(--color-line-strong);
+    overflow: hidden;
+    white-space: nowrap;
+    letter-spacing: 0.06em;
+  }
+  .tl-band--day {
+    top: 0;
+    color: var(--color-text);
+  }
+  .tl-band--phase {
+    top: 1.75rem;
+  }
+  .tl-plot {
+    position: relative;
+    height: calc((var(--lanes) + 1) * var(--lane-h) + var(--foot));
+  }
+  .tl-art i {
+    position: absolute;
+    display: block;
+  }
+  .tl-main {
+    left: calc(var(--unit) * 0.5);
+    right: calc(var(--unit) * 0.5);
+    bottom: var(--foot);
+    border-top: 1px solid var(--color-text);
+  }
+  .tl-branch {
+    left: calc(var(--unit) * (var(--x0) + 0.5));
+    width: calc(var(--unit) * (var(--x1) - var(--x0)));
+    bottom: var(--foot);
+    height: calc((var(--lane) + 1) * var(--lane-h));
+    border-top: 1px solid var(--color-line-strong);
+    border-right: 1px solid var(--color-line-strong);
+  }
+  .tl-dot {
+    left: calc(var(--unit) * (var(--x) + 0.5) - var(--dot) / 2);
+    bottom: calc(var(--foot) + (var(--lane) + 1) * var(--lane-h) - var(--dot) / 2 - 0.5px);
+    width: var(--dot);
+    height: var(--dot);
+    background: var(--color-muted);
+  }
+  .tl-dot--main {
+    bottom: calc(var(--foot) - var(--dot) / 2 - 0.5px);
+    background: var(--color-text);
+  }
+  .tl-branch.is-on {
+    border-color: var(--color-text);
+  }
+  .tl-dot.is-on {
+    background: var(--color-text);
+  }
+  .tl-prs {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tl-prs li {
+    position: absolute;
+    left: calc(var(--unit) * var(--x));
+    bottom: 0;
+    width: var(--unit);
+    height: calc(var(--foot) + 1rem);
+  }
+  .tl-prs a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+  .tl-prs a:focus-visible {
+    outline-offset: -2px;
+  }
+  /* The mark is centred on the bottom line, 1rem down from the top of the link. */
+  .tl-mark {
+    box-sizing: border-box;
+    width: 0.625rem;
+    height: 0.625rem;
+    margin-top: calc(1rem - 0.3125rem - 0.5px);
+    border: 1px solid var(--color-text);
+    background: var(--color-text);
+  }
+  .tl-no {
+    margin-top: calc(var(--spacing) * 2);
+    padding-inline: calc(var(--spacing) * 1);
+    letter-spacing: 0;
+  }
+  @media (hover: hover) {
+    .tl-prs a:hover {
+      color: var(--color-text);
+    }
+  }
+  .tl-prs a:active {
+    background: var(--color-line);
+  }
+  /* Open card: a hollow mark and a bar under the number, so color is not the only signal. */
+  .tl-prs a[aria-current] {
+    color: var(--color-text);
+  }
+  .tl-prs a[aria-current] .tl-mark {
+    background: var(--color-bg);
+    outline: 1px solid var(--color-text);
+    outline-offset: 2px;
+  }
+  .tl-prs a[aria-current] .tl-no {
+    box-shadow: inset 0 -2px 0 currentColor;
+  }
+
+  /* ---- pull requests ---- */
+  .prs {
+    margin-top: calc(var(--spacing) * 4);
+    border-top: 1px solid var(--color-line);
+  }
+  .pr {
+    border-bottom: 1px solid var(--color-line);
+  }
+  /* Whatever scrolls a row or a link into view (a jump, Tab) keeps it clear of the bars. */
+  .pr,
+  .built summary,
+  .built a {
+    scroll-margin-block: calc(var(--spacing) * 2) calc(var(--bar-bottom) + var(--spacing) * 2);
+  }
+  .pr summary {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 1.5rem;
+    grid-template-areas:
+      "no title mark"
+      ". credits credits"
+      ". ci ci";
+    align-items: baseline;
+    column-gap: calc(var(--spacing) * 2);
+    row-gap: calc(var(--spacing) * 2);
+    min-height: calc(var(--spacing) * 12);
+    padding-block: calc(var(--spacing) * 3);
+    cursor: pointer;
+    list-style: none;
+  }
+  .pr summary::-webkit-details-marker {
+    display: none;
+  }
+  .pr summary::after {
+    content: "+";
+    grid-area: mark;
+    justify-self: end;
+    font-size: var(--text-control);
+    font-weight: 600;
+    line-height: var(--text-body--line-height);
+  }
+  .pr[open] > summary::after {
+    content: "\2212";
+  }
+  @media (hover: hover) {
+    .pr summary:hover {
+      background: var(--color-surface);
+    }
+  }
+  .pr summary:active {
+    background: var(--color-line);
+  }
+  /* Reached from a timeline mark without JavaScript: mark the row the link landed on. */
+  .pr:target > summary {
+    box-shadow: inset 2px 0 0 var(--color-text);
+  }
+  .pr-no {
+    grid-area: no;
+    padding-left: calc(var(--spacing) * 2);
+    color: var(--color-muted);
+    letter-spacing: 0;
+  }
+  .pr-title {
+    grid-area: title;
+    font-weight: 600;
+    text-wrap: pretty;
+  }
+  .pr-credits {
+    grid-area: credits;
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--spacing) * 2);
+  }
+  .credit-badge {
+    padding: calc(var(--spacing) * 1) calc(var(--spacing) * 2);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+  .pr-none {
+    padding-block: calc(var(--spacing) * 1);
+    color: var(--color-muted);
+  }
+  .pr-ci {
+    grid-area: ci;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+  .pr-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--spacing) * 4);
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 2) calc(var(--spacing) * 6) 3rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pr[open] > .pr-panel {
+      animation: var(--animate-reveal);
+    }
+  }
+  .credit {
+    max-width: var(--container-measure-wide);
+  }
+  .credit-label {
+    margin-right: calc(var(--spacing) * 2);
+    color: var(--color-muted);
+  }
+  .pr-facts {
+    display: grid;
+    row-gap: calc(var(--spacing) * 2);
+    width: 100%;
+    max-width: var(--container-measure-wide);
+  }
+  .pr-facts > div {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    column-gap: calc(var(--spacing) * 3);
+  }
+  .pr-facts dt {
+    color: var(--color-muted);
+  }
+  .pr-facts dd {
+    overflow-wrap: anywhere;
+  }
+  .pr-link {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    min-height: calc(var(--spacing) * 11);
+  }
+  .link-icon {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+    flex: none;
+  }
+
+  /* ---- crew ---- */
+  .built-side {
+    display: grid;
+    row-gap: calc(var(--spacing) * 12);
+    align-content: start;
+  }
+  .crew {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: calc(var(--spacing) * 4);
+    border-top: 1px solid var(--color-line);
+  }
+  .crew li {
+    padding-block: calc(var(--spacing) * 4);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .crew-role {
+    color: var(--color-muted);
+    text-transform: none;
+  }
+  .crew-model {
+    margin-top: calc(var(--spacing) * 1);
+  }
+  .crew-brief {
+    margin-top: calc(var(--spacing) * 2);
+    color: var(--color-muted);
+  }
+  .crew-did {
+    margin-top: calc(var(--spacing) * 2);
+    max-width: var(--container-measure);
+    text-wrap: pretty;
+  }
+  .crew-on {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: calc(var(--spacing) * 1);
+    margin-top: calc(var(--spacing) * 2);
+    color: var(--color-muted);
+  }
+  .crew-on a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: calc(var(--spacing) * 11);
+    min-height: calc(var(--spacing) * 11);
+    color: var(--color-text);
+    letter-spacing: 0;
+  }
+
+  /* ---- script notes ---- */
+  .notes-key {
+    margin-top: calc(var(--spacing) * 3);
+    max-width: var(--container-measure);
+    color: var(--color-muted);
+  }
+  .adrs {
+    margin-top: calc(var(--spacing) * 4);
+    border-top: 1px solid var(--color-line);
+  }
+  .adrs li {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: calc(var(--spacing) * 2);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .adr-no {
+    color: var(--color-muted);
+    letter-spacing: 0;
+  }
+  .adrs a {
+    display: block;
+    padding-block: calc(var(--spacing) * 3);
+    text-wrap: pretty;
+  }
+
+  /* ---- 640 and up ---- */
+  @media (min-width: 40rem) {
+    .pr summary {
+      grid-template-columns: 2.5rem minmax(0, 1fr) auto 1.5rem;
+      grid-template-areas:
+        "no title ci mark"
+        ". credits credits credits";
+    }
+    .credit {
+      display: grid;
+      grid-template-columns: 4.5rem minmax(0, 1fr);
+      column-gap: calc(var(--spacing) * 3);
+    }
+    .credit-label {
+      margin-right: 0;
+    }
+    .crew {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--spacing-gutter);
+    }
+  }
+
+  /* ---- 1024 and up: the list and the credits side by side ---- */
+  @media (min-width: 64rem) {
+    .built-grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      column-gap: calc(var(--spacing-gutter) * 2);
+    }
+    .built-head {
+      grid-column: 1 / -1;
+    }
+    .built-head {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      column-gap: calc(var(--spacing-gutter) * 2);
+      align-items: start;
+    }
+    /* The lead starts level with the title, under the slug's row. */
+    .built-intro {
+      margin-top: calc(var(--text-slug) * var(--text-slug--line-height) + var(--spacing) * 4);
+    }
+    .crew {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* A window with room for it: the timeline stays under the top bar while the cards scroll,
+     so the open card and its mark are on screen together. Layout only, nothing animates. */
+  @media (min-width: 64rem) and (min-height: 760px) {
+    .tl {
+      position: sticky;
+      top: var(--bar-top);
+      z-index: var(--z-raised);
+    }
+    .pr,
+    .built-prs summary,
+    .built-prs a {
+      scroll-margin-top: calc(var(--tl-h) + var(--spacing) * 2);
+    }
+  }
+  @media (min-width: 80rem) {
+    .tl-track {
+      --dot: 4px;
+    }
+    .tl-band-title {
+      display: inline;
+    }
+  }
+</style>

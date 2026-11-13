@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
 import Hero from "../components/hero/Hero.astro";
 import Scene from "../components/scene/Scene.astro";
+import Built from "../components/built/Built.astro";
 
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
 ---
@@ -15,4 +16,5 @@ const projects = (await getCollection("projects")).sort((a, b) => a.data.order -
   {projects.map((entry) => (
     <Scene entry={entry} />
   ))}
+  <Built />
 </Base>
