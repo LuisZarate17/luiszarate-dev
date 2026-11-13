@@ -19,143 +19,160 @@ const drawerGroups = note ? ["Stack", "Notes"] : [];
 
 /** "50 → 1" is split so the arrow can be drawn (spec 5.7). */
 const statParts = (value: string) => value.split("→").map((part) => part.trim());
+
+// A scene that opts in (`pin: true`) sits in a wrapper that scroll staging can arm (spec 4.4,
+// ADR-007). Unarmed, which is also the no-JS state, the wrapper is a plain block.
+const Pin = data.pin ? "div" : Fragment;
+const pinProps = data.pin ? { class: "scene-pin", "data-scene": id } : {};
 ---
 
-<section class="scene" id={id} data-world={id} aria-labelledby={`${id}-title`}>
-  <div class="scene-grid">
-    <div class="scene-head">
-      <div class="scene-slugrow">
-        <Slug no={number} loc={data.slug} />
-        <p class:list={["credit-badge font-mono text-meta uppercase", { team: teamProject }]}>
-          {teamProject ? "Team project" : "Solo project"}
-        </p>
+<Pin {...pinProps}>
+  <section class="scene" id={id} data-world={id} aria-labelledby={`${id}-title`}>
+    <div class="scene-grid">
+      <div class="scene-head">
+        <div class="scene-slugrow">
+          <Slug no={number} loc={data.slug} />
+          <p class:list={["credit-badge font-mono text-meta uppercase", { team: teamProject }]}>
+            {teamProject ? "Team project" : "Solo project"}
+          </p>
+        </div>
+        <h2 id={`${id}-title`}>
+          <span class="scene-kicker font-display text-heading uppercase">{data.title}</span>
+          <span class="sr-only">: </span>
+          <span class="scene-title font-display text-title uppercase">
+            {data.headline.map((line, i) => (
+              <>
+                {line}
+                {i < data.headline.length - 1 && (
+                  <>
+                    {" "}
+                    <br />
+                  </>
+                )}
+              </>
+            ))}
+          </span>
+        </h2>
+        <p class="scene-logline text-lead">{data.logline}</p>
       </div>
-      <h2 id={`${id}-title`}>
-        <span class="scene-kicker font-display text-heading uppercase">{data.title}</span>
-        <span class="sr-only">: </span>
-        <span class="scene-title font-display text-title uppercase">
-          {data.headline.map((line, i) => (
-            <>
-              {line}
-              {i < data.headline.length - 1 && (
-                <>
-                  {" "}
-                  <br />
-                </>
-              )}
-            </>
+
+      <div class="scene-proof">
+        <SimSlot id={id} />
+
+        {data.metrics.length > 0 && (
+          <dl class="stats">
+            {data.metrics.map((metric) => {
+              const parts = statParts(metric.value);
+              return (
+                <div class="stat">
+                  <dt class="text-small">{metric.label}</dt>
+                  <dd class="font-display text-stat uppercase">
+                    {parts.length === 2 ? (
+                      <>
+                        <span>{parts[0]}</span>
+                        <svg
+                          class="stat-arrow"
+                          viewBox="0 0 12 12"
+                          aria-hidden="true"
+                          focusable="false"
+                        >
+                          <path
+                            d="M0 6h11M6.5 1.5 11 6l-4.5 4.5"
+                            fill="none"
+                            stroke="currentColor"
+                            vector-effect="non-scaling-stroke"
+                          />
+                        </svg>
+                        <span class="sr-only"> to </span>
+                        <span>{parts[1]}</span>
+                      </>
+                    ) : (
+                      metric.value
+                    )}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        )}
+      </div>
+
+      <div class="scene-meta">
+        <ul class="stack font-mono text-meta uppercase" aria-label="Stack">
+          {data.stack.map((item) => (
+            <li>{item}</li>
           ))}
-        </span>
-      </h2>
-      <p class="scene-logline text-lead">{data.logline}</p>
-    </div>
+        </ul>
 
-    <div class="scene-proof">
-      <SimSlot id={id} />
-
-      {data.metrics.length > 0 && (
-        <dl class="stats">
-          {data.metrics.map((metric) => {
-            const parts = statParts(metric.value);
-            return (
-              <div class="stat">
-                <dt class="text-small">{metric.label}</dt>
-                <dd class="font-display text-stat uppercase">
-                  {parts.length === 2 ? (
-                    <>
-                      <span>{parts[0]}</span>
-                      <svg
-                        class="stat-arrow"
-                        viewBox="0 0 12 12"
-                        aria-hidden="true"
-                        focusable="false"
-                      >
-                        <path
-                          d="M0 6h11M6.5 1.5 11 6l-4.5 4.5"
-                          fill="none"
-                          stroke="currentColor"
-                          vector-effect="non-scaling-stroke"
-                        />
-                      </svg>
-                      <span class="sr-only"> to </span>
-                      <span>{parts[1]}</span>
-                    </>
-                  ) : (
-                    metric.value
-                  )}
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
-      )}
-    </div>
-
-    <div class="scene-meta">
-      <ul class="stack font-mono text-meta uppercase" aria-label="Stack">
-        {data.stack.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-
-      <div class="scene-links">
-        {data.live ? (
-          <>
-            <a class="btn btn-primary text-control" href={data.live} rel="noopener noreferrer">
-              {liveLabel}
-              <svg class="btn-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
-                <path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" />
-              </svg>
-            </a>
-            <a class="btn btn-ghost text-control" href={data.repo} rel="noopener noreferrer">
+        <div class="scene-links">
+          {data.live ? (
+            <>
+              <a class="btn btn-primary text-control" href={data.live} rel="noopener noreferrer">
+                {liveLabel}
+                <svg class="btn-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                  <path
+                    d="M2 10 10 2M4 2h6v6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                </svg>
+              </a>
+              <a class="btn btn-ghost text-control" href={data.repo} rel="noopener noreferrer">
+                Repository
+                <svg class="btn-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                  <path
+                    d="M2 10 10 2M4 2h6v6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                </svg>
+              </a>
+            </>
+          ) : (
+            <a class="btn btn-primary text-control" href={data.repo} rel="noopener noreferrer">
               Repository
               <svg class="btn-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
                 <path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" />
               </svg>
             </a>
-          </>
-        ) : (
-          <a class="btn btn-primary text-control" href={data.repo} rel="noopener noreferrer">
-            Repository
-            <svg class="btn-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
-              <path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" />
-            </svg>
-          </a>
+          )}
+        </div>
+
+        <p class="credit text-small">
+          <span class="credit-label font-mono text-meta uppercase">Credit</span>
+          {data.role}
+        </p>
+
+        {drawerGroups.length > 0 && (
+          <details class="drawer">
+            <summary class="text-control">
+              <span class="drawer-label">
+                Details
+                <span class="drawer-groups font-mono text-meta uppercase">
+                  {drawerGroups.join(" · ")}
+                </span>
+              </span>
+            </summary>
+            <div class="drawer-panel">
+              <div class="drawer-group">
+                <h3>Stack</h3>
+                <p class="text-body">{data.stack.join(", ")}.</p>
+              </div>
+              {note && (
+                <div class="drawer-group">
+                  <h3>Notes</h3>
+                  <p class="text-body">{note}</p>
+                </div>
+              )}
+            </div>
+          </details>
         )}
       </div>
-
-      <p class="credit text-small">
-        <span class="credit-label font-mono text-meta uppercase">Credit</span>
-        {data.role}
-      </p>
-
-      {drawerGroups.length > 0 && (
-        <details class="drawer">
-          <summary class="text-control">
-            <span class="drawer-label">
-              Details
-              <span class="drawer-groups font-mono text-meta uppercase">
-                {drawerGroups.join(" · ")}
-              </span>
-            </span>
-          </summary>
-          <div class="drawer-panel">
-            <div class="drawer-group">
-              <h3>Stack</h3>
-              <p class="text-body">{data.stack.join(", ")}.</p>
-            </div>
-            {note && (
-              <div class="drawer-group">
-                <h3>Notes</h3>
-                <p class="text-body">{note}</p>
-              </div>
-            )}
-          </div>
-        </details>
-      )}
     </div>
-  </div>
-</section>
+  </section>
+</Pin>
 
 <script>
   // Opening the drawer grows a vertically centred scene, which would move the bar under the
@@ -183,9 +200,28 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
     },
     true,
   );
+
+  // Scroll staging loads only on a page where a scene opts in to pinning.
+  if (document.querySelector(".scene-pin")) {
+    void import("../../lib/scroll-stage").then((stage) => stage.startScrollStage());
+  }
 </script>
 
 <style>
+  /* ---- pin (spec 4.4, ADR-007) ----
+     Armed by src/lib/scroll-stage.ts, never by CSS alone: the script holds the conditions (the
+     media query, the fit, the drawer) and keeps the scene in place when it toggles the class.
+     The spacer is the hold: 75% of the frame of extra scroll, under the sticky scene. */
+  :global(.scene-pin.is-armed)::after {
+    content: "";
+    display: block;
+    height: calc(var(--frame-h) * 0.75);
+  }
+  :global(.scene-pin.is-armed) > .scene {
+    position: sticky;
+    top: var(--bar-top);
+  }
+
   .scene {
     position: relative;
     isolation: isolate;

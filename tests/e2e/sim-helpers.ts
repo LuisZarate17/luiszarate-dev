@@ -32,3 +32,13 @@ export async function waitForHydration(page: Page, scope = "#sim-probe") {
     timeout: 10_000,
   });
 }
+
+/**
+ * LabQ and Bifrost pin on a large desktop screen, where the scroll plays them and they do not
+ * play by themselves (spec 4.4, tests/e2e/scroll-stage.spec.ts). Play-on-entry still applies in
+ * a desktop window too short to pin, so the tests of it run in one. No-op on the phone project.
+ */
+export async function useWindowTooShortToPin(page: Page) {
+  const size = page.viewportSize();
+  if (size && size.width >= 1024) await page.setViewportSize({ width: size.width, height: 740 });
+}

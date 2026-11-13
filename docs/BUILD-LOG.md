@@ -124,3 +124,24 @@ built, which model did the work, and why. Written as the work happens, not recon
   Cougar's divider never drew. No test caught it, so a unit test now fails on any undefined
   `var(--…)`. Other fixes: LabQ showed its counters twice, Mastery's first frame looked empty,
   and Bifrost's code font turned `->` into an arrow, on a card whose claim is the exact diff.
+
+## 2026-11-13: Scroll staging (orchestrator plan, Sonnet fit, Fable stage)
+
+- **Plan without a Fable pass.** Fable's weekly budget was spent, so the orchestrator wrote the
+  plan from the design spec and Fable's phase 5 notes. Its main call: pin scenes the way the
+  hero already pins, with CSS sticky, and drop GSAP (ADR-007). About 27 KB saved; "GSAP" leaves
+  the resume keyword list.
+- **Fit before pin (#15).** The spec only pins a scene that fits one frame, and none did. A
+  layout-only PR capped the stages at 2:1 and tightened the proof column; a test holds every
+  scene to one frame at 1440 x 900 and 1280 x 800.
+- **Stage.** LabQ and Bifrost hold for 75% of a frame and the scroll plays them: LabQ's fifty
+  land, then forty-nine are turned back; Bifrost's diff types in, waits in Review, then
+  applies, and Undo works once the scene lets go. The module that does it is 1 KB gzip and
+  loads only on a page with a pinned scene.
+- **Snag: the page jumped when a pin let go.** Collapsing a wrapper above or under the visitor
+  moves everything below it. The media query came out of the CSS, so the script is the only
+  switch and corrects the scroll each time; the browser's own scroll anchoring is paused for
+  that one frame so the correction is not applied twice.
+- **Snag: a sticky scene is a moving target.** While it holds, its rectangle follows the
+  scroll, so a strip link to it went nowhere. Cuts, the timecode and the strip all measure the
+  wrapper instead.

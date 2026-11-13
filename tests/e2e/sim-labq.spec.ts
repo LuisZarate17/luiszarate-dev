@@ -4,6 +4,7 @@ import {
   scrollStageIntoView,
   stage,
   stageSize,
+  useWindowTooShortToPin,
   waitForHydration,
 } from "./sim-helpers";
 
@@ -53,6 +54,7 @@ test.describe("labq simulation", () => {
   test("first play runs without, holds, then with (autoplay on desktop, a tap on a phone)", async ({
     page,
   }) => {
+    await useWindowTooShortToPin(page);
     await page.goto("/");
     await stage(page, SCOPE).scrollIntoViewIfNeeded();
     await waitForHydration(page, SCOPE);
@@ -95,6 +97,7 @@ test.describe("labq simulation", () => {
 
   test("the live readout shows the counters once, outside the canvas", async ({ page }, info) => {
     test.skip(info.project.name === "phone", "desktop autoplay");
+    await useWindowTooShortToPin(page);
     await page.goto("/");
     await stage(page, SCOPE).scrollIntoViewIfNeeded();
     await waitForHydration(page, SCOPE);

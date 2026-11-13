@@ -145,3 +145,51 @@ fan 16 px desktop, 12 px phone; at most about 29 px and 22 px with the pointer),
 at most 37.5rem tall, so a tall screen does not leave empty ground above the name. Visibility is
 read from the hero's rect every frame rather than from an IntersectionObserver, whose batched
 callbacks could leave the field stranded after a quick scroll out and back.
+
+## ADR-007: Scene pinning with CSS sticky, not GSAP
+
+**Status:** accepted, 2026-11-13. Amends design-system spec 4.4. Plan:
+`docs/scroll-staging/PLAN.md`.
+
+**Context.** Spec 4.4 pinned scenes with GSAP ScrollTrigger. ADR-006 had already moved the hero
+to `position: sticky` in a taller wrapper, so the site would have carried two pinning models,
+and about 27 KB gzip of GSAP, for two scenes. Every scene was also taller than one frame, which
+the spec's own "content fits `--frame-h`" rule would have refused to pin.
+
+**Decision.**
+
+- A scene with `pin: true` renders inside `div.scene-pin`. Armed (`is-armed`), the wrapper is
+  75% of `--frame-h` taller than the scene and the scene is sticky under the top bar. Unarmed,
+  which is also the no-JS state, the wrapper is a plain block.
+- `src/lib/scroll-stage.ts` arms a wrapper only when the spec's media query matches, the
+  scene's measured height is at most `--frame-h` and its drawer is closed. It re-checks on
+  resize, media change, drawer toggle, font load and any change of the scene's height.
+- While a scene holds, the module reads its rectangle once per scrolled frame and sends
+  `sim:progress` (`detail.progress`, 0 to 1) to the scene's `figure.sim`, then `sim:release`
+  when the hold ends, the wrapper is disarmed or the drawer opens. The simulation listens
+  through `useScrollStage`. An armed scene does not also play by itself on entry.
+- LabQ and Bifrost pin. Cougar Connect (a team project, its slider is a direct control) and
+  Mastery Pilot (the visitor gives the answers) do not.
+- The module is its own chunk, 1 KB gzip, fetched only on a page with a `.scene-pin`.
+  `npm run check:budget` caps it at 2 KB and fails if it gains an import.
+
+**Considered.**
+
+- _GSAP ScrollTrigger, as specified._ A pin-spacer, main-thread scrubbing and a `refresh()` to
+  remember on every layout change, for an effect sticky gives for free. Cost of leaving it:
+  "GSAP" comes off the resume keyword list. three.js stays.
+- _The media query in CSS, as the hero has it._ Then the browser collapses the wrapper before
+  the script can measure, and the page jumps under the visitor. With the class as the only
+  switch, every change goes through one function that keeps the scene where it is: disarming
+  mid-hold gives back the scroll already spent, and arming a scene that is already scrolling
+  out lands past its hold.
+- _Pinning all four scenes._ Two of four keeps a rhythm of hold, read, hold, read, and gives
+  the screen time to the two solo projects.
+
+**Consequences.** Timecode and scene strip count `main > .scene-pin` as a section, as they do
+`main > .hero-pin`; a wrapper names its scene in `data-scene`. A scene cut scrolls to the
+wrapper, because a sticky scene's own rectangle moves while it holds. Bifrost's scrub gained a
+second half (Review, then Applied), so the scroll plays the whole edit. Sticky needs every
+ancestor of a scene to stay `overflow: visible` or `clip`; a test asserts it. A scene that grows
+past one frame at some window size quietly stops pinning there, which is the intended fallback,
+and `tests/e2e/scene-fit.spec.ts` guards the two common laptop sizes.

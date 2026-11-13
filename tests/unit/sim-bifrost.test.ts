@@ -5,6 +5,8 @@ import {
   DIFF,
   NOTE,
   ROW_COUNT,
+  STAGE_APPLY_AT,
+  STAGE_TYPE_END,
   STILL,
   STILL_SESSION,
   isPlaying,
@@ -128,6 +130,35 @@ describe("state machine", () => {
       frozen: true,
     });
     expect(run([{ type: "deny" }, { type: "reset" }])).toEqual(STILL);
+  });
+  it("staging types the diff in, waits in Review, then applies (spec 4.4)", () => {
+    const at = (progress: number) => reduce(STILL, { type: "stage", progress });
+    expect(at(0.001)).toEqual({ phase: "typing", typed: 0, frozen: true });
+    expect(at(STAGE_TYPE_END / 2)).toEqual({ phase: "typing", typed: 6, frozen: true });
+    expect(at(STAGE_TYPE_END)).toBe(STILL);
+    expect(at((STAGE_TYPE_END + STAGE_APPLY_AT) / 2)).toBe(STILL);
+    expect(at(STAGE_APPLY_AT).phase).toBe("applied");
+    expect(at(1).phase).toBe("applied");
+  });
+  it("staging returns the same state for the same frame, so it renders once", () => {
+    const half = reduce(STILL, { type: "stage", progress: 0.2 });
+    expect(reduce(half, { type: "stage", progress: 0.201 })).toBe(half);
+    const applied = reduce(STILL, { type: "stage", progress: 0.9 });
+    expect(reduce(applied, { type: "stage", progress: 0.95 })).toBe(applied);
+  });
+  it("staging writes the file on apply and restores it when scrolled back", () => {
+    const applied = reduceSession(STILL_SESSION, { type: "stage", progress: 1 });
+    expect(applied.file).toEqual(sideAfter());
+    expect(reduceSession(applied, { type: "stage", progress: 0.7 }).file).toEqual(sideBefore());
+    // Released at the end, the card is live: Undo restores the file byte for byte.
+    const released = reduceSession(applied, { type: "settle" });
+    expect(released).toBe(applied);
+    expect(reduceSession(released, { type: "undo" }).file).toEqual(sideBefore());
+  });
+  it("settling a half-typed frame finishes it as Review", () => {
+    const half = reduce(STILL, { type: "stage", progress: 0.2 });
+    expect(reduce(half, { type: "settle" })).toBe(STILL);
+    expect(reduce(STILL, { type: "settle" })).toBe(STILL);
   });
   it("a scrubbed frame is static: it is not playing and ticks do not advance it", () => {
     const scrubbed = reduce(STILL, { type: "scrub", progress: 0.5 });
