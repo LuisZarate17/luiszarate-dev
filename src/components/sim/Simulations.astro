@@ -5,6 +5,7 @@
 // import: bifrost
 
 // import: cougar-connect
+import { CougarSim } from "./cougar/CougarSim";
 
 // import: labq
 
@@ -21,6 +22,7 @@ void id; // delete with the first simulation, which reads it
 {/* bifrost */}
 
 {/* cougar-connect */}
+{id === "cougar-connect" && <CougarSim client:visible />}
 
 {/* labq */}
 

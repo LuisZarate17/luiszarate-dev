@@ -62,8 +62,13 @@ for (const project of projects) {
         project.credit === "team" ? /^team project$/i : /^solo project$/i,
       );
       await expect(s.locator("p.credit")).toContainText(project.role);
-      const img = s.locator(".sim-still img");
-      await expect(img).toHaveAttribute("alt", /.{40,}/);
+      if (project.id === "cougar-connect") {
+        // Simulation scene: the still is a DOM ledger with the credit line, not a screenshot.
+        await expect(s.locator(".sim-still .cougar-credit")).toContainText(/Solo rebuild by Luis/);
+      } else {
+        const img = s.locator(".sim-still img");
+        await expect(img).toHaveAttribute("alt", /.{40,}/);
+      }
       await expect(s.locator("figcaption")).not.toBeEmpty();
     });
 

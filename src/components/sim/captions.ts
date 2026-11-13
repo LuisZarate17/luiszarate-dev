@@ -6,6 +6,8 @@
 export const simCaptions: Record<string, string> = {
   // bifrost
   // cougar-connect
+  "cougar-connect":
+    "Drag to compare the 2024 team build with the 2026 solo rebuild. Each row links to its commit.",
   // labq
   // mastery-pilot
 };
