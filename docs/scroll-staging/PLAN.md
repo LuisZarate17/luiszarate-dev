@@ -1,6 +1,7 @@
 # Phase 6 plan: scroll staging
 
-Status: **draft for Luis to review**. Written by the orchestrator. Fable's budget for the week
+Status: **accepted 2026-11-13**. Luis left both open questions to the orchestrator; the
+recommendations below stand. Written by the orchestrator. Fable's budget for the week
 is spent, so this plan rests on the design spec (4.4, 4.6) and Fable's phase 5 notes, not a
 new Fable pass.
 
@@ -87,7 +88,8 @@ changes.
 - **The timecode and scene strip treat the hero's wrapper as section 0** (`main > .hero-pin`).
   Scene wrappers need the same selector care.
 
-## Open questions for Luis
+## Decisions (2026-11-13)
 
-1. CSS sticky instead of GSAP: accept losing "GSAP" as a keyword?
-2. Pin LabQ and Cougar Connect only, or all four?
+1. CSS sticky, not GSAP. One pinning model for the whole site, no 27 KB library. Recorded as
+   ADR-007 in the staging PR.
+2. LabQ and Cougar Connect pin; Bifrost and Mastery Pilot stay interactive blocks.
