@@ -508,13 +508,27 @@ const statParts = (value: string) => value.split("→").map((part) => part.trim(
       flex: 0 1 auto;
       white-space: nowrap;
     }
+    /* The proof column fits one frame: the numbers sit closer to the simulation. */
     .stats {
-      margin-top: calc(var(--spacing) * 6);
+      margin-top: calc(var(--spacing) * 4);
+    }
+    .stat {
+      gap: calc(var(--spacing) * 1);
     }
     .scene:has(.drawer[open]) .scene-proof {
       position: sticky;
       top: calc(var(--bar-top) + var(--spacing-scene));
       align-self: start;
+    }
+  }
+
+  /* ---- a short desktop window (the 1280 x 800 laptop) ---- */
+  @media (min-width: 64rem) and (max-height: 859px) {
+    .scene {
+      padding-block: calc(var(--spacing) * 6);
+    }
+    .stat {
+      padding-top: calc(var(--spacing) * 2);
     }
   }
 </style>

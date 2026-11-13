@@ -108,4 +108,43 @@
   .sim-still.light {
     padding: calc(var(--spacing) * 6);
   }
+  /* Desktop scenes fit one frame (scroll staging plan, decision 2). A readout with a single
+     value reads as one line, label then value. */
+  .sim-readout {
+    margin-top: calc(var(--spacing) * 2);
+  }
+  .sim-readout-item:only-child {
+    flex-flow: row wrap;
+    align-items: baseline;
+    gap: 0 calc(var(--spacing) * 3);
+  }
+  /* Where the buttons and a one-line readout always fit one row, the readout sits beside the
+     buttons. Opt-in per simulation: a row that wrapped as buttons came and went would move
+     the page. */
+  .sim:has(.bifrost),
+  .sim:has(.cougar) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: calc(var(--spacing) * 6);
+  }
+  .sim:has(.bifrost) > :is(.sim-stage, figcaption),
+  .sim:has(.cougar) > :is(.sim-stage, figcaption),
+  .sim:has(.bifrost) > astro-island > .sim-stage,
+  .sim:has(.cougar) > astro-island > .sim-stage {
+    grid-column: 1 / -1;
+  }
+  .sim:has(.bifrost) .sim-readout,
+  .sim:has(.cougar) .sim-readout {
+    margin-top: calc(var(--spacing) * 3);
+  }
+}
+
+/* A short desktop window: the stack under the stage closes up. */
+@media (min-width: 64rem) and (max-height: 859px) {
+  .sim .sim-controls,
+  .sim:has(.bifrost) .sim-readout,
+  .sim:has(.cougar) .sim-readout {
+    margin-top: calc(var(--spacing) * 2);
+  }
 }
