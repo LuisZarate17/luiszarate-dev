@@ -1,0 +1,864 @@
+{
+  "repo": "LuisZarate17/luiszarate-dev",
+  "url": "https://github.com/LuisZarate17/luiszarate-dev",
+  "main": [
+    {
+      "sha": "07784be",
+      "date": "2026-11-11T04:39:52Z",
+      "subject": "Initial commit",
+      "pr": null
+    },
+    {
+      "sha": "a77bc00",
+      "date": "2026-11-11T05:54:21Z",
+      "subject": "Merge pull request #1 from LuisZarate17/chore/foundation",
+      "pr": 1
+    },
+    {
+      "sha": "d078e59",
+      "date": "2026-11-11T07:24:09Z",
+      "subject": "Correct project name from 'LabsQ' to 'LabQ'",
+      "pr": null
+    },
+    {
+      "sha": "db78531",
+      "date": "2026-11-11T23:26:19Z",
+      "subject": "Merge pull request #2 from LuisZarate17/feat/design-tokens",
+      "pr": 2
+    },
+    {
+      "sha": "8ae8484",
+      "date": "2026-11-11T23:48:02Z",
+      "subject": "Scene template, static hero and project page (#3)",
+      "pr": 3
+    },
+    {
+      "sha": "03ef66a",
+      "date": "2026-11-11T23:56:40Z",
+      "subject": "Add frame, scene cut and scene strip (#4)",
+      "pr": 4
+    },
+    {
+      "sha": "2491344",
+      "date": "2026-11-12T03:38:46Z",
+      "subject": "docs: add roadmap (#5)",
+      "pr": 5
+    },
+    {
+      "sha": "55ffc38",
+      "date": "2026-11-12T04:45:28Z",
+      "subject": "Build log: design-system phase (#6)",
+      "pr": 6
+    },
+    {
+      "sha": "f268482",
+      "date": "2026-11-12T22:51:50Z",
+      "subject": "3D hero: five dot-lattice plates (#7)",
+      "pr": 7
+    },
+    {
+      "sha": "0b281b8",
+      "date": "2026-11-12T22:52:43Z",
+      "subject": "chore: add Stop hook for lint and type check; code review in definition of done (#8)",
+      "pr": 8
+    },
+    {
+      "sha": "b5e05f0",
+      "date": "2026-11-12T23:30:58Z",
+      "subject": "Add Claude Code GitHub Workflow (#9)",
+      "pr": 9
+    },
+    {
+      "sha": "f395479",
+      "date": "2026-11-13T03:34:20Z",
+      "subject": "feat: simulation slot (shared base, budget, test fixture) (#10)",
+      "pr": 10
+    },
+    {
+      "sha": "9794b0b",
+      "date": "2026-11-13T04:35:36Z",
+      "subject": "feat: project simulations (LabQ, Bifrost, Cougar Connect, Mastery Pilot) (#11)",
+      "pr": 11
+    },
+    {
+      "sha": "dc242ed",
+      "date": "2026-11-13T05:03:39Z",
+      "subject": "docs: roadmap and build log for phases 4 and 5 (#12)",
+      "pr": 12
+    },
+    {
+      "sha": "9da5596",
+      "date": "2026-11-13T05:15:53Z",
+      "subject": "fix: design review of the simulations (#14)",
+      "pr": 14
+    },
+    {
+      "sha": "4a05a23",
+      "date": "2026-11-13T05:16:09Z",
+      "subject": "docs: phase 6 plan (scroll staging), draft (#13)",
+      "pr": 13
+    },
+    {
+      "sha": "2d03f82",
+      "date": "2026-11-13T17:55:47Z",
+      "subject": "feat: every scene fits the frame on desktop (phase 6, 1 of 2) (#15)",
+      "pr": 15
+    },
+    {
+      "sha": "561b4be",
+      "date": "2026-11-13T18:27:07Z",
+      "subject": "feat: LabQ and Bifrost pin and play on scroll (#16)",
+      "pr": 16
+    }
+  ],
+  "prs": [
+    {
+      "number": 1,
+      "title": "Set up project foundation",
+      "branch": "chore/foundation",
+      "createdAt": "2026-11-11T05:35:33Z",
+      "mergedAt": "2026-11-11T05:54:21Z",
+      "mergeSha": "a77bc00",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/1",
+      "additions": 12989,
+      "deletions": 1,
+      "changedFiles": 35,
+      "commits": [
+        {
+          "sha": "9c37b6f",
+          "date": "2026-11-11T05:27:11Z",
+          "subject": "Set up project foundation"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Design tokens, fonts and color-world schema",
+      "branch": "feat/design-tokens",
+      "createdAt": "2026-11-11T23:15:57Z",
+      "mergedAt": "2026-11-11T23:26:19Z",
+      "mergeSha": "db78531",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/2",
+      "additions": 2550,
+      "deletions": 103,
+      "changedFiles": 29,
+      "commits": [
+        {
+          "sha": "bd44a59",
+          "date": "2026-11-11T23:14:59Z",
+          "subject": "docs: add design system spec and ADR-005"
+        },
+        {
+          "sha": "7047913",
+          "date": "2026-11-11T23:14:59Z",
+          "subject": "test: add Vitest unit tests for contrast and world styles"
+        },
+        {
+          "sha": "c2c423a",
+          "date": "2026-11-11T23:14:59Z",
+          "subject": "feat: design tokens, fonts, world schema and world styles"
+        },
+        {
+          "sha": "8bb0880",
+          "date": "2026-11-11T23:15:41Z",
+          "subject": "docs: correct font import paths in spec; ignore agent worktrees"
+        },
+        {
+          "sha": "c4703de",
+          "date": "2026-11-11T23:17:14Z",
+          "subject": "Merge remote-tracking branch 'origin/main' into feat/design-tokens"
+        },
+        {
+          "sha": "a40162f",
+          "date": "2026-11-11T23:17:40Z",
+          "subject": "Rename LabsQ to LabQ; fix README table formatting from main"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Scene template, static hero and project page",
+      "branch": "feat/scene-template",
+      "createdAt": "2026-11-11T23:33:35Z",
+      "mergedAt": "2026-11-11T23:48:02Z",
+      "mergeSha": "8ae8484",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/3",
+      "additions": 897,
+      "deletions": 48,
+      "changedFiles": 16,
+      "commits": [
+        {
+          "sha": "0064817",
+          "date": "2026-11-11T23:32:47Z",
+          "subject": "Add scene template, static hero and project page"
+        },
+        {
+          "sha": "35ea87c",
+          "date": "2026-11-11T23:42:26Z",
+          "subject": "Apply design review fixes to scenes"
+        },
+        {
+          "sha": "df7a39e",
+          "date": "2026-11-11T23:42:58Z",
+          "subject": "docs: record drawer-only-when-needed decision in spec 5.8"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Frame: letterbox bars, scene cut and strip",
+      "branch": "feat/frame",
+      "createdAt": "2026-11-11T23:49:18Z",
+      "mergedAt": "2026-11-11T23:56:41Z",
+      "mergeSha": "03ef66a",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/4",
+      "additions": 929,
+      "deletions": 1,
+      "changedFiles": 11,
+      "commits": [
+        {
+          "sha": "e5638f9",
+          "date": "2026-11-11T23:35:08Z",
+          "subject": "Add frame, scene cut and scene strip"
+        },
+        {
+          "sha": "f2a350f",
+          "date": "2026-11-11T23:48:12Z",
+          "subject": "Merge remote-tracking branch 'origin/main' into feat/frame"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Add roadmap",
+      "branch": "docs/roadmap",
+      "createdAt": "2026-11-12T02:52:20Z",
+      "mergedAt": "2026-11-12T03:38:47Z",
+      "mergeSha": "2491344",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/5",
+      "additions": 59,
+      "deletions": 0,
+      "changedFiles": 1,
+      "commits": [
+        {
+          "sha": "9341b94",
+          "date": "2026-11-12T02:52:11Z",
+          "subject": "docs: add roadmap"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Build log: design-system phase",
+      "branch": "docs/build-log-phase-3",
+      "createdAt": "2026-11-12T04:12:52Z",
+      "mergedAt": "2026-11-12T04:45:29Z",
+      "mergeSha": "55ffc38",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/6",
+      "additions": 30,
+      "deletions": 0,
+      "changedFiles": 1,
+      "commits": [
+        {
+          "sha": "8615c3a",
+          "date": "2026-11-12T04:12:49Z",
+          "subject": "docs: build log for the design-system phase"
+        },
+        {
+          "sha": "8eff84e",
+          "date": "2026-11-12T04:13:04Z",
+          "subject": "docs: correct merge-strategy note"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "3D hero: five dot-lattice plates",
+      "branch": "feat/hero",
+      "createdAt": "2026-11-12T04:59:14Z",
+      "mergedAt": "2026-11-12T22:51:51Z",
+      "mergeSha": "f268482",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/7",
+      "additions": 3347,
+      "deletions": 78,
+      "changedFiles": 30,
+      "commits": [
+        {
+          "sha": "e4b2683",
+          "date": "2026-11-12T04:57:47Z",
+          "subject": "feat(hero): five-plate dot-lattice hero with CSS still and sticky pin"
+        },
+        {
+          "sha": "4949106",
+          "date": "2026-11-12T04:58:28Z",
+          "subject": "Merge remote-tracking branch 'origin/main' into feat/hero"
+        },
+        {
+          "sha": "c278bc1",
+          "date": "2026-11-12T20:45:39Z",
+          "subject": "fix(hero): halve the fan, solid front plate, cap phone height, fix scroll-back stall"
+        },
+        {
+          "sha": "13459a1",
+          "date": "2026-11-12T21:09:19Z",
+          "subject": "fix(hero): code-review findings (context loss, watchdog, boot, plates, scripts)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Stop hook: lint and type check before an agent finishes",
+      "branch": "chore/stop-hook",
+      "createdAt": "2026-11-12T21:00:33Z",
+      "mergedAt": "2026-11-12T22:52:44Z",
+      "mergeSha": "0b281b8",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/8",
+      "additions": 32,
+      "deletions": 1,
+      "changedFiles": 3,
+      "commits": [
+        {
+          "sha": "1b46014",
+          "date": "2026-11-12T21:00:30Z",
+          "subject": "chore: add Stop hook for lint and type check; code review in definition of done"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Add Claude Code GitHub Workflow",
+      "branch": "add-claude-github-actions-1794525928653",
+      "createdAt": "2026-11-12T23:26:34Z",
+      "mergedAt": "2026-11-12T23:30:59Z",
+      "mergeSha": "b5e05f0",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/9",
+      "additions": 93,
+      "deletions": 0,
+      "changedFiles": 2,
+      "commits": [
+        {
+          "sha": "d6e0bc4",
+          "date": "2026-11-12T23:25:30Z",
+          "subject": "\"Claude PR Assistant workflow\""
+        },
+        {
+          "sha": "6b41ec3",
+          "date": "2026-11-12T23:25:31Z",
+          "subject": "\"Claude Code Review workflow\""
+        },
+        {
+          "sha": "23fbc19",
+          "date": "2026-11-12T23:28:03Z",
+          "subject": "ci: format Claude workflows; review once per PR and skip docs-only PRs"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "feat: simulation slot (shared base, budget, test fixture)",
+      "branch": "feat/sim-slot",
+      "createdAt": "2026-11-13T03:20:26Z",
+      "mergedAt": "2026-11-13T03:34:20Z",
+      "mergeSha": "f395479",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/10",
+      "additions": 896,
+      "deletions": 69,
+      "changedFiles": 21,
+      "commits": [
+        {
+          "sha": "e2677a5",
+          "date": "2026-11-13T02:21:23Z",
+          "subject": "docs: simulation spec for phase 5"
+        },
+        {
+          "sha": "9b7d25f",
+          "date": "2026-11-13T03:20:12Z",
+          "subject": "feat: simulation slot (shared base, budget, test fixture)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "claude-review",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "title": "feat: project simulations (LabQ, Bifrost, Cougar Connect, Mastery Pilot)",
+      "branch": "feat/sims",
+      "createdAt": "2026-11-13T04:31:32Z",
+      "mergedAt": "2026-11-13T04:35:37Z",
+      "mergeSha": "9794b0b",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/11",
+      "additions": 3628,
+      "deletions": 23,
+      "changedFiles": 32,
+      "commits": [
+        {
+          "sha": "693411a",
+          "date": "2026-11-13T04:00:05Z",
+          "subject": "chore: per-simulation wiring markers; PORT env for parallel Playwright runs"
+        },
+        {
+          "sha": "5959319",
+          "date": "2026-11-13T04:09:50Z",
+          "subject": "feat: mastery-pilot simulation"
+        },
+        {
+          "sha": "612a41c",
+          "date": "2026-11-13T04:10:13Z",
+          "subject": "fix: budget counts only scripts the page loads itself, not lazy island URLs"
+        },
+        {
+          "sha": "bfe7f7b",
+          "date": "2026-11-13T04:10:11Z",
+          "subject": "feat: cougar-connect simulation"
+        },
+        {
+          "sha": "eadfbf1",
+          "date": "2026-11-13T04:12:00Z",
+          "subject": "feat: bifrost simulation"
+        },
+        {
+          "sha": "0f21894",
+          "date": "2026-11-13T04:14:21Z",
+          "subject": "feat: labq simulation"
+        },
+        {
+          "sha": "814e6d8",
+          "date": "2026-11-13T04:14:35Z",
+          "subject": "merge: labq simulation"
+        },
+        {
+          "sha": "f58894d",
+          "date": "2026-11-13T04:14:42Z",
+          "subject": "merge: bifrost simulation"
+        },
+        {
+          "sha": "13addaa",
+          "date": "2026-11-13T04:14:42Z",
+          "subject": "merge: cougar simulation"
+        },
+        {
+          "sha": "b20e326",
+          "date": "2026-11-13T04:14:42Z",
+          "subject": "merge: mastery simulation"
+        },
+        {
+          "sha": "e1489ae",
+          "date": "2026-11-13T04:17:52Z",
+          "subject": "test: one scene assertion for all four simulations; keep worktrees out of lint and type check"
+        },
+        {
+          "sha": "5be6196",
+          "date": "2026-11-13T04:29:13Z",
+          "subject": "fix: code-review findings for the simulations"
+        }
+      ],
+      "checks": [
+        {
+          "name": "claude-review",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "title": "docs: roadmap and build log for phases 4 and 5",
+      "branch": "docs/phase-5",
+      "createdAt": "2026-11-13T04:59:09Z",
+      "mergedAt": "2026-11-13T05:03:40Z",
+      "mergeSha": "dc242ed",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/12",
+      "additions": 68,
+      "deletions": 24,
+      "changedFiles": 2,
+      "commits": [
+        {
+          "sha": "4010cd6",
+          "date": "2026-11-13T04:58:59Z",
+          "subject": "docs: roadmap and build log for phases 4 and 5"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "title": "docs: phase 6 plan (scroll staging), draft",
+      "branch": "docs/phase-6-plan",
+      "createdAt": "2026-11-13T05:04:53Z",
+      "mergedAt": "2026-11-13T05:16:10Z",
+      "mergeSha": "4a05a23",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/13",
+      "additions": 93,
+      "deletions": 0,
+      "changedFiles": 1,
+      "commits": [
+        {
+          "sha": "02e87f3",
+          "date": "2026-11-13T04:59:45Z",
+          "subject": "docs: phase 6 plan (scroll staging), draft"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "title": "fix: design review of the simulations",
+      "branch": "fix/sim-design",
+      "createdAt": "2026-11-13T05:10:22Z",
+      "mergedAt": "2026-11-13T05:15:54Z",
+      "mergeSha": "9da5596",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/14",
+      "additions": 322,
+      "deletions": 78,
+      "changedFiles": 22,
+      "commits": [
+        {
+          "sha": "96d5356",
+          "date": "2026-11-13T05:07:48Z",
+          "subject": "fix: design review of the simulations"
+        },
+        {
+          "sha": "1c2a741",
+          "date": "2026-11-13T05:10:19Z",
+          "subject": "fix: accent outline on Mastery Pilot's answer button"
+        }
+      ],
+      "checks": [
+        {
+          "name": "claude-review",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "title": "feat: every scene fits the frame on desktop (phase 6, 1 of 2)",
+      "branch": "feat/scene-fit",
+      "createdAt": "2026-11-13T17:50:22Z",
+      "mergedAt": "2026-11-13T17:55:48Z",
+      "mergeSha": "2d03f82",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/15",
+      "additions": 216,
+      "deletions": 18,
+      "changedFiles": 7,
+      "commits": [
+        {
+          "sha": "f7a9aec",
+          "date": "2026-11-13T05:17:45Z",
+          "subject": "docs: phase 6 plan accepted"
+        },
+        {
+          "sha": "10c6ba9",
+          "date": "2026-11-13T17:49:36Z",
+          "subject": "feat: every scene fits the frame on desktop"
+        }
+      ],
+      "checks": [
+        {
+          "name": "claude-review",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "title": "feat: LabQ and Bifrost pin and play on scroll (phase 6, 2 of 2)",
+      "branch": "feat/scroll-stage",
+      "createdAt": "2026-11-13T18:22:58Z",
+      "mergedAt": "2026-11-13T18:27:07Z",
+      "mergeSha": "561b4be",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/16",
+      "additions": 1251,
+      "deletions": 148,
+      "changedFiles": 21,
+      "commits": [
+        {
+          "sha": "85bda51",
+          "date": "2026-11-13T18:22:10Z",
+          "subject": "feat: LabQ and Bifrost pin and play on scroll"
+        }
+      ],
+      "checks": [
+        {
+          "name": "claude-review",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

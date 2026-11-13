@@ -18,7 +18,8 @@
     "test:e2e": "playwright test",
     "lhci": "lhci autorun",
     "check:budget": "node scripts/check-budget.mjs",
-    "hero:still": "node scripts/hero-still.mjs"
+    "hero:still": "node scripts/hero-still.mjs",
+    "history:sync": "node scripts/history.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.7",
