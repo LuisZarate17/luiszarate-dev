@@ -101,7 +101,7 @@ export const MasterySim = forwardRef<SimHandle>(function MasterySim(_props, hand
         <>
           <Controls label="Mastery Pilot controls">
             {live && state.engaged && label !== null && (
-              <SimButton onClick={onAnswer} busy={!state.replied}>
+              <SimButton onClick={onAnswer} busy={!state.replied} primary>
                 {label}
               </SimButton>
             )}
