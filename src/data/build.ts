@@ -71,6 +71,7 @@ export const phases: Phase[] = [
   },
   { n: 6, title: "Scroll staging", roles: "Orchestrator plan, Fable build" },
   { n: 7, title: "How it was built", roles: "Fable" },
+  { n: 8, title: "About and contact", roles: "Fable" },
 ];
 
 /** Merged pull requests, by number. */
@@ -187,6 +188,12 @@ export const prRecords: Record<number, PrRecord> = {
     note: "The scroll stage, by Fable end to end, through the push and the pull request; the orchestrator only dispatched it.",
     source: "BUILD-LOG, 2026-11-13: Scroll staging; orchestrator session record, 2026-11-11..13",
   },
+  17: {
+    phase: 7,
+    credits: [{ by: "fable", work: "Build" }],
+    note: "Fable, end to end (design, build, tests, self-review, PR); the orchestrator (Claude Opus 5.5) dispatched it and supplied the model credits for earlier PRs from its session record.",
+    source: "orchestrator session record",
+  },
 };
 
 export interface CrewMember {
@@ -214,7 +221,7 @@ export const crew: CrewMember[] = [
     role: "design-reviewer",
     model: "Fable",
     brief: "Design and taste: decisions and reviews, not bulk code.",
-    did: "Produced the three art-direction concepts, the design-system spec and the hero direction, reviewed the simulation spec before any code, and reviewed the scene template, the hero and the simulations from screenshots. From phase 6 on it also builds: the scroll staging and this section.",
+    did: "Produced the three art-direction concepts, the design-system spec and the hero direction, reviewed the simulation spec before any code, and reviewed the scene template, the hero and the simulations from screenshots. From phase 6 on it also builds: the scroll staging, this section and the contact scene.",
   },
   {
     id: "sonnet",

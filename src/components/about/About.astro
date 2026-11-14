@@ -1,0 +1,384 @@
+---
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+import Slug from "../scene/Slug.astro";
+import { about } from "../../data/about";
+import { encodeAddress } from "../../lib/about";
+import { history } from "../../lib/build/history";
+
+/**
+ * About and contact: the last scene (concept A; spec 5.2, 5.5, 6.3). A quiet scene on the base
+ * colour with no world: who Luis is in three sentences, then how to reach him.
+ *
+ * Everything is HTML at build time and complete without JavaScript: the address is text a
+ * visitor can select, never a mailto link. The script below only adds the copy button.
+ *
+ * Two slots render only when their file exists (see `src/data/about.ts`): the photo
+ * (`src/assets/about/photo.*`) and the resume (`public/resume.pdf`). Without them the section
+ * is laid out the same and nothing stands in for them.
+ *
+ * The last cut: the scene ends in a band of the letterbox colour, so at the end of the page
+ * the bottom bar rises to close the frame. The scroll does it; nothing animates, so there is
+ * nothing to turn off under reduced motion.
+ */
+const photos = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/about/photo.{jpg,jpeg,png,webp}",
+  { eager: true },
+);
+const photo = Object.values(photos)[0]?.default;
+const hasResume = existsSync(join(process.cwd(), "public", "resume.pdf"));
+
+const year = new Date().getUTCFullYear();
+---
+
+<section class="about" id="contact" aria-labelledby="contact-title">
+  <div class="about-grid">
+    <div class="about-who">
+      <Slug no="SC 06" loc="INT. PORTFOLIO — LAST SCENE" />
+      <h2 id="contact-title" class="about-title font-display text-title uppercase">
+        Contact
+      </h2>
+      {photo && (
+        <Image
+          class="about-photo"
+          src={photo}
+          alt="Luis Zarate"
+          width={96}
+          height={96}
+          fit="cover"
+          densities={[1, 2]}
+          format="webp"
+        />
+      )}
+      <p class="about-bio text-lead">{about.bio.join(" ")}</p>
+    </div>
+
+    <dl class="contact">
+      <div class="contact-row">
+        <dt class="font-mono text-meta uppercase">Email</dt>
+        <dd>
+          <span
+            class="contact-email text-lead"
+            data-copy-source
+            set:html={encodeAddress(about.email)}
+          />
+          <span class="contact-act">
+            <button class="contact-copy text-control" type="button" data-copy hidden>
+              Copy email
+            </button>
+            <span
+              class="contact-status font-mono text-meta uppercase"
+              role="status"
+              data-copy-status
+            ></span>
+          </span>
+        </dd>
+      </div>
+      {about.links.map((link) => (
+        <div class="contact-row">
+          <dt class="font-mono text-meta uppercase">{link.label}</dt>
+          <dd>
+            <a class="contact-link text-lead" href={link.href} rel="noopener noreferrer">
+              {link.text}
+              <svg class="link-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                <path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+            </a>
+          </dd>
+        </div>
+      ))}
+      {hasResume && (
+        <div class="contact-row">
+          <dt class="font-mono text-meta uppercase">Resume</dt>
+          <dd>
+            <a class="contact-link text-lead" href="/resume.pdf" type="application/pdf">
+              Resume (PDF)
+            </a>
+          </dd>
+        </div>
+      )}
+    </dl>
+  </div>
+
+  <footer class="about-end font-mono text-meta uppercase">
+    <p>© {year} Luis Zarate</p>
+    <a href={history.url} rel="noopener noreferrer">
+      Source of this site
+      <svg class="link-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+        <path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+      </svg>
+    </a>
+  </footer>
+</section>
+
+<script>
+  /**
+   * The copy button. It is `hidden` in the HTML and shown here, so it never appears where it
+   * cannot work. The address is read from the page, so it is not in this script.
+   */
+  const section = document.getElementById("contact");
+  const button = section?.querySelector<HTMLButtonElement>("[data-copy]");
+  const source = section?.querySelector<HTMLElement>("[data-copy-source]");
+  const status = section?.querySelector<HTMLElement>("[data-copy-status]");
+
+  if (button && source && status) {
+    let timer = 0;
+
+    /** Empties the live region first, so the same words are announced again on a second press. */
+    const say = (text: string) => {
+      window.clearTimeout(timer);
+      status.textContent = "";
+      requestAnimationFrame(() => {
+        status.textContent = text;
+      });
+      timer = window.setTimeout(() => {
+        status.textContent = "";
+      }, 4000);
+    };
+
+    const select = () => {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    };
+
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(source.textContent?.trim() ?? "");
+        say("Copied");
+      } catch {
+        // No clipboard access (an insecure page, a denied permission, an older browser):
+        // select the address, so the visitor's own copy command or menu takes it from there.
+        select();
+        say("Selected, ready to copy");
+      }
+    });
+
+    button.hidden = false;
+  }
+</script>
+
+<style>
+  .about {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    min-height: var(--frame-h);
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .about-grid {
+    flex: 1;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: calc(
+      var(--container-frame) + 2 * max(var(--spacing-margin), env(safe-area-inset-left))
+    );
+    margin-inline: auto;
+    padding-block: calc(var(--spacing-scene) * 1.5) calc(var(--spacing-scene) * 2);
+    padding-inline: max(var(--spacing-margin), env(safe-area-inset-left))
+      max(var(--spacing-margin), env(safe-area-inset-right));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    row-gap: calc(var(--spacing) * 12);
+    column-gap: var(--spacing-gutter);
+  }
+
+  /* Whatever scrolls a control into view (a jump, Tab) keeps it clear of the bars. */
+  .about a,
+  .about button {
+    scroll-margin-block: calc(var(--spacing) * 2) calc(var(--bar-bottom) + var(--spacing) * 2);
+  }
+
+  /* ---- who ---- */
+  .about-title {
+    margin-top: calc(var(--spacing) * 4);
+  }
+  .about-photo {
+    display: block;
+    width: calc(var(--spacing) * 24);
+    height: calc(var(--spacing) * 24);
+    margin-top: calc(var(--spacing) * 8);
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--color-surface);
+  }
+  .about-bio {
+    margin-top: calc(var(--spacing) * 6);
+    max-width: 34rem;
+  }
+
+  /* ---- contact rows ---- */
+  .contact {
+    margin: 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .contact-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: calc(var(--spacing) * 1);
+    padding-block: calc(var(--spacing) * 4);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .contact dt {
+    color: var(--color-muted);
+  }
+  .contact dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
+    min-width: 0;
+    margin: 0;
+  }
+  /* One press or tap selects the whole address. */
+  .contact-email {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    user-select: all;
+    -webkit-user-select: all;
+  }
+  .contact-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(var(--spacing) * 12);
+    padding-inline: calc(var(--spacing) * 5);
+    border: 1px solid var(--color-text);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    transition-property: color, background-color, border-color;
+    transition-duration: var(--dur-ui);
+    transition-timing-function: var(--ease-ui);
+  }
+  .contact-copy[hidden] {
+    display: none;
+  }
+  @media (hover: hover) {
+    .contact-copy:hover {
+      background: var(--color-text);
+      color: var(--color-bg);
+    }
+  }
+  .contact-copy:active {
+    background: var(--color-accent);
+    color: var(--color-bg);
+    border-color: var(--color-accent);
+  }
+  /* The button and what it says. The status is a live region, so it is always rendered:
+     one that appears from `display: none` is not reliably announced. */
+  .contact-act {
+    display: inline-flex;
+    align-items: center;
+  }
+  .contact-status:not(:empty) {
+    margin-inline-start: calc(var(--spacing) * 3);
+  }
+
+  /* Text links (spec 5.6): the underline is always there; color is never what marks a link. */
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    min-height: calc(var(--spacing) * 11);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--color-line-strong);
+  }
+  .link-icon {
+    flex: none;
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+  }
+  @media (hover: hover) {
+    .contact-link:hover {
+      text-decoration-thickness: 2px;
+      text-decoration-color: var(--color-text);
+    }
+  }
+  .contact-link:active {
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--color-text);
+  }
+
+  /* ---- the last cut: a band of the letterbox colour that meets the bottom bar ---- */
+  .about-end {
+    --color-bg: var(--color-bar);
+    --color-text: var(--color-bar-strong);
+    --color-muted: var(--color-bar-text);
+    --color-focus: var(--color-bar-strong);
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 calc(var(--spacing) * 6);
+    min-height: calc(var(--spacing) * 24);
+    padding-block: calc(var(--spacing) * 6);
+    padding-inline: max(var(--spacing-margin), env(safe-area-inset-left))
+      max(var(--spacing-margin), env(safe-area-inset-right));
+    background: var(--color-bg);
+    color: var(--color-muted);
+  }
+  .about-end a {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    min-height: calc(var(--spacing) * 11);
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+  }
+  @media (hover: hover) {
+    .about-end a:hover {
+      color: var(--color-text);
+    }
+  }
+  .about-end a:focus-visible,
+  .about-end a:active {
+    color: var(--color-text);
+  }
+
+  /* Label beside the value where the row is wide enough for the address and its button:
+     tablets (one column) and wide desktops. Between them the two columns are narrow, so the
+     label stays above, as on phones. */
+  @media (min-width: 40rem) and (max-width: 63.9375rem), (min-width: 80rem) {
+    .contact-row {
+      grid-template-columns: 7rem minmax(0, 1fr);
+      align-items: center;
+      column-gap: var(--spacing-gutter);
+      min-height: calc(var(--spacing) * 12);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .about-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: end;
+    }
+    .about-who {
+      grid-column: 1 / span 6;
+    }
+    .contact {
+      grid-column: 7 / -1;
+    }
+  }
+  @media (min-width: 80rem) {
+    .contact {
+      grid-column: 8 / -1;
+    }
+  }
+</style>

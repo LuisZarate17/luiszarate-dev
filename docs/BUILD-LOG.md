@@ -185,3 +185,39 @@ built, which model did the work, and why. Written as the work happens, not recon
 - **Snag: the record disagreed with itself.** The phase 6 heading above said Sonnet built the
   fit PR; the PR's own description says Fable. The first-hand source won and the heading was
   corrected.
+- **Merged as #17.** The snapshot was synced after the merge, so #17 has its own card, credited
+  from the orchestrator's session record: Fable end to end, dispatched by the orchestrator.
+
+## 2026-11-14: About and contact (Fable)
+
+- **One PR, design to tests (Fable).** The last scene, `06 CONTACT` in the strip and `SC 06` in
+  its slug: three sentences on the base colour, then the address, GitHub and LinkedIn as rows
+  with hairlines, the same call-sheet language as the section before it. The heading is
+  "Contact", as the design spec names it (6.3).
+- **The address is text, not a link (ADR-009).** Luis wants to limit spam, so there is no
+  mailto anywhere. The address is selectable (one click or a long press takes all of it) and a
+  copy button writes it to the clipboard and says "Copied" in a polite live region. Without
+  clipboard access the button selects the address and says so. The button is hidden in the
+  HTML and shown by the script, so it never appears where it cannot work. In the page source
+  the address is written as character references: readers, selection and copying see plain
+  text, the simplest harvesters do not. A speed bump, not a lock.
+- **Slots that are files.** The photo and the resume are not ready. Each renders only when its
+  file exists (`src/assets/about/photo.*`, `public/resume.pdf`) and the layout is the same
+  without them: nothing stands in. A unit test rejects placeholder wording in the section and a
+  stand-in file in either slot (wrong type, too small).
+- **The bio is a draft.** Three sentences in `src/data/about.ts`, written only from the project
+  content files and this log: the positioning, which projects are solo and which began as team
+  builds, and where the numbers come from. No dates, employers or degrees, because the
+  repository records none. A unit test holds it to three sentences, the four project names and
+  the solo and team split in the content files. Luis approves or rewrites it.
+- **The last cut, without moving the bars.** The concept closes the bars to black. The spec
+  says the bars never move (4.3), and bars closing over the contact details would hide the one
+  thing the scene is for. So the scene ends in a band of the letterbox colour that meets the
+  bottom bar: at the end of the page the black rises as the visitor scrolls. No script and no
+  animation, so reduced motion needs no fallback. The band holds the footer line.
+- **Snag: six items in a 320 px strip.** A sixth scene left the current item 84 px on a 320 px
+  phone, and "Cougar Connect" with its number needs 116. Under 360 px the current item now
+  shows its name alone; a test checks every name stays inside its item.
+- **Snag: a live region that started hidden.** The first version hid the empty status with
+  `display: none`. A region that appears from nothing is not reliably announced, so it is
+  always rendered and only gains its spacing when it has text.
