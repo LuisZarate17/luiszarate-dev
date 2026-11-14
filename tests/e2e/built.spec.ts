@@ -278,7 +278,7 @@ test.describe("how it was built", () => {
     await page.goto("/");
     await page
       .getByRole("navigation", { name: "Scenes" })
-      .getByRole("link", { name: "Scene 5: How it was built" })
+      .getByRole("link", { name: "Scene 05 Build: How it was built" })
       .click();
     await expect(section(page).locator("h2")).toBeFocused();
     await expect(page).toHaveURL(/#build$/);
@@ -286,7 +286,7 @@ test.describe("how it was built", () => {
     expect(Math.abs(box.top - box.frameTop)).toBeLessThanOrEqual(1);
     await expect(
       page.getByRole("navigation", { name: "Scenes" }).locator("[aria-current]"),
-    ).toHaveAccessibleName("Scene 5: How it was built");
+    ).toHaveAccessibleName("Scene 05 Build: How it was built");
   });
 
   test("the timecode counts the section as the sixth", async ({ page }) => {

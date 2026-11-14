@@ -660,12 +660,12 @@ reflects this); pinned (4.4); drawer open (pin released, scene grows).
 `01 LABSQ`, `02 BIFROST`, `03 COUGAR CONNECT`, `04 MASTERY PILOT` (from the collection, by
 `order`), then `05 BUILD`, `06 CONTACT`.
 
-| Property        | Desktop (≥ 1024)                                             | Phone (< 1024)                                                                                               |
-| --------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Layout          | Row, items sized to content, each 56 tall, padding-inline 16 | Grid. The current item is `1fr`; every other item is 44 wide. All 56 tall                                    |
-| Number          | `text-meta`, bar-text                                        | `text-meta` at 14 px, bar-text, centered                                                                     |
-| Name            | `text-strip` (18 px), bar-text, 8 right of the number        | Shown for the current item only, Display 700 at 15 px, tracking 0.02em. Others keep the name visually hidden |
-| Accessible name | "Scene 1: LabQ" (`aria-label`)                               | Same                                                                                                         |
+| Property        | Desktop (≥ 1024)                                                                                                                                                           | Phone (< 1024)                                                                                               |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Layout          | Row, items sized to content, each 56 tall, padding-inline 16                                                                                                               | Grid. The current item is `1fr`; every other item is 44 wide. All 56 tall                                    |
+| Number          | `text-meta`, bar-text                                                                                                                                                      | `text-meta` at 14 px, bar-text, centered                                                                     |
+| Name            | `text-strip` (18 px), bar-text, 8 right of the number                                                                                                                      | Shown for the current item only, Display 700 at 15 px, tracking 0.02em. Others keep the name visually hidden |
+| Accessible name | "Scene 01 LabQ" (`aria-label`): it starts with the words on screen (WCAG 2.5.3; amended in phase 9, was "Scene 1: LabQ"). `05 BUILD` is "Scene 05 Build: How it was built" | Same                                                                                                         |
 
 States:
 

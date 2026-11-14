@@ -318,8 +318,8 @@ test.describe("scroll staging on a large desktop screen", () => {
     const strip = page.getByRole("navigation", { name: "Scenes" });
     const timecode = page.locator("#timecode");
     const expected = [
-      { id: "labq", counter: "01", name: "Scene 1: LabQ", minute: "00:00:" },
-      { id: "bifrost", counter: "02", name: "Scene 2: Bifrost", minute: "00:01:" },
+      { id: "labq", counter: "01", name: "Scene 01 LabQ", minute: "00:00:" },
+      { id: "bifrost", counter: "02", name: "Scene 02 Bifrost", minute: "00:01:" },
     ];
     for (const s of expected) {
       for (const p of [0.1, 0.5, 0.9]) {
@@ -365,10 +365,10 @@ test.describe("scroll staging on a large desktop screen", () => {
   test("a strip link lands on each scene's top, from above and from below", async ({ page }) => {
     const strip = page.getByRole("navigation", { name: "Scenes" });
     const scenes = [
-      { id: "labq", name: "Scene 1: LabQ" },
-      { id: "bifrost", name: "Scene 2: Bifrost" },
-      { id: "cougar-connect", name: "Scene 3: Cougar Connect" },
-      { id: "mastery-pilot", name: "Scene 4: Mastery Pilot" },
+      { id: "labq", name: "Scene 01 LabQ" },
+      { id: "bifrost", name: "Scene 02 Bifrost" },
+      { id: "cougar-connect", name: "Scene 03 Cougar Connect" },
+      { id: "mastery-pilot", name: "Scene 04 Mastery Pilot" },
     ];
     for (const s of [...scenes, ...scenes.toReversed()]) {
       await strip.getByRole("link", { name: s.name }).click();
@@ -383,7 +383,7 @@ test.describe("scroll staging on a large desktop screen", () => {
     // From inside its own hold, the link goes back to the start of the scene.
     await scrollToProgress(page, "bifrost", 0.6);
     const held = await page.evaluate(() => window.scrollY);
-    await strip.getByRole("link", { name: "Scene 2: Bifrost" }).click();
+    await strip.getByRole("link", { name: "Scene 02 Bifrost" }).click();
     await expect(page.locator("#bifrost h2")).toBeFocused();
     await expect
       .poll(() => page.evaluate(() => window.scrollY))

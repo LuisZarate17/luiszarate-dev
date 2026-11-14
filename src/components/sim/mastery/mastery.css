@@ -41,11 +41,6 @@
   grid-template-columns: 1fr;
   gap: calc(var(--spacing) * 0.5);
 }
-/* Not spoken yet: the label stays as a faint outline of the session; the line and chip are
-   hidden (and so unread by screen readers) but keep their space. */
-.mastery-row[data-visible="false"] .mastery-who {
-  opacity: 0.35;
-}
 .mastery-row[data-visible="false"] .mastery-text {
   visibility: hidden;
   opacity: 0;
@@ -60,6 +55,13 @@
 }
 .mastery-row[data-speaker="tutor"] .mastery-who {
   color: var(--color-accent);
+}
+/* Not spoken yet: the label stays as an outline of the session, in the muted color for both
+   speakers (the tutor's accent arrives with its line); the line and chip are hidden (and so
+   unread by screen readers) but keep their space. The label is not dimmed with opacity: at
+   0.35 it was 1.9:1 on the stage, under the 4.5:1 that text needs (WCAG 1.4.3). */
+.mastery-row[data-visible="false"] .mastery-who {
+  color: var(--color-muted);
 }
 .mastery-text {
   color: var(--color-text);

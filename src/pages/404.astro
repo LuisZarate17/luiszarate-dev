@@ -1,0 +1,90 @@
+---
+import Base from "../layouts/Base.astro";
+import Slug from "../components/scene/Slug.astro";
+
+/**
+ * The 404 page: one short scene on the base colour, with no world. In a rough cut, a "scene
+ * missing" card holds the place of footage that is not there; this is that card. A slug line,
+ * the title, one sentence and the way back to the start. Nothing moves, so reduced motion
+ * needs no branch, and the page is complete without JavaScript.
+ *
+ * Vercel serves `404.html` for any unknown path, so every link here is root-relative. The
+ * scene strip in the bottom bar leads back to the home page's scenes.
+ */
+---
+
+<Base
+  title="Scene missing (404) · Luis Zarate"
+  description="This page is not on Luis Zarate's portfolio. Go back to the start."
+  noindex
+>
+  <section class="lost" id="missing" aria-labelledby="missing-title">
+    <div class="lost-inner">
+      <Slug no="SC 404" loc="INT. CUTTING ROOM — NO FOOTAGE" />
+      <h1 id="missing-title" class="lost-title font-display text-title uppercase">
+        Scene missing
+      </h1>
+      <p class="lost-text text-lead">
+        There is no page at this address. It may have been mistyped, or the page was cut.
+      </p>
+      <a class="lost-back text-control" href="/">
+        Back to the start
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    min-height: var(--frame-h);
+    padding-block: var(--spacing-scene);
+    padding-inline: max(var(--spacing-margin), env(safe-area-inset-left))
+      max(var(--spacing-margin), env(safe-area-inset-right));
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  .lost-inner {
+    width: 100%;
+    max-width: var(--container-frame);
+    margin-inline: auto;
+  }
+  .lost-title {
+    margin-top: calc(var(--spacing) * 4);
+  }
+  .lost-text {
+    margin-top: calc(var(--spacing) * 6);
+    max-width: 34rem;
+    text-wrap: pretty;
+  }
+  /* The primary button of spec 5.6 with the neutral tokens, as the skip link has it. */
+  .lost-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(var(--spacing) * 12);
+    margin-top: calc(var(--spacing) * 8);
+    padding-inline: calc(var(--spacing) * 5);
+    border: 1px solid var(--color-text);
+    border-radius: var(--radius-md);
+    background: var(--color-text);
+    color: var(--color-bg);
+    transition-property: color, background-color, border-color;
+    transition-duration: var(--dur-ui);
+    transition-timing-function: var(--ease-ui);
+  }
+  @media (hover: hover) {
+    .lost-back:hover {
+      background: transparent;
+      color: var(--color-text);
+    }
+  }
+  .lost-back:active {
+    background: var(--color-accent);
+    color: var(--color-bg);
+    border-color: var(--color-accent);
+  }
+</style>

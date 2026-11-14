@@ -201,10 +201,10 @@ test.describe("contact", () => {
 
   test("the strip item cuts to the section and focuses its heading", async ({ page }) => {
     await page.goto("/");
-    await strip(page).getByRole("link", { name: "Scene 6: Contact" }).click();
+    await strip(page).getByRole("link", { name: "Scene 06 Contact" }).click();
     await expect(section(page).locator("h2")).toBeFocused();
     await expect(page).toHaveURL(/#contact$/);
-    await expect(strip(page).locator("[aria-current]")).toHaveAccessibleName("Scene 6: Contact");
+    await expect(strip(page).locator("[aria-current]")).toHaveAccessibleName("Scene 06 Contact");
   });
 
   test("it fills the frame and ends in the letterbox colour, against the bottom bar", async ({
@@ -347,7 +347,7 @@ test.describe("contact, with reduced motion", () => {
     expect(await clipboard(page)).toBe(EMAIL);
     // The cut to it is an instant jump, and focus still moves.
     await page.evaluate(() => window.scrollTo(0, 0));
-    await strip(page).getByRole("link", { name: "Scene 6: Contact" }).click();
+    await strip(page).getByRole("link", { name: "Scene 06 Contact" }).click();
     await expect(section(page).locator("h2")).toBeFocused();
     await expect.poll(() => page.evaluate(() => document.getAnimations().length)).toBe(0);
   });
