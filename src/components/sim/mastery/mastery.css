@@ -112,3 +112,18 @@
     transition: none;
   }
 }
+
+/* Short desktop frames (under 860 px tall, e.g. 1280 x 800): tighter dialogue spacing. Text can
+   wrap a line later or sooner by platform (fonts render differently on Linux than macOS), and
+   at 1280 x 800 the scene had only a few pixels to spare; this keeps it inside the frame. */
+@media (min-width: 64rem) and (max-height: 53.75rem) {
+  .mastery-sim {
+    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
+  }
+  .mastery-meter {
+    top: calc(var(--spacing) * 4);
+  }
+  .mastery-lines {
+    gap: calc(var(--spacing) * 0.75);
+  }
+}
