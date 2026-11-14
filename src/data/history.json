@@ -212,10 +212,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -259,10 +255,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -301,10 +293,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -337,10 +325,6 @@
         },
         {
           "name": "Playwright (desktop + phone)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
           "conclusion": "success"
         }
       ]
@@ -379,10 +363,6 @@
         },
         {
           "name": "Playwright (desktop + phone)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
           "conclusion": "success"
         }
       ]
@@ -432,10 +412,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -468,10 +444,6 @@
         },
         {
           "name": "Playwright (desktop + phone)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
           "conclusion": "success"
         }
       ]
@@ -516,10 +488,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -561,10 +529,6 @@
         },
         {
           "name": "Playwright (desktop + phone)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
           "conclusion": "success"
         }
       ]
@@ -658,10 +622,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -695,10 +655,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -731,10 +687,6 @@
         },
         {
           "name": "Playwright (desktop + phone)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
           "conclusion": "success"
         }
       ]
@@ -778,10 +730,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -824,10 +772,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -864,10 +808,6 @@
         },
         {
           "name": "Playwright (desktop + phone)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
           "conclusion": "success"
         }
       ]
@@ -917,10 +857,6 @@
         {
           "name": "Playwright (desktop + phone)",
           "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
-          "conclusion": "success"
         }
       ]
     },
@@ -958,10 +894,6 @@
         },
         {
           "name": "Playwright (desktop + phone)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
           "conclusion": "success"
         }
       ]

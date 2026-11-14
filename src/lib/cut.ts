@@ -99,6 +99,9 @@ export function createCutController<T>(deps: CutDeps<T>) {
 function headingOf(target: CutTarget): HTMLElement {
   const main = document.getElementById("main") as HTMLElement;
   const scope = target === "top" ? main : target;
+  // A disclosure's own control is its summary.
+  const summary = scope instanceof HTMLDetailsElement ? scope.querySelector("summary") : null;
+  if (summary) return summary;
   const heading = scope.querySelector<HTMLElement>("h1, h2, h3") ?? scope;
   if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1");
   return heading;
@@ -109,6 +112,9 @@ function swapDom(target: CutTarget) {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     history.replaceState(null, "", location.pathname + location.search);
   } else {
+    // A link to a disclosure (a pull-request card in "How it was built", clicked before that
+    // section's own script has loaded) shows what it points to: never a cut to a closed card.
+    if (target instanceof HTMLDetailsElement) target.open = true;
     // scroll-padding-top on <html> keeps the section's top edge under the top bar. A scene in
     // a pin wrapper (ADR-007) is sticky, so its own rectangle moves with the scroll while it
     // holds: the wrapper's top is where the scene starts.

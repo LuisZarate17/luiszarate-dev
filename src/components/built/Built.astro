@@ -3,7 +3,7 @@ import decisions from "../../../DECISIONS.md?raw";
 import Slug from "../scene/Slug.astro";
 import { CREW_NAMES, crew, phases, prRecords } from "../../data/build";
 import { parseAdrs } from "../../lib/build/adrs";
-import { history } from "../../lib/build/history";
+import { describeChecks, history, tallyChecks } from "../../lib/build/history";
 import { buildTimeline, mergeOrder } from "../../lib/build/timeline";
 
 /**
@@ -60,7 +60,6 @@ const phaseBands = phases.flatMap((phase) => {
 const cards = ordered.map((pr) => {
   const record = prRecords[pr.number];
   const phase = phases.find((p) => p.n === record?.phase);
-  const passed = pr.checks.filter((c) => c.conclusion === "success").length;
   return {
     pr,
     phase,
@@ -69,8 +68,7 @@ const cards = ordered.map((pr) => {
     credits: (record?.credits ?? []).map(
       (c) => `${CREW_NAMES[c.by]}${c.count ? ` ×${c.count}` : ""} · ${c.work}`,
     ),
-    passed,
-    allPassed: pr.checks.length > 0 && passed === pr.checks.length,
+    tally: tallyChecks(pr.checks),
   };
 });
 
@@ -179,7 +177,7 @@ const creditedOn = (id: string) =>
     <div class="built-prs">
       <h3 class="font-display text-heading uppercase">Pull requests</h3>
       <ol class="prs">
-        {cards.map(({ pr, phase, note, source, credits, passed, allPassed }) => (
+        {cards.map(({ pr, phase, note, source, credits, tally }) => (
           <li>
             <details class="pr" id={`pr-${pr.number}`} name="build-pr">
               <summary>
@@ -199,8 +197,9 @@ const creditedOn = (id: string) =>
                 <span class="pr-ci font-mono text-meta uppercase">
                   {pr.checks.length > 0 ? (
                     <>
-                      {passed}/{pr.checks.length} checks
+                      {tally.passed}/{tally.ran} checks
                       <span class="sr-only"> passed</span>
+                      {tally.skipped > 0 && `, ${tally.skipped} skipped`}
                     </>
                   ) : (
                     "No checks"
@@ -255,10 +254,8 @@ const creditedOn = (id: string) =>
                     <dd>
                       {pr.checks.length > 0 ? (
                         <>
-                          {allPassed
-                            ? `All ${pr.checks.length} passed on the last commit`
-                            : `${passed} of ${pr.checks.length} passed on the last commit`}
-                          : {pr.checks.map((c) => c.name).join("; ")}.
+                          {describeChecks(tally)} on the last commit:{" "}
+                          {pr.checks.map((c) => c.name).join("; ")}.
                         </>
                       ) : (
                         "None recorded."

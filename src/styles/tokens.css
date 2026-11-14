@@ -327,7 +327,9 @@
     font-size: 100%;
     font-synthesis: none;
     scroll-behavior: auto;
+    /* Whatever the browser scrolls into view (a jump, Tab) lands between the two bars. */
     scroll-padding-top: var(--bar-top);
+    scroll-padding-bottom: var(--bar-bottom);
     -webkit-text-size-adjust: 100%;
   }
   body {

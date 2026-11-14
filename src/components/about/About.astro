@@ -1,6 +1,4 @@
 ---
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
 import Slug from "../scene/Slug.astro";
@@ -28,8 +26,12 @@ const photos = import.meta.glob<{ default: ImageMetadata }>(
   { eager: true },
 );
 const photo = Object.values(photos)[0]?.default;
-const hasResume = existsSync(join(process.cwd(), "public", "resume.pdf"));
+// Resolved by Vite from the project root, wherever the build is run from. The glob is lazy, so
+// the file is only looked for, never imported.
+const hasResume = Object.keys(import.meta.glob("/public/resume.pdf")).length > 0;
 
+// The year of the build, on purpose: every merge to main rebuilds and republishes the site, so
+// this is the year it was last published, which is what the notice claims.
 const year = new Date().getUTCFullYear();
 ---
 
