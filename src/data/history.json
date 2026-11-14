@@ -109,6 +109,12 @@
       "date": "2026-11-13T18:27:07Z",
       "subject": "feat: LabQ and Bifrost pin and play on scroll (#16)",
       "pr": 16
+    },
+    {
+      "sha": "bd33521",
+      "date": "2026-11-13T23:53:24Z",
+      "subject": "feat: How it was built (phase 7) (#17)",
+      "pr": 17
     }
   ],
   "prs": [
@@ -842,6 +848,58 @@
           "name": "claude-review",
           "conclusion": "success"
         },
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "title": "feat: How it was built (phase 7)",
+      "branch": "feat/how-it-was-built",
+      "createdAt": "2026-11-13T18:51:20Z",
+      "mergedAt": "2026-11-13T23:53:25Z",
+      "mergeSha": "bd33521",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/17",
+      "additions": 3361,
+      "deletions": 34,
+      "changedFiles": 19,
+      "commits": [
+        {
+          "sha": "217febb",
+          "date": "2026-11-13T18:50:59Z",
+          "subject": "feat: history snapshot and curated model credits for How it was built"
+        },
+        {
+          "sha": "29534d0",
+          "date": "2026-11-13T18:50:59Z",
+          "subject": "feat: How it was built section (timeline, pull-request cards, crew, script notes)"
+        },
+        {
+          "sha": "5889b6f",
+          "date": "2026-11-13T18:50:59Z",
+          "subject": "docs: ADR-008, build log for phase 7, roadmap and AGENTS brought up to date"
+        },
+        {
+          "sha": "d7a020d",
+          "date": "2026-11-13T23:02:29Z",
+          "subject": "feat: credit every pull request from the orchestrator's session record"
+        }
+      ],
+      "checks": [
         {
           "name": "Lighthouse budget",
           "conclusion": "success"

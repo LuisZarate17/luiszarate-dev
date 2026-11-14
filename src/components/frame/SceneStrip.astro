@@ -5,11 +5,14 @@ import { getCollection } from "astro:content";
  * Bottom letterbox bar with the scene strip and counter (spec 5.1, 5.5).
  * One item per project, by `order`; section ids are the entry ids. Then the sections that
  * are not projects and have no color world: `05 BUILD` ("How it was built", shortened so the
- * strip fits; spec 5.5 and open question 4).
+ * strip fits; spec 5.5 and open question 4) and `06 CONTACT`, the last scene.
  */
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
 const pad = (n: number) => String(n).padStart(2, "0");
-const others = [{ id: "build", name: "Build", label: "How it was built" }];
+const others = [
+  { id: "build", name: "Build", label: "How it was built" },
+  { id: "contact", name: "Contact", label: "Contact" },
+];
 const total = projects.length + others.length;
 ---
 
@@ -122,6 +125,18 @@ const total = projects.length + others.length;
   }
   .counter {
     display: none;
+  }
+
+  /* Under 360 px (a 320 px phone, or 400% zoom) six items leave the current one 84 px: its
+     name alone fits, the number with it does not. The name and the top bar still mark it. */
+  @media (max-width: 22.4375rem) {
+    a[aria-current] .strip-no {
+      display: none;
+    }
+    a[aria-current] .strip-name {
+      font-size: 0.875rem;
+      letter-spacing: 0;
+    }
   }
 
   @media (min-width: 64rem) {

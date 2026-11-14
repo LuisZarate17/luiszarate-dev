@@ -57,10 +57,16 @@ test.describe("frame", () => {
     expect(before[1]!.y + before[1]!.height).toBe(viewport.height);
   });
 
-  test("the strip lists the four scenes and the build section with accessible names", async ({
+  test("the strip lists the four scenes, the build section and contact with accessible names", async ({
     page,
   }) => {
-    await expect(strip(page).getByRole("listitem")).toHaveCount(SCENES.length + 1);
+    await expect(strip(page).getByRole("listitem")).toHaveCount(SCENES.length + 2);
+    const contact = link(page, 6, "Contact");
+    await expect(contact).toHaveAttribute("href", "#contact");
+    await expect(contact).not.toHaveAttribute("data-world");
+    const contactBox = await contact.boundingBox();
+    expect(contactBox!.height).toBeGreaterThanOrEqual(44);
+    expect(contactBox!.width).toBeGreaterThanOrEqual(44);
     const build = link(page, 5, "How it was built");
     await expect(build).toHaveAttribute("href", "#build");
     await expect(build).not.toHaveAttribute("data-world");
@@ -98,12 +104,14 @@ test.describe("frame", () => {
     await expect(strip(page).locator("[aria-current]")).toHaveCount(0);
   });
 
-  test("the counter starts at 01 / 05 and follows the current scene", async ({ page }) => {
-    await expect(page.locator("nav.frame-bar--bottom")).toContainText("01 / 05");
+  test("the counter starts at 01 / 06 and follows the current scene", async ({ page }) => {
+    await expect(page.locator("nav.frame-bar--bottom")).toContainText("01 / 06");
     await scrollToSectionMiddle(page, "cougar-connect");
     await expect(page.locator("#strip-counter-current")).toHaveText("03");
     await scrollToSectionMiddle(page, "build");
     await expect(page.locator("#strip-counter-current")).toHaveText("05");
+    await scrollToSectionMiddle(page, "contact");
+    await expect(page.locator("#strip-counter-current")).toHaveText("06");
   });
 
   test("the home link cuts back to the top", async ({ page }) => {
@@ -154,6 +162,7 @@ test.describe("frame", () => {
     expect(stripOverflow).toBeLessThanOrEqual(0);
     await expect(link(page, 4, "Mastery Pilot")).toBeVisible();
     await expect(link(page, 5, "How it was built")).toBeVisible();
+    await expect(link(page, 6, "Contact")).toBeVisible();
   });
 });
 

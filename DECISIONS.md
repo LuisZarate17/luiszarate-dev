@@ -235,3 +235,46 @@ it lags `main` until someone runs the script, and a pull request can never appea
 snapshot it ships in. A new pull request shows up uncredited until the curated file is edited,
 which is the safe failure. The curated file is a second place to keep honest, so it stays small
 and cites its sources.
+
+## ADR-009: Contact: the address as text, optional slots as files, the last cut as a still band
+
+**Status:** accepted, 2026-11-14. Amends the concept's "the bars close to black as the last cut"
+(`docs/art-direction/CONCEPTS.md`, concept A).
+
+**Context.** The last scene has to give a recruiter a way to reach Luis. Luis wants to limit
+spam to the address. The photo and the resume PDF were not ready when the scene was built. And
+the concept ends the page by closing the letterbox bars, which the design spec forbids
+elsewhere: the bars never move (spec 4.3).
+
+**Decision.**
+
+- The address is selectable text with a copy button, never a `mailto:` link. The page writes it
+  as decimal character references (`encodeAddress` in `src/lib/about.ts`), so the HTML source
+  does not hold it as a plain string while browsers, screen readers, selection and copying see
+  the text. The copy button is added by a small inline script that reads the address from the
+  page; the address is in no script.
+- The photo and the resume are files, not fields. `src/assets/about/photo.{jpg,jpeg,png,webp}`
+  and `public/resume.pdf` each render when present and leave no gap when absent. Tests fail on
+  placeholder wording in the section and on a stand-in file in either slot.
+- The copy lives in `src/data/about.ts`, edited by hand, with the source of each claim noted.
+- The last cut is a band of the letterbox colour at the end of the scene, holding the footer.
+  It meets the bottom bar, so scrolling to the end closes the frame. Nothing animates.
+
+**Considered.**
+
+- _A `mailto:` link._ One tap to write, and the pattern every address harvester looks for
+  first. Luis chose the copy button.
+- _Assembling the address with JavaScript._ Hides it better, and leaves no address at all
+  without JavaScript. The page must be complete without it (concept, performance floor).
+- _A contact form._ Needs a backend or a third party, for a page that has neither.
+- _Placeholder photo and a disabled resume link._ AGENTS.md: real content only. An avatar
+  silhouette on a portfolio reads as unfinished.
+- _Animating the bars closed at the end of the page._ Breaks the rule that the bars never move,
+  needs a scroll listener and a reduced-motion variant, and covers the contact details at the
+  moment a visitor reaches them.
+
+**Consequences.** Character references stop only naive harvesters; anything that renders the
+page reads the address, and it is also in this public repository. Writing to Luis takes two
+steps (copy, then paste) instead of one. Adding the photo or the resume is adding one file,
+with no code change. The page ends in black in both themes, because the bar colour is dark in
+both.
