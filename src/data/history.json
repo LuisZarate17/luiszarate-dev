@@ -897,6 +897,48 @@
           "conclusion": "success"
         }
       ]
+    },
+    {
+      "number": 18,
+      "title": "feat: About and contact (phase 8)",
+      "branch": "feat/about-contact",
+      "createdAt": "2026-11-14T00:12:36Z",
+      "mergedAt": "2026-11-14T01:33:14Z",
+      "mergeSha": "a76692a",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/18",
+      "additions": 1201,
+      "deletions": 31,
+      "changedFiles": 14,
+      "commits": [
+        {
+          "sha": "332189b",
+          "date": "2026-11-14T00:12:32Z",
+          "subject": "feat: About and contact (phase 8)"
+        },
+        {
+          "sha": "0aeb9ff",
+          "date": "2026-11-14T00:19:03Z",
+          "subject": "fix: more headroom for Mastery Pilot on short desktop screens"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Vercel Preview Comments",
+          "conclusion": "success"
+        }
+      ]
     }
   ]
 }
