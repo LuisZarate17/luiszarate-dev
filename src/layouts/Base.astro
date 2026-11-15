@@ -11,9 +11,17 @@ import sansRegular from "@fontsource/hanken-grotesk/files/hanken-grotesk-latin-4
 interface Props {
   title: string;
   description: string;
+  /** A page that is not content (the 404 page): no canonical URL, and search engines skip it. */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
+// `site` is set in astro.config.mjs; it changes when the domain is connected at launch.
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// public/og.png, 1200 x 630, written by `npm run share:image`. Share cards need absolute URLs.
+const shareImage = new URL("/og.png", Astro.site);
+const shareAlt =
+  "Luis Zarate, full-stack engineer: the name in large capitals, with four colored plates fanned behind it.";
 ---
 
 <!doctype html>
@@ -23,6 +31,22 @@ const { title, description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#0b0b0d" />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Luis Zarate" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={shareAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareImage} />
+    <meta name="twitter:image:alt" content={shareAlt} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preload" as="font" type="font/woff2" href={displayBlack} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={sansRegular} crossorigin />

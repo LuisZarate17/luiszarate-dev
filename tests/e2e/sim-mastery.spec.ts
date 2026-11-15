@@ -102,11 +102,22 @@ test("the readout is always there, so the caption never moves", async ({ page })
 test("hidden lines keep their space; Show all and Restart work", async ({ page }) => {
   await load(page);
   await reachFirstExchange(page);
-  // An unrevealed line keeps its space: the text is hidden (and unread), the speaker label dims.
+  // An unrevealed line keeps its space: the text is hidden (and unread), the speaker label stays.
   await expect(rows(page).nth(7).locator(".mastery-text")).toHaveCSS("visibility", "hidden");
-  await expect(rows(page).nth(7).locator(".mastery-who")).toHaveCSS("opacity", "0.35");
+  // The waiting label is muted, never faded: it stays readable (WCAG 1.4.3). The tutor's accent
+  // comes with its line.
+  const color = (i: number) =>
+    rows(page)
+      .nth(i)
+      .locator(".mastery-who")
+      .evaluate((el) => getComputedStyle(el).color);
+  const muted = await color(0);
+  await expect(rows(page).nth(0)).toHaveAttribute("data-speaker", "student");
+  await expect(rows(page).nth(7)).toHaveAttribute("data-speaker", "tutor");
+  expect(await color(7)).toBe(muted);
+  expect(await color(1)).not.toBe(muted);
+  await expect(rows(page).nth(7).locator(".mastery-who")).toHaveCSS("opacity", "1");
   await expect(rows(page).nth(7).locator(".mastery-who")).toHaveAttribute("aria-hidden", "true");
-  await expect(rows(page).nth(1).locator(".mastery-who")).toHaveCSS("opacity", "1");
   await page.getByRole("button", { name: "Show all" }).click();
   await expect.poll(() => visibleCount(page)).toBe(8);
   await page.getByRole("button", { name: "Restart" }).click();

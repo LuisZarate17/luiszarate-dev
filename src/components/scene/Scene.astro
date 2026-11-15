@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import Slug from "./Slug.astro";
-import { liveLabels, notes } from "./notes";
 import SimSlot from "../sim/SimSlot.astro";
 
 interface Props {
@@ -10,10 +9,9 @@ interface Props {
 
 const { entry } = Astro.props;
 const { id, data } = entry;
-const note = notes[id];
+const { note, liveLabel } = data;
 const number = `SC ${String(data.order).padStart(2, "0")}`;
 const teamProject = data.credit === "team";
-const liveLabel = liveLabels[id] ?? "Live demo";
 // The drawer exists only when it holds more than the stack list, which the scene already shows.
 const drawerGroups = note ? ["Stack", "Notes"] : [];
 

@@ -14,7 +14,7 @@ const SCENES = [
 
 const strip = (page: Page) => page.getByRole("navigation", { name: "Scenes" });
 const link = (page: Page, n: number, name: string) =>
-  strip(page).getByRole("link", { name: `Scene ${n}: ${name}` });
+  strip(page).getByRole("link", { name: `Scene 0${n} ${name}` });
 const barTop = (page: Page) => page.locator("header.frame-bar--top");
 
 async function scrollToSectionMiddle(page: Page, id: string) {
@@ -67,7 +67,7 @@ test.describe("frame", () => {
     const contactBox = await contact.boundingBox();
     expect(contactBox!.height).toBeGreaterThanOrEqual(44);
     expect(contactBox!.width).toBeGreaterThanOrEqual(44);
-    const build = link(page, 5, "How it was built");
+    const build = link(page, 5, "Build: How it was built");
     await expect(build).toHaveAttribute("href", "#build");
     await expect(build).not.toHaveAttribute("data-world");
     const buildBox = await build.boundingBox();
@@ -161,7 +161,7 @@ test.describe("frame", () => {
       .evaluate((el) => el.scrollWidth - el.clientWidth);
     expect(stripOverflow).toBeLessThanOrEqual(0);
     await expect(link(page, 4, "Mastery Pilot")).toBeVisible();
-    await expect(link(page, 5, "How it was built")).toBeVisible();
+    await expect(link(page, 5, "Build: How it was built")).toBeVisible();
     await expect(link(page, 6, "Contact")).toBeVisible();
   });
 });

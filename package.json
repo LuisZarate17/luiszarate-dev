@@ -19,6 +19,7 @@
     "lhci": "lhci autorun",
     "check:budget": "node scripts/check-budget.mjs",
     "hero:still": "node scripts/hero-still.mjs",
+    "share:image": "node scripts/share-image.mjs",
     "history:sync": "node scripts/history.mjs"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@axe-core/playwright": "4.14.0",
     "@eslint/js": "^10.0.1",
     "@lhci/cli": "^0.16.0",
     "@playwright/test": "1.63.0",

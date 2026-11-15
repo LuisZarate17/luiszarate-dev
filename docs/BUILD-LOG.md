@@ -221,3 +221,46 @@ built, which model did the work, and why. Written as the work happens, not recon
 - **Snag: a live region that started hidden.** The first version hid the empty status with
   `display: none`. A region that appears from nothing is not reliably announced, so it is
   always rendered and only gains its spacing when it has text.
+- **Merged as #18.** Fable end to end; the orchestrator (Claude Opus 5.5) dispatched it and
+  fixed one layout overflow in Mastery Pilot that only showed in CI, where Linux wraps a line
+  the Mac does not.
+
+## 2026-11-14: Polish and QA (Fable)
+
+- **A review before any fix.** AGENTS.md asks for one high-effort code review of each phase's
+  integrated diff, with the findings going to Luis first. Fable reviewed everything merged
+  since the simulations (#14 to #18) and reported a ranked list; this PR fixes none of it
+  except where the audit below found the same thing.
+- **axe in the test suite.** `tests/e2e/a11y.spec.ts` runs axe-core (WCAG 2.0 A and AA, 2.1 AA)
+  on the home page and the 404 page, at desktop and phone size, with and without reduced
+  motion, and once more with the drawers and a pull-request card open. The page is walked top
+  to bottom first, so every simulation is hydrated when axe looks. No rule is disabled, and
+  the label-in-name rule that axe leaves off is turned on, because Lighthouse reports it.
+- **What it found: two things.** In Mastery Pilot the speaker labels of lines not yet spoken
+  were dimmed to 35% opacity, which is 1.9:1 on the stage where text needs 4.5:1. They are now
+  the muted colour at full strength for both speakers; the tutor's accent arrives with its
+  line. And the scene strip's links were named "Scene 1: LabQ" while showing "01 LabQ", so a
+  visitor using speech input could not say what they saw (WCAG 2.5.3). The name is now
+  "Scene 01 LabQ", which starts with the visible words; the spec's 5.5 is amended.
+- **The 404 page is a "scene missing" card.** In a rough cut, a card with those words holds
+  the place of footage that is not there. One scene on the base colour, no world: the slug
+  `SC 404 · INT. CUTTING ROOM — NO FOOTAGE`, the title, one sentence, one button back to the
+  start. Nothing moves. Vercel serves `404.html` at any path, so the strip's links become
+  `/#labq` and so on away from the home page, and the counter shows `--`.
+- **The share image is the hero, rendered from the real parts.** `npm run share:image` draws
+  1200 x 630 in headless Chromium and writes `public/og.png` (23 KB, committed): the bars, the
+  hero's slug line, the name with the four project plates fanned behind it, "Full-stack
+  engineer". The plate colours are read from the content files, the base colours from the
+  tokens and the fonts from the packages the site ships, and the script fails if a font did
+  not load or the name does not fit. Committed and not built on Vercel, for the reason in
+  ADR-008: the build should not need a browser.
+- **Metadata.** Canonical URL, Open Graph and Twitter card tags from `Astro.site`, a static
+  `robots.txt` and a one-URL `sitemap.xml`. The 404 page is `noindex` and has no canonical.
+  `site` is the Vercel address until the domain is connected; three places follow it
+  (`astro.config.mjs`, `public/robots.txt`, `public/sitemap.xml`) and a test compares them.
+- **Snag: Lighthouse marked the 404 page down for being a 404 page.** Lighthouse CI audits
+  every HTML file in `dist/`, and `noindex` fails its "is crawlable" audit (SEO 0.63). The 404
+  page is now held to the same performance, accessibility and best-practices floors, and only
+  the home page to the SEO floor.
+- **Backlog folded in.** The Bifrost drawer note and the two live-link labels moved from a
+  side module into the content schema (`note`, `liveLabel`), so a project is again one file.

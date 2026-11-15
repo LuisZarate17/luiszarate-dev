@@ -194,6 +194,12 @@ export const prRecords: Record<number, PrRecord> = {
     note: "Fable, end to end (design, build, tests, self-review, PR); the orchestrator (Claude Opus 5.5) dispatched it and supplied the model credits for earlier PRs from its session record.",
     source: "orchestrator session record",
   },
+  18: {
+    phase: 8,
+    credits: [{ by: "fable", work: "Build" }],
+    note: "Fable, end to end; the orchestrator (Claude Opus 5.5) dispatched it and fixed one CI-only layout overflow in Mastery Pilot.",
+    source: "BUILD-LOG, 2026-11-14: About and contact; orchestrator session record",
+  },
 };
 
 export interface CrewMember {

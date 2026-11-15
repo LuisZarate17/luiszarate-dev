@@ -32,8 +32,12 @@ const projects = defineCollection({
     stack: z.array(z.string()).min(1),
     repo: z.url(),
     live: z.url().optional(),
+    /** Label of the live link when "Live demo" would overstate what it opens. */
+    liveLabel: z.string().max(24).default("Live demo"),
     /** What Luis did, stated accurately (team projects say so). */
     role: z.string(),
+    /** An extra note for the Details drawer. The drawer exists only when there is one. */
+    note: z.string().optional(),
     metrics: z
       .array(
         z.object({
