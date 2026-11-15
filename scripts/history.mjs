@@ -6,8 +6,9 @@
 // machine and writes one JSON file the page renders from.
 //
 //  - `main`: every first-parent commit on main (short sha, date, subject, the PR it landed).
-//  - `prs`: every merged pull request: title, branch, dates, the commit it became on main, its
-//    size, the commits on its branch before the squash, and the check runs on its last commit.
+//  - `prs`: every pull request merged into main: title, branch, dates, the commit it became on
+//    main, its size, the commits on its branch before the squash, and the CI check runs on its
+//    last commit.
 //
 // It needs `git` with the full history of main and the `gh` CLI, signed in.
 import { execFileSync } from "node:child_process";
@@ -66,7 +67,8 @@ if (run("git", ["rev-parse", "--is-shallow-repository"]).trim() === "true")
 
 const api = (path) => JSON.parse(run("gh", ["api", "--paginate", "--slurp", path])).flat();
 const merged = api(`repos/${repo}/pulls?state=closed&per_page=100`)
-  .filter((pr) => pr.merged_at)
+  // Only what landed on main: a pull request merged into another branch is not a merge to main.
+  .filter((pr) => pr.merged_at && pr.base.ref === "main")
   .sort((a, b) => a.number - b.number);
 
 /** The commit on main a pull request became: by sha, or by the "(#n)" GitHub writes. */
@@ -78,6 +80,9 @@ const landed = (pr) =>
       c.subject.startsWith(`Merge pull request #${pr.number} `),
   );
 
+// Check runs that are not CI: this one only reports that the preview's comment tool is on.
+const NOT_CI = new Set(["Vercel Preview Comments"]);
+
 const prs = merged.map((pr) => {
   const detail = JSON.parse(run("gh", ["api", `repos/${repo}/pulls/${pr.number}`]));
   const commits = api(`repos/${repo}/pulls/${pr.number}/commits?per_page=100`).map((c) => ({
@@ -86,9 +91,9 @@ const prs = merged.map((pr) => {
     subject: firstLine(c.commit.message),
   }));
   // One entry per check name: the latest run wins.
-  const runs = api(`repos/${repo}/commits/${pr.head.sha}/check-runs?per_page=100`).flatMap(
-    (page) => page.check_runs ?? [],
-  );
+  const runs = api(`repos/${repo}/commits/${pr.head.sha}/check-runs?per_page=100`)
+    .flatMap((page) => page.check_runs ?? [])
+    .filter((check) => !NOT_CI.has(check.name));
   const latest = new Map();
   for (const check of runs.sort((a, b) => a.id - b.id))
     latest.set(check.name, check.conclusion ?? check.status);

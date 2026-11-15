@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { CREW_NAMES, crew, phases, prRecords } from "../../src/data/build";
 import raw from "../../src/data/history.json";
 import { githubAnchor, parseAdrs } from "../../src/lib/build/adrs";
-import { history } from "../../src/lib/build/history";
+import { describeChecks, history, tallyChecks } from "../../src/lib/build/history";
 import {
   DOT_GAP,
   buildTimeline,
@@ -95,6 +95,32 @@ describe("history.json (written by npm run history:sync)", () => {
 
   it("holds no author names or addresses", () => {
     expect(JSON.stringify(raw)).not.toMatch(/@[\w-]+\.[a-z]{2,}|"author"|"email"/i);
+  });
+});
+
+describe("check counts", () => {
+  const check = (conclusion: string, name = conclusion) => ({ name, conclusion });
+
+  it("lists only CI checks", () => {
+    for (const pr of raw.prs)
+      expect(pr.checks.map((c) => c.name)).not.toContain("Vercel Preview Comments");
+  });
+
+  it("does not count a skipped or neutral check as failed", () => {
+    const tally = tallyChecks([check("success", "a"), check("success", "b"), check("skipped")]);
+    expect(tally).toEqual({ ran: 2, passed: 2, skipped: 1 });
+    expect(describeChecks(tally)).toBe("2 of 2 passed, 1 skipped");
+    expect(tallyChecks([check("success"), check("neutral")])).toEqual({
+      ran: 1,
+      passed: 1,
+      skipped: 1,
+    });
+  });
+
+  it("counts anything else that did not succeed as not passed", () => {
+    const tally = tallyChecks([check("success"), check("failure"), check("cancelled")]);
+    expect(tally).toEqual({ ran: 3, passed: 1, skipped: 0 });
+    expect(describeChecks(tally)).toBe("1 of 3 passed");
   });
 });
 

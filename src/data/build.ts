@@ -72,6 +72,7 @@ export const phases: Phase[] = [
   { n: 6, title: "Scroll staging", roles: "Orchestrator plan, Fable build" },
   { n: 7, title: "How it was built", roles: "Fable" },
   { n: 8, title: "About and contact", roles: "Fable" },
+  { n: 9, title: "Polish and QA", roles: "Fable" },
 ];
 
 /** Merged pull requests, by number. */
@@ -199,6 +200,12 @@ export const prRecords: Record<number, PrRecord> = {
     credits: [{ by: "fable", work: "Build" }],
     note: "Fable, end to end; the orchestrator (Claude Opus 5.5) dispatched it and fixed one CI-only layout overflow in Mastery Pilot.",
     source: "BUILD-LOG, 2026-11-14: About and contact; orchestrator session record",
+  },
+  19: {
+    phase: 9,
+    credits: [{ by: "fable", work: "Build" }],
+    note: "Fable, end to end, including the phase 6–8 code review whose findings went to Luis before any fix; the orchestrator (Claude Opus 5.5) dispatched it.",
+    source: "PR #19 description; orchestrator session record",
   },
 };
 

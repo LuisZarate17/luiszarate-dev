@@ -95,10 +95,15 @@ test.describe("how it was built, without JavaScript", () => {
       "Sonnet · Fixes",
     ]);
     await expect(card(page, 11).locator(".credit")).toContainText("Four Sonnet implementers");
+    // A skipped or neutral check is not a failure, and the preview's comment tool is not CI.
+    const skipped = eleventh.checks.filter((c) => /^(skipped|neutral)$/.test(c.conclusion)).length;
     const passed = eleventh.checks.filter((c) => c.conclusion === "success").length;
-    await expect(summary(page, 11).locator(".pr-ci")).toContainText(
-      `${passed}/${eleventh.checks.length} checks`,
+    const ran = eleventh.checks.length - skipped;
+    await expect(summary(page, 11).locator(".pr-ci")).toContainText(`${passed}/${ran} checks`);
+    await expect(card(page, 11).locator(".pr-facts")).toContainText(
+      `${passed} of ${ran} passed${skipped > 0 ? `, ${skipped} skipped` : ""} on the last commit`,
     );
+    await expect(card(page, 11).locator(".pr-facts")).not.toContainText("Vercel Preview Comments");
     for (const check of eleventh.checks)
       await expect(card(page, 11).locator(".pr-facts")).toContainText(check.name);
     // One card at a time, natively: the cards share a name.
@@ -247,6 +252,24 @@ test.describe("how it was built", () => {
     await expect(card(page, 13)).toHaveAttribute("open");
     await expect(summary(page, 13)).toBeFocused();
     await expect(summary(page, 13)).toBeInViewport();
+  });
+
+  test("a card link clicked before the interaction has loaded still opens its card", async ({
+    page,
+  }) => {
+    // The chunk never arrives: the link falls through to the scene cut (src/lib/cut.ts).
+    await page.route(/build-timeline\.[\w-]+\.js/, (route) => route.abort());
+    await page.goto("/");
+    await page.waitForLoadState("load");
+    const credit = section(page).locator('.crew-on a[href="#pr-13"]');
+    await credit.scrollIntoViewIfNeeded();
+    await credit.click();
+    await expect(card(page, 13)).toHaveAttribute("open");
+    await expect(summary(page, 13)).toBeFocused();
+    await expect(page).toHaveURL(/#pr-13$/);
+    const box = await inFrame(page, "#pr-13 > summary");
+    expect(box.top).toBeGreaterThanOrEqual(box.frameTop);
+    expect(box.bottom).toBeLessThanOrEqual(box.frameBottom);
   });
 
   test("a page opened on a card's link shows that card", async ({ page }) => {
