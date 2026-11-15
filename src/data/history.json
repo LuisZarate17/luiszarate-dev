@@ -121,6 +121,12 @@
       "date": "2026-11-14T01:33:13Z",
       "subject": "feat: About and contact (phase 8) (#18)",
       "pr": 18
+    },
+    {
+      "sha": "fc32029",
+      "date": "2026-11-15T18:42:14Z",
+      "subject": "feat: polish and QA (phase 9) (#19)",
+      "pr": 19
     }
   ],
   "prs": [
@@ -899,29 +905,28 @@
       ]
     },
     {
-      "number": 18,
-      "title": "feat: About and contact (phase 8)",
-      "branch": "feat/about-contact",
-      "createdAt": "2026-11-14T00:12:36Z",
-      "mergedAt": "2026-11-14T01:33:14Z",
-      "mergeSha": "a76692a",
-      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/18",
-      "additions": 1201,
-      "deletions": 31,
-      "changedFiles": 14,
+      "number": 19,
+      "title": "feat: polish and QA (phase 9)",
+      "branch": "feat/polish-qa",
+      "createdAt": "2026-11-14T23:30:07Z",
+      "mergedAt": "2026-11-15T18:42:15Z",
+      "mergeSha": "fc32029",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/19",
+      "additions": 707,
+      "deletions": 105,
+      "changedFiles": 31,
       "commits": [
         {
-          "sha": "332189b",
-          "date": "2026-11-14T00:12:32Z",
-          "subject": "feat: About and contact (phase 8)"
-        },
-        {
-          "sha": "0aeb9ff",
-          "date": "2026-11-14T00:19:03Z",
-          "subject": "fix: more headroom for Mastery Pilot on short desktop screens"
+          "sha": "ca6d2e8",
+          "date": "2026-11-14T23:30:03Z",
+          "subject": "feat: polish and QA (phase 9)"
         }
       ],
       "checks": [
+        {
+          "name": "claude-review",
+          "conclusion": "success"
+        },
         {
           "name": "Lighthouse budget",
           "conclusion": "success"
@@ -932,10 +937,6 @@
         },
         {
           "name": "Playwright (desktop + phone)",
-          "conclusion": "success"
-        },
-        {
-          "name": "Vercel Preview Comments",
           "conclusion": "success"
         }
       ]
