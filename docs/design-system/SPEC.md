@@ -779,7 +779,8 @@ line-clamped, collapsed, put in a tooltip or moved into the drawer.
   project is identified before the title is read. The words carry the meaning; the accent
   border is reinforcement.
 - The statement comes from the content file's `role` and is written against the project's own
-  README. It states what Luis built in plain verbs.
+  README. It states what Luis built in plain verbs, in the first person like the rest of the
+  page (`docs/GUIDE.md`, section 3).
 - Schema addition: `credit: z.enum(["solo", "team"])`, so the badge is data, not a guess from
   the `role` string.
 - In "How it was built", the same badge and statement pattern credits the models that did the

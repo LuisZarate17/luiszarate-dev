@@ -18,7 +18,7 @@ repo: https://github.com/LuisZarate17/CougarConnect
 live: https://cougarconnect.onrender.com/Account/Login
 liveLabel: "Live demo: sign-in"
 role: >-
-  Team project (fall 2024). Solo in 2026, Luis removed hardcoded secrets, migrated to
+  Team project (fall 2024). Solo in 2026, I removed hardcoded secrets, migrated to
   PostgreSQL, added the xUnit suite and CI, deployed it on Render, and redesigned
   connections, messaging and notifications.
 metrics:

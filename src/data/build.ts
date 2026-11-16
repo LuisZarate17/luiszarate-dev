@@ -129,7 +129,7 @@ export const prRecords: Record<number, PrRecord> = {
     creditSource: "BUILD-LOG, 2026-11-11: Design system",
   },
   5: {
-    what: "The roadmap: the phases from planning to launch with their status, a backlog of small items from design review, and the decisions still open for Luis. Docs only.",
+    what: "The roadmap: the phases from planning to launch with their status, a backlog of small items from design review, and the decisions still open for me. Docs only.",
     source: "PR #5 description",
     credits: [{ by: "orchestrator", work: "Docs" }],
     creditNote: "Written by the orchestrator directly, on Claude Opus 5.5, with no subagent.",
@@ -145,7 +145,7 @@ export const prRecords: Record<number, PrRecord> = {
   },
   7: {
     phase: 4,
-    what: "The name as five dot-lattice plates in depth that fan out on load, follow the pointer and break apart on scroll (ADR-006). three.js loads only inside the hero, under a budget check; reduced motion and no JavaScript get a CSS still. A design review halved the fan and made the front plate solid, approved by Luis.",
+    what: "The name as five dot-lattice plates in depth that fan out on load, follow the pointer and break apart on scroll (ADR-006). three.js loads only inside the hero, under a budget check; reduced motion and no JavaScript get a CSS still. A design review halved the fan and made the front plate solid; I approved both.",
     source: "PR #7 description; BUILD-LOG, 2026-11-12: 3D hero",
     credits: [
       { by: "fable", work: "Direction" },
@@ -157,14 +157,14 @@ export const prRecords: Record<number, PrRecord> = {
     creditSource: "BUILD-LOG, 2026-11-12: 3D hero; ROADMAP phase 4; PR #7 description",
   },
   8: {
-    what: "A hook that runs lint and the type check before an agent can finish, and sends any failure back to be fixed. Also adds code review to the definition of done, with the findings going to Luis before any fix.",
+    what: "A hook that runs lint and the type check before an agent can finish, and sends any failure back to be fixed. Also adds code review to the definition of done, with the findings coming to me before any fix.",
     source: "PR #8 description",
     credits: [{ by: "orchestrator", work: "Build" }],
     creditNote: "Written by the orchestrator directly, on Claude Opus 5.5, with no subagent.",
     creditSource: "orchestrator session record, 2026-11-11..13",
   },
   9: {
-    what: "The GitHub workflows for AI code review on pull requests. Luis generated them with the GitHub app's installer; the triggers were then changed so each pull request gets one review and docs-only pull requests are skipped.",
+    what: "The GitHub workflows for AI code review on pull requests. I generated them with the GitHub app's installer; the triggers were then changed so each pull request gets one review and docs-only pull requests are skipped.",
     source:
       "orchestrator session record, 2026-11-11..13; the review workflow in .github/workflows/",
     credits: [{ by: "orchestrator", work: "Edit" }],
@@ -271,6 +271,24 @@ export const prRecords: Record<number, PrRecord> = {
     creditNote:
       "Fable, end to end, including the phase 6–8 code review whose findings went to Luis before any fix; the orchestrator (Claude Opus 5.5) dispatched it.",
     creditSource: "PR #19 description; orchestrator session record",
+  },
+  20: {
+    phase: 9,
+    what: "Fixes from the code review of phases 6 to 8. Keyboard focus no longer lands behind the bottom bar, the history keeps only pull requests into main, and a skipped check is no longer counted as a failed one. A new test tabs through every scene and checks each focused element is inside the frame.",
+    source: "PR #20 description",
+    credits: [{ by: "fable", work: "Fixes" }],
+    creditNote:
+      "Fable, end to end: the fixes for its own review of phases 6 to 8, after the findings went to Luis; the orchestrator (Claude Opus 5.5) dispatched it.",
+    creditSource: "PR #20 description; orchestrator session record",
+  },
+  21: {
+    phase: 9,
+    what: "This section, reframed: it now says how I ran the project, and each card leads with what changed and why. Before, every card led with a credit badge and the page read as a list of tools. The per-pull-request credits stay in the data and the build log (ADR-008, amendment).",
+    source: "PR #21 description; BUILD-LOG, 2026-11-15: How it was built, reframed",
+    credits: [{ by: "fable", work: "Build" }],
+    creditNote:
+      "Fable, end to end: the reframe of this section, directed by Luis; the orchestrator (Claude Opus 5.5) dispatched it.",
+    creditSource: "PR #21 description; BUILD-LOG, 2026-11-15: How it was built, reframed",
   },
 };
 
