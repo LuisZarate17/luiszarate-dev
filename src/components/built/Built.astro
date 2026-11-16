@@ -1,23 +1,27 @@
 ---
 import decisions from "../../../DECISIONS.md?raw";
 import Slug from "../scene/Slug.astro";
-import { CREW_NAMES, crew, phases, prRecords } from "../../data/build";
+import { phases, prRecords } from "../../data/build";
 import { parseAdrs } from "../../lib/build/adrs";
-import { describeChecks, history, tallyChecks } from "../../lib/build/history";
+import { checkLabel, describeChecks, history, tallyChecks } from "../../lib/build/history";
 import { buildTimeline, mergeOrder } from "../../lib/build/timeline";
 
 /**
- * "How it was built" (concept A; ADR-008): the repository's real history as a timeline, a card
- * per pull request, the crew and the decision records.
+ * "How it was built" (concept A; ADR-008): how Luis ran the project. The repository's real
+ * history as a timeline, a card per pull request saying what changed and why, one line on the
+ * tools, and the decision records.
  *
  * Everything is rendered here, at build time, as plain HTML: the cards are native `details`
  * and the timeline's marks are links to them, so the section reads and works without
  * JavaScript. `src/lib/build-timeline.ts` (loaded when the section comes near) makes a mark
  * open its card in place.
  *
- * History comes from `src/data/history.json` (`npm run history:sync`); who did the work comes
- * from `src/data/build.ts`, curated from the build log. A pull request the curated file does
- * not cover, such as one merged after it was last edited, renders with no credit.
+ * History comes from `src/data/history.json` (`npm run history:sync`); what each pull request
+ * changed comes from `src/data/build.ts`, curated from the pull request descriptions and the
+ * build log. A pull request the curated file does not cover, such as one merged after it was
+ * last edited, renders with its facts and no summary. The models are tools here, named once
+ * under "Tools": the per-pull-request credits stay in the data and the build log (ADR-008,
+ * amendment).
  */
 const ordered = mergeOrder(history.prs);
 const timeline = buildTimeline(history);
@@ -63,18 +67,19 @@ const cards = ordered.map((pr) => {
   return {
     pr,
     phase,
-    note: record?.note,
+    what: record?.what,
     source: record?.source,
-    credits: (record?.credits ?? []).map(
-      (c) => `${CREW_NAMES[c.by]}${c.count ? ` ×${c.count}` : ""} · ${c.work}`,
-    ),
     tally: tallyChecks(pr.checks),
   };
 });
 
-/** The pull requests a crew member is credited on, in merge order. */
-const creditedOn = (id: string) =>
-  ordered.filter((pr) => prRecords[pr.number]?.credits.some((c) => c.by === id));
+/** Totals for the lead, all from the snapshot. */
+const branchCommits = ordered.reduce((sum, pr) => sum + pr.commits.length, 0);
+const checkRuns = cards.reduce(
+  (sum, { tally }) => ({ ran: sum.ran + tally.ran, passed: sum.passed + tally.passed }),
+  { ran: 0, passed: 0 },
+);
+const buildLog = `${history.url}/blob/main/docs/BUILD-LOG.md`;
 ---
 
 <section
@@ -93,23 +98,27 @@ const creditedOn = (id: string) =>
       </div>
       <div class="built-intro">
         <p class="text-lead">
-          Luis directed Claude models in Claude Code and made the calls. An orchestrator planned,
-          wrote the specs and merged; subagents on other models built and reviewed, some of them
-          side by side in parallel git worktrees.
+          How Luis runs a project: a written spec before the code, a decision record for each
+          lasting choice, one branch and one pull request per change, and nothing merged until CI is
+          green.
+        </p>
+        <p class="built-how text-small">
+          CI runs on every pull request: formatting, lint, type check, unit tests, the build and a
+          JavaScript budget, then Playwright at desktop and phone size and a Lighthouse budget.
+          Independent features are built side by side on separate branches in git worktrees, and
+          code review findings go to Luis before any fix.
         </p>
         <p class="built-asof text-small">
           {last && (
             <>
               This is the repository's real history, as of pull request #{last.number}, merged{" "}
               <time datetime={last.mergedAt}>{dayFormat.format(new Date(last.mergedAt))}</time>
-              .{" "}
+              :{" "}
             </>
           )}
-          Every commit is authored by Luis, so the model credits come from the{" "}
-          <a href={`${history.url}/blob/main/docs/BUILD-LOG.md`} rel="noopener noreferrer">
-            build log
-          </a>{" "}
-          and the orchestrator's own session record. Where neither names a model, the card says so.
+          {plural(ordered.length, "pull request")} in {plural(days, "day")},{" "}
+          {plural(branchCommits, "commit")} on their branches, {count.format(checkRuns.passed)} of{" "}
+          {count.format(checkRuns.ran)} check runs passed.
         </p>
       </div>
     </header>
@@ -169,15 +178,15 @@ const creditedOn = (id: string) =>
       </div>
     </div>
     <p class="tl-key text-small">
-      Each numbered mark is a pull request merged to <code>main</code>; open one to see who did the
-      work. The lines above are branches, with a dot per commit; stacked lines were open at the same
-      time. The order is real and the spacing is not to scale. Days are UTC.
+      Each numbered mark is a pull request merged to <code>main</code>; open one to see what changed
+      and why. The lines above are branches, with a dot per commit; stacked lines were open at the
+      same time. The order is real and the spacing is not to scale. Days are UTC.
     </p>
 
     <div class="built-prs">
       <h3 class="font-display text-heading uppercase">Pull requests</h3>
       <ol class="prs">
-        {cards.map(({ pr, phase, note, source, credits, tally }) => (
+        {cards.map(({ pr, phase, what, source, tally }) => (
           <li>
             <details class="pr" id={`pr-${pr.number}`} name="build-pr">
               <summary>
@@ -185,15 +194,6 @@ const creditedOn = (id: string) =>
                   <span class="sr-only">Pull request </span>#{pr.number}
                 </span>
                 <span class="pr-title text-body">{pr.title}</span>
-                <span class="pr-credits">
-                  {credits.length > 0 ? (
-                    credits.map((credit) => (
-                      <span class="credit-badge font-mono text-meta uppercase">{credit}</span>
-                    ))
-                  ) : (
-                    <span class="pr-none font-mono text-meta uppercase">Model not recorded</span>
-                  )}
-                </span>
                 <span class="pr-ci font-mono text-meta uppercase">
                   {pr.checks.length > 0 ? (
                     <>
@@ -207,18 +207,13 @@ const creditedOn = (id: string) =>
                 </span>
               </summary>
               <div class="pr-panel">
-                {note && (
-                  <p class="credit text-small">
-                    <span class="credit-label font-mono text-meta uppercase">Credit</span>
-                    <span>{note}</span>
-                  </p>
-                )}
+                {what && <p class="pr-what text-small">{what}</p>}
                 <dl class="pr-facts text-small">
                   {phase && (
                     <div>
                       <dt>Phase</dt>
                       <dd>
-                        {phase.n}, {phase.title}: {phase.roles}
+                        {phase.n}, {phase.title}
                       </dd>
                     </div>
                   )}
@@ -255,7 +250,7 @@ const creditedOn = (id: string) =>
                       {pr.checks.length > 0 ? (
                         <>
                           {describeChecks(tally)} on the last commit:{" "}
-                          {pr.checks.map((c) => c.name).join("; ")}.
+                          {pr.checks.map((c) => checkLabel(c.name)).join("; ")}.
                         </>
                       ) : (
                         "None recorded."
@@ -288,31 +283,17 @@ const creditedOn = (id: string) =>
     </div>
 
     <div class="built-side">
-      <div class="built-crew">
-        <h3 class="font-display text-heading uppercase">Crew</h3>
-        <ul class="crew">
-          {crew.map((member) => {
-            const on = creditedOn(member.id);
-            return (
-              <li>
-                <p class="crew-role font-mono text-meta uppercase">{member.role}</p>
-                <p class="crew-model font-display text-heading uppercase">{member.model}</p>
-                <p class="crew-brief text-small">{member.brief}</p>
-                <p class="crew-did text-small">{member.did}</p>
-                {on.length > 0 && (
-                  <p class="crew-on font-mono text-meta uppercase">
-                    Credited on{" "}
-                    {on.map((pr) => (
-                      <a href={`#pr-${pr.number}`}>
-                        <span class="sr-only">Pull request </span>#{pr.number}
-                      </a>
-                    ))}
-                  </p>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+      <div class="built-tools">
+        <h3 class="font-display text-heading uppercase">Tools</h3>
+        <p class="tools text-small">
+          Built with Claude Code. Opus planned and coordinated, Sonnet implemented, and Fable did
+          design specs and reviews, then implementation too. Luis set the brief, made the decisions,
+          and reviewed and approved every pull request before it merged. The{" "}
+          <a href={buildLog} rel="noopener noreferrer">
+            build log
+          </a>{" "}
+          records which model did what.
+        </p>
       </div>
 
       <div class="built-notes">
@@ -389,9 +370,8 @@ const creditedOn = (id: string) =>
   }
 
   /* Text links (spec 5.6): the underline is always there; color is never what marks a link. */
-  .built-asof a,
+  .tools a,
   .adrs a,
-  .crew-on a,
   .pr-link {
     color: inherit;
     text-decoration: underline;
@@ -400,9 +380,8 @@ const creditedOn = (id: string) =>
     text-decoration-color: var(--color-line-strong);
   }
   @media (hover: hover) {
-    .built-asof a:hover,
+    .tools a:hover,
     .adrs a:hover,
-    .crew-on a:hover,
     .pr-link:hover {
       color: var(--color-text);
       text-decoration-thickness: 2px;
@@ -419,10 +398,13 @@ const creditedOn = (id: string) =>
     margin-top: calc(var(--spacing) * 6);
     max-width: var(--container-measure);
   }
+  .built-how,
   .built-asof {
     margin-top: calc(var(--spacing) * 4);
-    color: var(--color-muted);
     text-wrap: pretty;
+  }
+  .built-asof {
+    color: var(--color-muted);
   }
 
   /* ---- timeline ----
@@ -600,7 +582,6 @@ const creditedOn = (id: string) =>
     grid-template-columns: 2.5rem minmax(0, 1fr) 1.5rem;
     grid-template-areas:
       "no title mark"
-      ". credits credits"
       ". ci ci";
     align-items: baseline;
     column-gap: calc(var(--spacing) * 2);
@@ -647,23 +628,6 @@ const creditedOn = (id: string) =>
     font-weight: 600;
     text-wrap: pretty;
   }
-  .pr-credits {
-    grid-area: credits;
-    display: flex;
-    flex-wrap: wrap;
-    gap: calc(var(--spacing) * 2);
-  }
-  .credit-badge {
-    padding: calc(var(--spacing) * 1) calc(var(--spacing) * 2);
-    border: 1px solid var(--color-line-strong);
-    border-radius: var(--radius-sm);
-    color: var(--color-text);
-    white-space: nowrap;
-  }
-  .pr-none {
-    padding-block: calc(var(--spacing) * 1);
-    color: var(--color-muted);
-  }
   .pr-ci {
     grid-area: ci;
     color: var(--color-muted);
@@ -681,12 +645,9 @@ const creditedOn = (id: string) =>
       animation: var(--animate-reveal);
     }
   }
-  .credit {
+  .pr-what {
     max-width: var(--container-measure-wide);
-  }
-  .credit-label {
-    margin-right: calc(var(--spacing) * 2);
-    color: var(--color-muted);
+    text-wrap: pretty;
   }
   .pr-facts {
     display: grid;
@@ -717,54 +678,20 @@ const creditedOn = (id: string) =>
     flex: none;
   }
 
-  /* ---- crew ---- */
+  /* ---- tools ---- */
   .built-side {
     display: grid;
     row-gap: calc(var(--spacing) * 12);
     align-content: start;
   }
-  .crew {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    margin-top: calc(var(--spacing) * 4);
-    border-top: 1px solid var(--color-line);
-  }
-  .crew li {
-    padding-block: calc(var(--spacing) * 4);
-    border-bottom: 1px solid var(--color-line);
-  }
-  .crew-role {
-    color: var(--color-muted);
-    text-transform: none;
-  }
-  .crew-model {
-    margin-top: calc(var(--spacing) * 1);
-  }
-  .crew-brief {
-    margin-top: calc(var(--spacing) * 2);
-    color: var(--color-muted);
-  }
-  .crew-did {
-    margin-top: calc(var(--spacing) * 2);
+  .tools {
+    margin-top: calc(var(--spacing) * 3);
     max-width: var(--container-measure);
     text-wrap: pretty;
   }
-  .crew-on {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: calc(var(--spacing) * 1);
-    margin-top: calc(var(--spacing) * 2);
-    color: var(--color-muted);
-  }
-  .crew-on a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: calc(var(--spacing) * 11);
-    min-height: calc(var(--spacing) * 11);
-    color: var(--color-text);
-    letter-spacing: 0;
+  /* The link is inline in a sentence; padding gives it a taller target without moving the line. */
+  .tools a {
+    padding-block: calc(var(--spacing) * 3);
   }
 
   /* ---- script notes ---- */
@@ -798,25 +725,11 @@ const creditedOn = (id: string) =>
   @media (min-width: 40rem) {
     .pr summary {
       grid-template-columns: 2.5rem minmax(0, 1fr) auto 1.5rem;
-      grid-template-areas:
-        "no title ci mark"
-        ". credits credits credits";
-    }
-    .credit {
-      display: grid;
-      grid-template-columns: 4.5rem minmax(0, 1fr);
-      column-gap: calc(var(--spacing) * 3);
-    }
-    .credit-label {
-      margin-right: 0;
-    }
-    .crew {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: var(--spacing-gutter);
+      grid-template-areas: "no title ci mark";
     }
   }
 
-  /* ---- 1024 and up: the list and the credits side by side ---- */
+  /* ---- 1024 and up: the list beside the tools and the notes ---- */
   @media (min-width: 64rem) {
     .built-grid {
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
@@ -834,9 +747,6 @@ const creditedOn = (id: string) =>
     /* The lead starts level with the title, under the slug's row. */
     .built-intro {
       margin-top: calc(var(--text-slug) * var(--text-slug--line-height) + var(--spacing) * 4);
-    }
-    .crew {
-      grid-template-columns: minmax(0, 1fr);
     }
   }
   /* A window with room for it: the timeline stays under the top bar while the cards scroll,

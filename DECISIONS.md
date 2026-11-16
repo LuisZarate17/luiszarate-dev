@@ -236,6 +236,19 @@ snapshot it ships in. A new pull request shows up uncredited until the curated f
 which is the safe failure. The curated file is a second place to keep honest, so it stays small
 and cites its sources.
 
+**Amendment, 2026-11-15 (presentation; approved by Luis).** The section led with which model
+did the work: a credit badge on every card, a crew list, about 110 model names on the page. A
+visitor could take that as "AI built this site". What happened is that Luis directed it: he set
+the brief and the decisions and reviewed every pull request, and the models implemented. So the
+data stays and the page changes. Each card now leads with what the pull request changed and why
+(`what` and `source` in `src/data/build.ts`, written from the pull request descriptions and the
+build log). The crew list is one "Tools" line that names the models once and links to the build
+log, where the full attribution stays public. The per-pull-request credits, their notes and
+their sources remain in `src/data/build.ts`, unrendered, and still tested. The review check is
+shown as "AI code review", not by its job name. Tests hold the count: at most four model names
+in the section outside the script notes, plus any in a pull request's own title or branch
+name. Nothing is removed from the record, and nothing is claimed that the record does not say.
+
 ## ADR-009: Contact: the address as text, optional slots as files, the last cut as a still band
 
 **Status:** accepted, 2026-11-14. Amends the concept's "the bars close to black as the last cut"

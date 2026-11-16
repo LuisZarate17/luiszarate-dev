@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { CREW_NAMES, crew, phases, prRecords } from "../../src/data/build";
 import raw from "../../src/data/history.json";
 import { githubAnchor, parseAdrs } from "../../src/lib/build/adrs";
-import { describeChecks, history, tallyChecks } from "../../src/lib/build/history";
+import { checkLabel, describeChecks, history, tallyChecks } from "../../src/lib/build/history";
 import {
   DOT_GAP,
   buildTimeline,
@@ -124,8 +124,30 @@ describe("check counts", () => {
   });
 });
 
-describe("curated credits (src/data/build.ts)", () => {
+describe("curated records (src/data/build.ts)", () => {
   const numbers = new Set(history.prs.map((pr) => pr.number));
+  const MODELS = /claude|fable|sonnet|opus|haiku/i;
+
+  it("says what every pull request in the history changed, with a source", () => {
+    for (const pr of history.prs) {
+      const record = prRecords[pr.number];
+      expect(record, `#${pr.number} has no record`).toBeDefined();
+      expect(record!.what.length, `#${pr.number}`).toBeGreaterThan(40);
+      expect(record!.source, `#${pr.number}`).toBeTruthy();
+    }
+  });
+
+  it("keeps the models out of what the page shows per pull request", () => {
+    for (const [n, record] of Object.entries(prRecords)) {
+      expect(record.what, `#${n}`).not.toMatch(MODELS);
+      expect(record.source, `#${n}`).not.toMatch(MODELS);
+    }
+    for (const phase of phases) expect(phase.title).not.toMatch(MODELS);
+    for (const pr of history.prs)
+      for (const check of pr.checks) expect(checkLabel(check.name)).not.toMatch(MODELS);
+    expect(checkLabel("claude-review")).toBe("AI code review");
+    expect(checkLabel("Lighthouse budget")).toBe("Lighthouse budget");
+  });
 
   it("only names pull requests that are in the history", () => {
     for (const n of Object.keys(prRecords)) expect(numbers.has(Number(n)), `#${n}`).toBe(true);
@@ -142,8 +164,8 @@ describe("curated credits (src/data/build.ts)", () => {
 
   it("cites a source for every credit, and claims nothing where it has none", () => {
     for (const [n, record] of Object.entries(prRecords)) {
-      if (record.credits.length > 0) expect(record.source, `#${n}`).toBeTruthy();
-      else expect(record.note ?? record.source, `#${n}`).toBeUndefined();
+      if (record.credits.length > 0) expect(record.creditSource, `#${n}`).toBeTruthy();
+      else expect(record.creditNote ?? record.creditSource, `#${n}`).toBeUndefined();
     }
   });
 

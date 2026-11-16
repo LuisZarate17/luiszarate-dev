@@ -3,8 +3,8 @@ import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * "How it was built" (ADR-008): the timeline, the pull-request cards, the crew and the script
- * notes. Everything is checked against the committed snapshot the page renders from.
+ * "How it was built" (ADR-008): the timeline, the pull-request cards, the tools line and the
+ * script notes. Everything is checked against the committed snapshot the page renders from.
  */
 interface Pr {
   number: number;
@@ -21,6 +21,10 @@ const merged = [...history.prs].sort((a, b) => Date.parse(a.mergedAt) - Date.par
 const first = merged[0]!;
 const last = merged.at(-1)!;
 const eleventh = history.prs.find((pr) => pr.number === 11)!;
+/** A check's name as the page shows it (`checkLabel`, src/lib/build/history.ts). */
+const label = (name: string) => (name === "claude-review" ? "AI code review" : name);
+const MODELS = /claude|fable|sonnet|opus|haiku/i;
+const EVERY_MODEL = new RegExp(MODELS, "gi");
 
 const section = (page: Page) => page.locator("main > section#build");
 const mark = (page: Page, n: number) => section(page).locator(`.tl-prs a[href="#pr-${n}"]`);
@@ -82,19 +86,16 @@ test.describe("how it was built, without JavaScript", () => {
     expect(order).toEqual(merged.map((pr) => pr.number));
   });
 
-  test("a card opens from its summary and shows who did the work and what CI said", async ({
+  test("a card opens from its summary and shows what changed and what CI said", async ({
     page,
   }) => {
     await page.goto("/");
     await expect(card(page, 11)).not.toHaveAttribute("open");
     await summary(page, 11).click();
     await expect(card(page, 11)).toHaveAttribute("open");
-    await expect(summary(page, 11).locator(".credit-badge")).toHaveText([
-      "Sonnet ×4 · Build",
-      "Orchestrator · Integration",
-      "Sonnet · Fixes",
-    ]);
-    await expect(card(page, 11).locator(".credit")).toContainText("Four Sonnet implementers");
+    await expect(card(page, 11).locator(".pr-what")).toContainText(
+      "built side by side in four git worktrees",
+    );
     // A skipped or neutral check is not a failure, and the preview's comment tool is not CI.
     const skipped = eleventh.checks.filter((c) => /^(skipped|neutral)$/.test(c.conclusion)).length;
     const passed = eleventh.checks.filter((c) => c.conclusion === "success").length;
@@ -105,26 +106,60 @@ test.describe("how it was built, without JavaScript", () => {
     );
     await expect(card(page, 11).locator(".pr-facts")).not.toContainText("Vercel Preview Comments");
     for (const check of eleventh.checks)
-      await expect(card(page, 11).locator(".pr-facts")).toContainText(check.name);
+      await expect(card(page, 11).locator(".pr-facts")).toContainText(label(check.name));
     // One card at a time, natively: the cards share a name.
     await summary(page, 3).click();
     await expect(card(page, 3)).toHaveAttribute("open");
     await expect(card(page, 11)).not.toHaveAttribute("open");
   });
 
-  test("every pull request in the snapshot is credited, with a statement and its source", async ({
+  test("every pull request in the snapshot says what changed, with its source", async ({
     page,
   }) => {
     await page.goto("/");
-    await expect(section(page).locator(".pr-none")).toHaveCount(0);
     for (const pr of history.prs) {
-      expect(await summary(page, pr.number).locator(".credit-badge").count()).toBeGreaterThan(0);
-      await expect(card(page, pr.number).locator(".credit")).toHaveCount(1);
+      const what = card(page, pr.number).locator(".pr-what");
+      await expect(what).toHaveCount(1);
+      expect((await what.textContent())!.trim().length).toBeGreaterThan(40);
       await expect(card(page, pr.number).locator(".pr-facts")).toContainText("Record");
     }
-    await expect(summary(page, 5).locator(".credit-badge")).toHaveText(["Orchestrator · Docs"]);
-    await expect(summary(page, 10).locator(".credit-badge")).toHaveText(["Orchestrator · Build"]);
-    await expect(card(page, 10).locator(".credit")).toContainText("Claude Sonnet 5.5");
+  });
+
+  test("Luis is the subject and the models are tools: named in one line, not per card", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const s = section(page);
+    // No card carries a model credit, in its row or in its panel.
+    await expect(s.locator(".credit-badge, .credit, .crew")).toHaveCount(0);
+    // A branch name is git's, not the page's wording (#9's names its tool).
+    for (const pr of history.prs) {
+      const panel = await card(page, pr.number).locator(".pr-panel").textContent();
+      expect(panel!.replace(pr.branch, ""), `#${pr.number}`).not.toMatch(MODELS);
+    }
+    const tools = s.locator(".tools");
+    await expect(tools).toContainText("Built with Claude Code");
+    await expect(tools).toContainText("Luis set the brief");
+    await expect(tools.getByRole("link", { name: "build log" })).toHaveAttribute(
+      "href",
+      `${history.url}/blob/main/docs/BUILD-LOG.md`,
+    );
+    await expect(s.locator(".built-intro")).toContainText("How Luis runs a project");
+    await expect(s.locator(".built-asof")).toContainText(`${history.prs.length} pull requests`);
+    // The whole section outside the script notes (ADR titles are quoted from DECISIONS.md):
+    // four names in the tools line, plus titles and branch names as GitHub has them (#9's).
+    const text = await s.evaluate((el) => {
+      const copy = el.cloneNode(true) as HTMLElement;
+      copy.querySelector(".built-notes")?.remove();
+      for (const style of copy.querySelectorAll("style, script")) style.remove();
+      return copy.textContent ?? "";
+    });
+    const inTitles = history.prs.flatMap(
+      (pr) => `${pr.title} ${pr.branch}`.match(EVERY_MODEL) ?? [],
+    ).length;
+    expect(inTitles).toBeLessThanOrEqual(2);
+    const named = text.match(EVERY_MODEL) ?? [];
+    expect(named.length, named.join(", ")).toBeLessThanOrEqual(4 + inTitles);
   });
 
   test("a timeline mark is a plain link to its card", async ({ page }) => {
@@ -134,11 +169,9 @@ test.describe("how it was built, without JavaScript", () => {
     await expect(summary(page, last.number)).toBeInViewport();
   });
 
-  test("lists the crew and the decision records", async ({ page }) => {
+  test("lists the decision records", async ({ page }) => {
     await page.goto("/");
     const s = section(page);
-    await expect(s.locator(".crew > li")).toHaveCount(4);
-    await expect(s.locator(".crew-model")).toHaveText(["Opus 5.5", "Fable", "Sonnet", "Haiku"]);
     const adrs = s.locator(".adrs a");
     expect(await adrs.count()).toBeGreaterThanOrEqual(8);
     await expect(adrs.first()).toHaveAttribute(
@@ -159,7 +192,7 @@ test.describe("how it was built", () => {
       "H2 How it was built",
       "H3 Timeline",
       "H3 Pull requests",
-      "H3 Crew",
+      "H3 Tools",
       "H3 Script notes",
     ]);
   });
@@ -244,16 +277,6 @@ test.describe("how it was built", () => {
     await expect(card(page, 7).locator("a.pr-link")).toBeFocused();
   });
 
-  test("a crew credit opens the card it names", async ({ page }) => {
-    await arrive(page);
-    const credit = section(page).locator('.crew-on a[href="#pr-13"]');
-    await credit.scrollIntoViewIfNeeded();
-    await credit.click();
-    await expect(card(page, 13)).toHaveAttribute("open");
-    await expect(summary(page, 13)).toBeFocused();
-    await expect(summary(page, 13)).toBeInViewport();
-  });
-
   test("a card link clicked before the interaction has loaded still opens its card", async ({
     page,
   }) => {
@@ -261,9 +284,8 @@ test.describe("how it was built", () => {
     await page.route(/build-timeline\.[\w-]+\.js/, (route) => route.abort());
     await page.goto("/");
     await page.waitForLoadState("load");
-    const credit = section(page).locator('.crew-on a[href="#pr-13"]');
-    await credit.scrollIntoViewIfNeeded();
-    await credit.click();
+    await mark(page, 13).scrollIntoViewIfNeeded();
+    await mark(page, 13).click();
     await expect(card(page, 13)).toHaveAttribute("open");
     await expect(summary(page, 13)).toBeFocused();
     await expect(page).toHaveURL(/#pr-13$/);
@@ -281,7 +303,7 @@ test.describe("how it was built", () => {
 
   test("every target is at least 44 px and nothing is hover-only", async ({ page }) => {
     await arrive(page);
-    const targets = section(page).locator(".tl-prs a, details.pr > summary, .crew-on a");
+    const targets = section(page).locator(".tl-prs a, details.pr > summary");
     for (const box of await targets.evaluateAll((els) =>
       els.map((el) => {
         const r = el.getBoundingClientRect();
