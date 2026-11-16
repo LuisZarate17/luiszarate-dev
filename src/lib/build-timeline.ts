@@ -2,7 +2,7 @@
  * The timeline's interaction in "How it was built". Progressive: without it the marks are
  * plain links to the cards, which are native `details`.
  *
- *  - a link to a card (`a[href="#pr-…"]`, in the timeline or the crew list) opens that card in
+ *  - a link to a card (`a[href="#pr-…"]`, wherever it is in the section) opens that card in
  *    place, moves focus to it and brings it into the frame, instead of a scene cut;
  *  - the mark and branch of the open card are shown as current, however the card was opened;
  *  - Left, Right, Home and End move between the marks.

@@ -71,3 +71,13 @@ export function describeChecks(tally: CheckTally): string {
   const skipped = tally.skipped > 0 ? `, ${tally.skipped} skipped` : "";
   return `${tally.passed} of ${tally.ran} passed${skipped}`;
 }
+
+/**
+ * A check's name as the page shows it. The review job is named after its tool on GitHub; the
+ * page says what the check is (ADR-008, amendment) and names the tools once, elsewhere.
+ */
+const CHECK_LABELS: Record<string, string> = { "claude-review": "AI code review" };
+
+export function checkLabel(name: string): string {
+  return CHECK_LABELS[name] ?? name;
+}

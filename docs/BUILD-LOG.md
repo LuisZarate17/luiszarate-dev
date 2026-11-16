@@ -264,3 +264,16 @@ built, which model did the work, and why. Written as the work happens, not recon
   the home page to the SEO floor.
 - **Backlog folded in.** The Bifrost drawer note and the two live-link labels moved from a
   side module into the content schema (`note`, `liveLabel`), so a project is again one file.
+
+## 2026-11-15: How it was built, reframed (Fable)
+
+- **Luis is the subject, the models are tools.** Luis found that the section brought up the
+  models too much: every card led with a model badge, there was a crew list, and the page named
+  a model about 110 times, which reads as "AI built this". He directed the build, so the page
+  now says how he ran it: specs, decision records, CI on every pull request, parallel branches,
+  code review. Each card leads with what changed and why, written from the pull request
+  descriptions and this log; the crew list became one "Tools" line that names the models once
+  and links here. Nothing was dropped from the record: the per-pull-request credits stay in
+  `src/data/build.ts` with their sources, and this log keeps the full account (ADR-008,
+  amendment). A test fails if the section names a model more than four times outside the script
+  notes and the pull requests' own titles and branch names.
