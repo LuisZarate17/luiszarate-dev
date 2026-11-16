@@ -16,6 +16,8 @@ is itself a resume project, so the front end is the point. Treat it as a product
 - **Art direction is "Final Cut"** (ADR-002, `docs/art-direction/CONCEPTS.md`). Film grammar
   stays restrained: letterbox bars, slug lines and cuts. No film grain, clapperboards or
   "directed by".
+- Adding a project or a simulation, the copy voice, and the launch checklist are in
+  `docs/GUIDE.md` ("Extending this site"). Read it before extending the page.
 - Decisions with lasting consequences get an ADR in `DECISIONS.md`. Notable work gets an entry
   in `docs/BUILD-LOG.md`; it is the source for the site's "How it was built" section.
 

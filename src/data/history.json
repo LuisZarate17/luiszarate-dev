@@ -127,6 +127,18 @@
       "date": "2026-11-15T18:42:14Z",
       "subject": "feat: polish and QA (phase 9) (#19)",
       "pr": 19
+    },
+    {
+      "sha": "f8f2e01",
+      "date": "2026-11-15T19:17:54Z",
+      "subject": "fix: review findings for phases 6-8 (#20)",
+      "pr": 20
+    },
+    {
+      "sha": "d99fc9c",
+      "date": "2026-11-16T04:19:58Z",
+      "subject": "feat: How it was built puts Luis first, models as tools (#21)",
+      "pr": 21
     }
   ],
   "prs": [
@@ -920,6 +932,91 @@
           "sha": "ca6d2e8",
           "date": "2026-11-14T23:30:03Z",
           "subject": "feat: polish and QA (phase 9)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "claude-review",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "title": "fix: review findings for phases 6-8",
+      "branch": "fix/review-phase-6-8",
+      "createdAt": "2026-11-14T23:48:57Z",
+      "mergedAt": "2026-11-15T19:17:55Z",
+      "mergeSha": "f8f2e01",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/20",
+      "additions": 221,
+      "deletions": 87,
+      "changedFiles": 11,
+      "commits": [
+        {
+          "sha": "ca6d2e8",
+          "date": "2026-11-14T23:30:03Z",
+          "subject": "feat: polish and QA (phase 9)"
+        },
+        {
+          "sha": "1b80604",
+          "date": "2026-11-14T23:48:54Z",
+          "subject": "fix: review findings for phases 6-8"
+        },
+        {
+          "sha": "0e78bb0",
+          "date": "2026-11-15T18:42:43Z",
+          "subject": "merge main after #19"
+        },
+        {
+          "sha": "7262fa0",
+          "date": "2026-11-15T18:48:22Z",
+          "subject": "chore: re-sync history after #19 merged; credit #19 and phase 9"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Lighthouse budget",
+          "conclusion": "success"
+        },
+        {
+          "name": "Lint, typecheck, build",
+          "conclusion": "success"
+        },
+        {
+          "name": "Playwright (desktop + phone)",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "title": "feat: How it was built puts Luis first, models as tools",
+      "branch": "feat/built-reframe",
+      "createdAt": "2026-11-16T03:37:56Z",
+      "mergedAt": "2026-11-16T04:19:59Z",
+      "mergeSha": "d99fc9c",
+      "url": "https://github.com/LuisZarate17/luiszarate-dev/pull/21",
+      "additions": 304,
+      "deletions": 248,
+      "changedFiles": 9,
+      "commits": [
+        {
+          "sha": "94d231e",
+          "date": "2026-11-16T03:37:52Z",
+          "subject": "feat: How it was built puts Luis first, models as tools"
         }
       ],
       "checks": [

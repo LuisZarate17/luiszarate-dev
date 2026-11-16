@@ -139,12 +139,12 @@ test.describe("how it was built, without JavaScript", () => {
     }
     const tools = s.locator(".tools");
     await expect(tools).toContainText("Built with Claude Code");
-    await expect(tools).toContainText("Luis set the brief");
+    await expect(tools).toContainText("I set the brief");
     await expect(tools.getByRole("link", { name: "build log" })).toHaveAttribute(
       "href",
       `${history.url}/blob/main/docs/BUILD-LOG.md`,
     );
-    await expect(s.locator(".built-intro")).toContainText("How Luis runs a project");
+    await expect(s.locator(".built-intro")).toContainText("How I run a project");
     await expect(s.locator(".built-asof")).toContainText(`${history.prs.length} pull requests`);
     // The whole section outside the script notes (ADR titles are quoted from DECISIONS.md):
     // four names in the tools line, plus titles and branch names as GitHub has them (#9's).

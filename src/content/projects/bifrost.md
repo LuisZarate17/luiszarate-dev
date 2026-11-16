@@ -17,7 +17,7 @@ world:
   secondaryLight: "#5A45B8"
 stack: [Rust, Tauri, React, TypeScript, Ollama]
 repo: https://github.com/LuisZarate17/bifrost
-role: "Solo project. Built the shared Rust engine and all three apps, the guards on model-written code, and the hidden-test benchmark that chose the coding model."
+role: "Solo project. I built the shared Rust engine and all three apps, the guards on model-written code, and the hidden-test benchmark that chose the coding model."
 note: "The model comparison run was stopped early; the repo's write-up says what that leaves unproven."
 metrics:
   - { value: "3", label: "apps on one local model: Vidar, Mimir and Hugin" }

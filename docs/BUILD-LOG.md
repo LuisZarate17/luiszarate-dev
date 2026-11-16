@@ -277,3 +277,32 @@ built, which model did the work, and why. Written as the work happens, not recon
   `src/data/build.ts` with their sources, and this log keeps the full account (ADR-008,
   amendment). A test fails if the section names a model more than four times outside the script
   notes and the pull requests' own titles and branch names.
+
+## 2026-11-15: Review fixes for phases 6 to 8 (Fable)
+
+- **The findings, fixed after Luis read them (#20).** Keyboard focus could land behind the
+  bottom bar; `scroll-padding-bottom` now keeps it in the frame, and a test tabs through every
+  scene to hold it. The history snapshot keeps only pull requests into `main`, a skipped check
+  is no longer counted as failed, a `#pr-N` link opens its card before the timeline script has
+  loaded, and the resume slot is found from the project root.
+
+## 2026-11-16: Final design pass and the guide (Fable)
+
+- **A review of everything, as a visitor.** Screenshots of every section at 1440 x 900,
+  1280 x 800, 1024 x 768 and Pixel 7, with and without reduced motion, read first as a
+  recruiter with a minute and then as an engineer. The page held up: hierarchy, the worlds,
+  the empty photo and resume slots and the 404 card needed nothing.
+- **One voice.** The page spoke in three: loglines said "I", two credit lines said "Luis", two
+  had no subject, and How it was built was in the third person. It is now Luis in the first
+  person throughout: the four credit lines, the lead and Tools paragraph of How it was built
+  ("How I run a project"), and the pull-request summaries. "Luis" stays only as a name. No fact
+  or number changed. The rule is in `docs/GUIDE.md`, section 3.
+- **Snag: the counter remembered the last scene.** Back on the hero after visiting Contact, the
+  bottom bar still read `06 / 06` with no scene marked. It returns to `01` now, with a test.
+- **Snag: an orphaned "DAYS".** On a phone the slug of How it was built wrapped between the
+  count and its unit. No-break spaces keep each count with its unit.
+- **The guide.** `docs/GUIDE.md`, "Extending this site": adding a project and a simulation, the
+  voice and what never to claim, the design habits the spec does not state, the pin rules, what
+  to test, and the launch checklist. It links to the spec, the ADRs and the plans and repeats
+  none of them. Fable's access ends today; this is its hand-off.
+- **Left for later, ranked, in the pull request.** Nothing large was changed here on purpose.

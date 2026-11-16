@@ -189,6 +189,7 @@ const name = (n: number, short: string, full = short) =>
   /** Tracks the current scene with an observer collapsed to the frame's midline (spec 5.5). */
   const links = [...document.querySelectorAll<HTMLAnchorElement>(".strip a")];
   const counter = document.getElementById("strip-counter-current");
+  const idleCount = counter?.textContent ?? "";
   const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
   const sections = [...document.querySelectorAll<HTMLElement>(SECTION_SELECTOR)];
 
@@ -198,8 +199,11 @@ const name = (n: number, short: string, full = short) =>
       if (a === current) a.setAttribute("aria-current", "true");
       else a.removeAttribute("aria-current");
     }
-    if (counter && current) {
-      counter.textContent = String(links.indexOf(current) + 1).padStart(2, "0");
+    // Back on the hero no scene is current: the counter returns to what the page rendered.
+    if (counter) {
+      counter.textContent = current
+        ? String(links.indexOf(current) + 1).padStart(2, "0")
+        : idleCount;
     }
   }
 

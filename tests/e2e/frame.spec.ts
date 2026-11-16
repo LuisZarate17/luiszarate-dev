@@ -114,6 +114,16 @@ test.describe("frame", () => {
     await expect(page.locator("#strip-counter-current")).toHaveText("06");
   });
 
+  test("back on the hero the counter returns to 01, not the last scene visited", async ({
+    page,
+  }) => {
+    await scrollToSectionMiddle(page, "contact");
+    await expect(page.locator("#strip-counter-current")).toHaveText("06");
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(strip(page).locator("[aria-current]")).toHaveCount(0);
+    await expect(page.locator("#strip-counter-current")).toHaveText("01");
+  });
+
   test("the home link cuts back to the top", async ({ page }) => {
     await scrollToSectionMiddle(page, "mastery-pilot");
     await page.locator("header .home:visible").click();

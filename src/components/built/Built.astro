@@ -30,7 +30,8 @@ const span = timeline.cols + 1;
 
 const number = "SC 05";
 const days = timeline.days.length;
-const location = `INT. GIT LOG — ${ordered.length} PULL REQUESTS, ${days} DAYS`;
+// No-break spaces keep each count with its unit when the slug wraps on a phone.
+const location = `INT. GIT LOG — ${ordered.length}\u00a0PULL REQUESTS, ${days}\u00a0DAYS`;
 const last = ordered.at(-1);
 
 const dayFormat = new Intl.DateTimeFormat("en-GB", {
@@ -98,15 +99,14 @@ const buildLog = `${history.url}/blob/main/docs/BUILD-LOG.md`;
       </div>
       <div class="built-intro">
         <p class="text-lead">
-          How Luis runs a project: a written spec before the code, a decision record for each
-          lasting choice, one branch and one pull request per change, and nothing merged until CI is
-          green.
+          How I run a project: a written spec before the code, a decision record for each lasting
+          choice, one branch and one pull request per change, and nothing merged until CI is green.
         </p>
         <p class="built-how text-small">
           CI runs on every pull request: formatting, lint, type check, unit tests, the build and a
           JavaScript budget, then Playwright at desktop and phone size and a Lighthouse budget.
           Independent features are built side by side on separate branches in git worktrees, and
-          code review findings go to Luis before any fix.
+          code review findings come to me before any fix.
         </p>
         <p class="built-asof text-small">
           {last && (
@@ -287,7 +287,7 @@ const buildLog = `${history.url}/blob/main/docs/BUILD-LOG.md`;
         <h3 class="font-display text-heading uppercase">Tools</h3>
         <p class="tools text-small">
           Built with Claude Code. Opus planned and coordinated, Sonnet implemented, and Fable did
-          design specs and reviews, then implementation too. Luis set the brief, made the decisions,
+          design specs and reviews, then implementation too. I set the brief, made the decisions,
           and reviewed and approved every pull request before it merged. The{" "}
           <a href={buildLog} rel="noopener noreferrer">
             build log
